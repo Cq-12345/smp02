@@ -53,4 +53,4 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/gnn/train_gnn.
 - GIN/GAT/MPNN 已完成 5 epoch smoke，见 `reports/gnn_architecture_smoke_leaderboard.md`。
 - MPNN 在 smoke 中最好，MAPEK test 为 11.0512%，MAE test 为 47.1922 C，但仍弱于 VAE-WVCM-GPR/NuSVR。
 - 下一步加入 global formulation features，如组分数、官能团统计、reaction principle 和 process condition template。
-- 与 VAE-WVCM ensemble：GNN disagreement 可作为 PiEvo 的 epistemic/OOD 信号。
+- VAE-WVCM model zoo ensemble disagreement 已先行落地，见 `reports/predictor_ensemble_disagreement.md`；GNN 后续应作为独立结构视角加入同一 disagreement/OOD 审计，而不是替代主代理模型。

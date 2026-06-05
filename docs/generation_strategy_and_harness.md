@@ -14,6 +14,7 @@ h = (m_1..m_n, r_1..r_n)
 
 - Harness 硬约束过滤。
 - VAE-WVCM / GNN / ensemble predictor 评估。
+- Predictor ensemble disagreement 标记 epistemic/OOD 风险。
 - PiEvo-faithful IDS 选择。
 - 真实或高保真实验结果回写。
 
@@ -254,7 +255,7 @@ PYTHONPATH=src python trail/harness/constraints.py \
 ## 5. 推荐闭环
 
 ```text
-知识库/RAG -> 生成候选 -> Harness -> predictor/uncertainty/OOD -> PiEvo IDS -> observation -> posterior/anomaly -> 新一轮生成
+知识库/RAG -> 生成候选 -> Harness -> predictor/ensemble disagreement/OOD -> PiEvo IDS -> observation -> posterior/anomaly -> 新一轮生成
 ```
 
 生成模型的价值应通过两个指标衡量：
@@ -268,4 +269,5 @@ PYTHONPATH=src python trail/harness/constraints.py \
 2. 将 LLM 生成继续限制在“提出 principle/官能团组合/候选模板”，SMILES 草案必须由 RDKit、预测模型和 Harness 再验证。
 3. 对 feedback-guided replacement 做更大候选池和真实/高保真 observation 版本的 PiEvo sweep，确认 surrogate posterior 规律是否能被物理证据保留。
 4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 和 feedback-aware LLM/RAG 侧都已完成 observation ledger -> PiEvo posterior 的 smoke 闭环。
-5. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。
+5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
+6. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。

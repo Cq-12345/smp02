@@ -1,0 +1,15 @@
+{
+  "candidate_rows": 10000,
+  "ensemble_models": 6,
+  "target_tg_c": 195.0,
+  "target_window_c": 5.0,
+  "mean_ensemble_std_c": 32.16103728846615,
+  "median_ensemble_std_c": 30.918520578260548,
+  "max_ensemble_std_c": 83.5055129324988,
+  "near_target_rows": 1045,
+  "near_target_low_disagreement_rows": 84,
+  "near_target_high_disagreement_rows": 526,
+  "mean_abs_best_model_delta_c": 30.374043040674035,
+  "consensus_std_c": 10.0,
+  "high_disagreement_std_c": 25.0
+}

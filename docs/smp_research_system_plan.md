@@ -71,6 +71,7 @@
 - 论文复现模型：CNN、SVR、RF。
 - 扩展 model zoo：MLP、GBR、KRR、LightGBM、XGBoost、CatBoost、NGBoost、ExtraTrees、GPR、KNN、PLS、ElasticNet 等。
 - GNN 草案：`trail/gnn/train_gnn.py`。
+- 集成分歧审计：`scripts/run_predictor_ensemble_disagreement.py` 会从同一 latent size 的强模型中计算候选级 ensemble mean/std/range，把 epistemic/OOD 风险写入 `artifacts/trail/predictors/ensemble_disagreement/`。
 
 关键指标：
 
@@ -86,6 +87,7 @@
 - 默认遵循论文 85/15 train/test split。
 - 模型选择应优先看 `MAPEK test`、`MAE test`、`RMSE test` 和 R2 的综合表现。
 - 任何用于 agent 的 predictor 都必须保存模型路径、latent size、训练特征路径和指标。
+- 单一最佳模型不能单独决定推荐顺序；当前 workflow 同时记录 target distance、Harness、PiEvo posterior 和 predictor ensemble disagreement。
 
 ## 4. 生成模型策略
 
@@ -111,7 +113,7 @@ Agent 分工：
 
 - Space Agent：确定目标 Tg、组分数量、ratio 范围、硬约束、候选来源。
 - Generator Agent：产生候选配方。
-- Predictor Agent：调用 VAE-WVCM predictor，给出 Tg mean/sigma/OOD。
+- Predictor Agent：调用 VAE-WVCM predictor、GNN 和 model zoo ensemble，给出 Tg mean/sigma、模型间分歧和 OOD 风险。
 - Principle Agent：维护 principle space，处理 anomaly，提出新 principle。
 - Experiment Agent：执行 surrogate 或真实实验观测。
 - Optimizer Agent：用 IDS 选择下一步最值得观测的候选。

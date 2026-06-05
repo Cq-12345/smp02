@@ -13,6 +13,7 @@
    - VAE 编码单体。
    - WVCM 生成配方向量。
    - model zoo / GNN / uncertainty / OOD 评估 Tg。
+   - predictor ensemble disagreement 标记单一模型和强模型集体判断的偏差。
    - 按可变 `target_tg_c` 和 target distance 排序。
    - Harness 检查 RDKit、比例、目标窗口和反应兼容性。
 4. 优化/改进假设：
@@ -85,12 +86,22 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_gener
   --pievo-output-dir artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke \
   --report reports/feedback_aware_llm_rag_pievo_feedback.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_predictor_ensemble_disagreement.py \
+  --candidates artifacts/reproduce/discovery/candidate_space_top_scored.csv \
+  --out-dir artifacts/trail/predictors/ensemble_disagreement \
+  --report reports/predictor_ensemble_disagreement.md \
+  --top-k 6 \
+  --target-tg-c 195 \
+  --target-window-c 5 \
+  --device cpu
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
   --feedback-aware-ledger artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv \
   --feedback-aware-observation-ledger artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv \
   --feedback-aware-pievo-summary artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json \
+  --ensemble-disagreement-summary artifacts/trail/predictors/ensemble_disagreement/ensemble_disagreement_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
 ```
 
@@ -121,5 +132,12 @@ LLM/RAG 反馈闭环已经补充：
 - 这 2 条 records 已通过 `scripts/import_generation_ledger_observations.py` 转成 surrogate observation ledger，并进入 195 C PiEvo-faithful 6 轮 smoke。
 - PiEvo 接收 2 条外部 observations、0 条拒绝；6 轮 selected 全部通过 target guard，最佳 selected distance 为 0.0055 C，MAP principle 为 `reaction_a5dd26ae10ad`。
 - 当前运行使用 `offline_policy` provider 保持可复现；外部 LLM 只替换候选 JSON 生成步骤，不改变 ledger/Harness/PiEvo 审计链。
+
+Predictor ensemble disagreement 已补充：
+
+- 当前使用 6 个 VAE(512)-WVCM 强模型作为 ensemble 成员，覆盖 GPR、NuSVR、XGBoost、ExtraTrees 和 sklearn GradientBoosting。
+- 10000 条候选中，按 ensemble mean 计算 195±5 C 近目标候选共有 1045 条；其中低分歧 84 条，高分歧 526 条。
+- `ensemble_std_tg_c` 不是物理不确定性，而是模型间分歧；低分歧近目标候选适合优先进入人工审核，高分歧近目标候选应作为 OOD/epistemic 风险标记。
+- Workflow summary 已读取 `ensemble_disagreement_summary.json`，让 predictor agent 的 OOD 信号进入总览，而不是停留在单独报告。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。
