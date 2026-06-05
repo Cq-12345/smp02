@@ -273,6 +273,24 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    process_design_suggestion = tmp_path / "process_design_suggestion.json"
+    process_design_suggestion.write_text(
+        json.dumps(
+            {
+                "suggestion_rows": 12,
+                "high_tg_rows": 8,
+                "high_sigma_rows": 5,
+                "can_unlock_observation_after_human_approval_rows": 12,
+                "suggested_process_record_pass_rows": 12,
+                "suggested_process_fields_complete_rows": 12,
+                "suggested_ready_for_active_ledger_rows": 0,
+                "process_template_counts": {"epoxy_amine_thermal_cure": 5},
+                "suggested_field_frequency": {"catalyst_loading": 4},
+                "evidence_level": "knowledge_template_suggestion_not_observation",
+            }
+        ),
+        encoding="utf-8",
+    )
     validation_result_intake = tmp_path / "validation_result_intake.json"
     validation_result_intake.write_text(
         json.dumps(
@@ -439,6 +457,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         validation_requests,
         validation_execution,
         process_completion_packet,
+        process_design_suggestion,
         validation_result_intake,
         active_observations,
         active_evidence_pievo_bridge,
@@ -545,6 +564,16 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["process_completion_packet_incomplete_rows"] == 12
     assert result["process_completion_packet_target_counts"]["250.0"] == 8
     assert result["process_completion_packet_required_field_frequency"]["cure_temperature_c"] == 12
+    assert result["process_design_suggestion_rows"] == 12
+    assert result["process_design_suggestion_high_tg_rows"] == 8
+    assert result["process_design_suggestion_high_sigma_rows"] == 5
+    assert result["process_design_suggestion_can_unlock_after_human_approval_rows"] == 12
+    assert result["process_design_suggestion_record_pass_rows"] == 12
+    assert result["process_design_suggestion_fields_complete_rows"] == 12
+    assert result["process_design_suggestion_ready_for_active_ledger_rows"] == 0
+    assert result["process_design_suggestion_template_counts"]["epoxy_amine_thermal_cure"] == 5
+    assert result["process_design_suggestion_suggested_field_frequency"]["catalyst_loading"] == 4
+    assert result["process_design_suggestion_evidence_level"] == "knowledge_template_suggestion_not_observation"
     assert result["validation_result_template_rows"] == 25
     assert result["validation_result_rows"] == 0
     assert result["validation_result_accepted_rows"] == 0

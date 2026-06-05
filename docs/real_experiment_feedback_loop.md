@@ -155,6 +155,22 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_proces
 - `process_completion_packet_summary.json`
 - `reports/process_completion_packet.md`
 
+Process design suggestion packet：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_process_design_suggestion_packet.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/process_design_suggestion_packet.md
+```
+
+输出：
+
+- `process_design_suggestion_packet.csv`
+- `process_design_suggested_process_records.csv`
+- `process_design_suggested_process_record_ledger.csv`
+- `process_design_suggestion_summary.json`
+- `reports/process_design_suggestion_packet.md`
+
 ## 5. 与 PiEvo 的连接
 
 当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
@@ -255,6 +271,14 @@ Smoke 结果：
 - 当前 packet 有 12 行，全部匹配已有 draft process record；目标分布仍为 250 C 8 个、195 C 4 个。
 - 必填字段频次最高的是 `cure_temperature_c` 和 `post_cure_temperature_c`，各 10 次；其次是 `mix_temperature_c`、`cure_time_h`、`post_cure_time_h`，各 6 次。
 - 当前 12 行基础 process record 格式通过，但 `ready_for_active_ledger_rows=0`；因为字段尚未人工填写，且 review status 仍不是 `approved_for_active_ledger`。
+
+当前 process design suggestion packet：
+
+- `scripts/build_process_design_suggestion_packet.py` 会读取 process completion packet 和知识库 `process_condition_templates`，给每个 immediate process completion task 生成工艺建议字段。
+- 当前 12 条建议中，8 条是 250 C 高 Tg 工艺窗口，5 条 predictor sigma 不低于 75 C，需要高保真或人工重点复核。
+- 建议覆盖 5 条环氧-胺热固化、4 条环氧-酸酐催化固化、2 条酸酐-胺酰亚胺化、1 条马来酰亚胺加成/共聚。
+- 12 条 suggested process records 都通过基础格式检查，且模板字段均可由建议补全；但它们仍只是 `knowledge_template_suggestion_not_observation`，全部保持 `review_status=needs_human_review`，`ready_for_active_ledger_rows=0`。
+- 这一步的作用是让人工补工艺不再从空白字段开始；它不能替代真实实验、文献复现或高保真模拟，也不能单独解锁 PiEvo high-authority posterior。
 
 当前 validation result intake：
 

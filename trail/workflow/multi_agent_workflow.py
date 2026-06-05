@@ -57,6 +57,7 @@ def summarize(
     validation_request_summary: Path = Path("artifacts/trail/human_review/validation_request_summary.json"),
     validation_execution_schedule_summary: Path = Path("artifacts/trail/human_review/validation_execution_schedule_summary.json"),
     process_completion_packet_summary: Path = Path("artifacts/trail/human_review/process_completion_packet_summary.json"),
+    process_design_suggestion_summary: Path = Path("artifacts/trail/human_review/process_design_suggestion_summary.json"),
     validation_result_intake_summary: Path = Path("artifacts/trail/human_review/validation_result_intake_summary.json"),
     active_observation_summary: Path = Path("artifacts/trail/human_review/active_high_authority_observation_summary.json"),
     active_evidence_pievo_bridge_summary: Path = Path(
@@ -84,6 +85,7 @@ def summarize(
     validation_requests = read_json(validation_request_summary, {})
     validation_execution = read_json(validation_execution_schedule_summary, {})
     process_completion_packet = read_json(process_completion_packet_summary, {})
+    process_design_suggestion = read_json(process_design_suggestion_summary, {})
     validation_result_intake = read_json(validation_result_intake_summary, {})
     active_observations = read_json(active_observation_summary, {})
     active_evidence_pievo_bridge = read_json(active_evidence_pievo_bridge_summary, {})
@@ -257,6 +259,28 @@ def summarize(
         "process_completion_packet_incomplete_rows": process_completion_packet.get("process_incomplete_rows", 0),
         "process_completion_packet_target_counts": process_completion_packet.get("target_counts", {}),
         "process_completion_packet_required_field_frequency": process_completion_packet.get("required_field_frequency", {}),
+        "process_design_suggestion_rows": process_design_suggestion.get("suggestion_rows", 0),
+        "process_design_suggestion_high_tg_rows": process_design_suggestion.get("high_tg_rows", 0),
+        "process_design_suggestion_high_sigma_rows": process_design_suggestion.get("high_sigma_rows", 0),
+        "process_design_suggestion_can_unlock_after_human_approval_rows": process_design_suggestion.get(
+            "can_unlock_observation_after_human_approval_rows",
+            0,
+        ),
+        "process_design_suggestion_record_pass_rows": process_design_suggestion.get(
+            "suggested_process_record_pass_rows",
+            0,
+        ),
+        "process_design_suggestion_fields_complete_rows": process_design_suggestion.get(
+            "suggested_process_fields_complete_rows",
+            0,
+        ),
+        "process_design_suggestion_ready_for_active_ledger_rows": process_design_suggestion.get(
+            "suggested_ready_for_active_ledger_rows",
+            0,
+        ),
+        "process_design_suggestion_template_counts": process_design_suggestion.get("process_template_counts", {}),
+        "process_design_suggestion_suggested_field_frequency": process_design_suggestion.get("suggested_field_frequency", {}),
+        "process_design_suggestion_evidence_level": process_design_suggestion.get("evidence_level", ""),
         "validation_result_template_rows": validation_result_intake.get("template_rows", 0),
         "validation_result_rows": validation_result_intake.get("result_rows", 0),
         "validation_result_accepted_rows": validation_result_intake.get("accepted_result_rows", 0),
@@ -360,6 +384,10 @@ def main() -> None:
         default="artifacts/trail/human_review/process_completion_packet_summary.json",
     )
     parser.add_argument(
+        "--process-design-suggestion-summary",
+        default="artifacts/trail/human_review/process_design_suggestion_summary.json",
+    )
+    parser.add_argument(
         "--validation-result-intake-summary",
         default="artifacts/trail/human_review/validation_result_intake_summary.json",
     )
@@ -417,6 +445,7 @@ def main() -> None:
         Path(args.validation_request_summary),
         Path(args.validation_execution_schedule_summary),
         Path(args.process_completion_packet_summary),
+        Path(args.process_design_suggestion_summary),
         Path(args.validation_result_intake_summary),
         Path(args.active_observation_summary),
         Path(args.active_evidence_pievo_bridge_summary),

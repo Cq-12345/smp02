@@ -1,0 +1,51 @@
+{
+  "input_packet_rows": 12,
+  "suggestion_rows": 12,
+  "target_counts": {
+    "195.0": 4,
+    "250.0": 8
+  },
+  "process_template_counts": {
+    "epoxy_amine_thermal_cure": 5,
+    "epoxy_anhydride_catalyzed_cure": 4,
+    "anhydride_amine_imidization": 2,
+    "maleimide_addition_or_copolymerization": 1
+  },
+  "candidate_origin_counts": {
+    "sparse_target_replacement_250": 8,
+    "pievo_latent_local_search_selected": 3,
+    "vae_latent_local_search": 1
+  },
+  "required_field_frequency": {
+    "catalyst_loading": 3,
+    "cure_temperature_c": 10,
+    "post_cure_temperature_c": 10,
+    "mix_temperature_c": 6,
+    "cure_time_h": 6,
+    "post_cure_time_h": 6,
+    "solvent": 2,
+    "imidization_temperature_c": 2,
+    "imidization_time_h": 2,
+    "co_reactant_stoichiometry": 1
+  },
+  "suggested_field_frequency": {
+    "catalyst_loading": 4,
+    "cure_temperature_c": 10,
+    "post_cure_temperature_c": 10,
+    "mix_temperature_c": 6,
+    "cure_time_h": 6,
+    "post_cure_time_h": 6,
+    "solvent": 2,
+    "imidization_temperature_c": 2,
+    "imidization_time_h": 2,
+    "co_reactant_stoichiometry": 1
+  },
+  "high_tg_rows": 8,
+  "high_sigma_rows": 5,
+  "human_review_required_rows": 12,
+  "can_unlock_observation_after_human_approval_rows": 12,
+  "suggested_process_record_pass_rows": 12,
+  "suggested_process_fields_complete_rows": 12,
+  "suggested_ready_for_active_ledger_rows": 0,
+  "evidence_level": "knowledge_template_suggestion_not_observation"
+}
