@@ -8,6 +8,7 @@ numpy
 openpyxl
 pandas
 python-docx
+pytest
 pyyaml
 rdkit
 scikit-learn

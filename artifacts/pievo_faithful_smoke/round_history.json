@@ -1,0 +1,50 @@
+[
+  {
+    "round": 1,
+    "generated_candidates": 220,
+    "selection_method": "warmup_max_variance",
+    "selected_predicted_tg_mean_c": 267.68781986947863,
+    "selected_target_distance_c": 17.68781986947863,
+    "selected_reward": 0.02908409046006517,
+    "anomaly_count": 0,
+    "added_principles": [],
+    "posterior_entropy": 3.663561646129646,
+    "map_principle": "aromatic_backbones_raise_tg"
+  },
+  {
+    "round": 2,
+    "generated_candidates": 220,
+    "selection_method": "warmup_max_variance",
+    "selected_predicted_tg_mean_c": 156.51145153300706,
+    "selected_target_distance_c": 93.48854846699294,
+    "selected_reward": 7.580325521702602e-09,
+    "anomaly_count": 0,
+    "added_principles": [],
+    "posterior_entropy": 3.663561646129646,
+    "map_principle": "aromatic_backbones_raise_tg"
+  },
+  {
+    "round": 3,
+    "generated_candidates": 220,
+    "selection_method": "ids_min_regret2_over_information",
+    "selected_predicted_tg_mean_c": 230.5070110073702,
+    "selected_target_distance_c": 19.49298899262979,
+    "selected_reward": 0.020270314592684555,
+    "anomaly_count": 0,
+    "added_principles": [],
+    "posterior_entropy": 3.663561646129646,
+    "map_principle": "aromatic_backbones_raise_tg"
+  },
+  {
+    "round": 4,
+    "generated_candidates": 220,
+    "selection_method": "ids_min_regret2_over_information",
+    "selected_predicted_tg_mean_c": 266.8937577321374,
+    "selected_target_distance_c": 16.893757732137374,
+    "selected_reward": 0.03408998794594349,
+    "anomaly_count": 0,
+    "added_principles": [],
+    "posterior_entropy": 3.6635563947386744,
+    "map_principle": "aromatic_backbones_raise_tg"
+  }
+]

@@ -63,11 +63,17 @@ These priors start with finite confidence, then evolve from the agent's in-silic
 
 ## Objective
 
-For the 250 C task, the agent ranks candidates by:
+For a target Tg task, the target is supplied by configuration:
+
+```text
+T_target = agent_discovery.target_tg_c
+```
+
+The 250 C run is only one configured instance. The ranking objective is:
 
 ```text
 score(h) =
-  |mu_Tg(h) - 250|
+  |mu_Tg(h) - T_target|
   + lambda_sigma * sigma_Tg(h)
   + lambda_ood * d_ood(h)
   + lambda_n * max(0, n - 2)
@@ -79,13 +85,25 @@ Lower score is better. The selected report also shows the direct target distance
 
 ## PiEvo Mapping
 
-PiEvo's core idea is to move from a fixed-prior hypothesis search to optimization over an evolving principle space. In this SMP agent:
+PiEvo's core idea is to move from a fixed-prior hypothesis search to optimization over an evolving principle space. In the original `agent_discovery` mode:
 
 - Hypotheses are formulations `h`.
 - Principles are soft priors over structural motifs, reaction families, novelty, OOD, and component-count behavior.
 - The experiment surrogate is the current VAE-WVCM-GPR Tg predictor.
 - The observation is `(h, Tg_hat, sigma, hard_validity, feature vector)`.
-- High-surprisal candidates are close-to-target candidates with low prior support or high OOD/uncertainty.
+- "Anomalies" are engineering heuristics: close-to-target candidates with low prior support or high OOD/uncertainty.
 - Principle augmentation can add or refine beliefs, for example that a specific out-of-library source pattern or `n>=3` blending pattern is useful for hitting the target.
 
 Because the current loop observes only model predictions, principle updates are in-silico beliefs. Real DSC/synthesis results should override them when available.
+
+This mode is useful for large-scale candidate triage, but it is not a faithful implementation of PiEvo's mathematical loop. The faithful version is implemented separately as `pievo_faithful`, whose state uses:
+
+```text
+p_t(P) proportional p0(P) * product_s p(y_s | h_s, P)
+
+S_s = 1 - exp(-sqrt((y_s - mu_MAP(h_s))^2 / (sigma_MAP^2(h_s) + sigma_obs^2)))
+
+h_t = argmin_h Delta_t(h)^2 / (I_t(h) + eps)
+```
+
+See `docs/pievo_faithful_smp.md` and `src/smp02/pievo_faithful.py`.

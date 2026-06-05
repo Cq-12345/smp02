@@ -11,6 +11,7 @@ from smp02.agent_discovery import run_agent_discovery
 from smp02.data import augment_smiles, filter_smiles_by_charset, iter_chembl_smiles, load_smp_records, records_to_frame, unique_monomers
 from smp02.discovery import discover_candidates
 from smp02.functional_groups import classify_many
+from smp02.pievo_faithful import run_pievo_faithful
 from smp02.predictors import select_best_model, train_predictor_suite
 from smp02.training import fine_tune_vae_decoder, train_vae_model
 from smp02.utils import ensure_dir, load_config, load_json, resolve_device, save_json, set_seed
@@ -189,6 +190,19 @@ def agent_discover(cfg: dict) -> None:
         )
 
 
+def pievo_faithful(cfg: dict) -> None:
+    device = resolve_device(cfg.get("device", "cuda"))
+    selected = run_pievo_faithful(cfg, device)
+    if not selected.empty:
+        best = selected.sort_values("target_distance_c").iloc[0]
+        print(
+            f"Best PiEvo-faithful observation: Tg={float(best['predicted_tg_mean_c']):.2f} C, "
+            f"distance={float(best['target_distance_c']):.2f} C, "
+            f"reward={float(best['environment_reward']):.4f}",
+            flush=True,
+        )
+
+
 def run_all(cfg: dict, force: bool = False) -> None:
     inspect_data(cfg)
     train_vae(cfg, force=force)
@@ -199,7 +213,19 @@ def run_all(cfg: dict, force: bool = False) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="SMP02 paper reproduction workflow")
-    parser.add_argument("command", choices=["inspect-data", "train-vae", "train-predictors", "discover", "closed-loop", "agent-discover", "run-all"])
+    parser.add_argument(
+        "command",
+        choices=[
+            "inspect-data",
+            "train-vae",
+            "train-predictors",
+            "discover",
+            "closed-loop",
+            "agent-discover",
+            "pievo-faithful",
+            "run-all",
+        ],
+    )
     parser.add_argument("--config", default="configs/reproduce.yaml")
     parser.add_argument("--force", action="store_true", help="overwrite existing VAE checkpoints")
     args = parser.parse_args()
@@ -217,6 +243,8 @@ def main() -> None:
         closed_loop(cfg)
     elif args.command == "agent-discover":
         agent_discover(cfg)
+    elif args.command == "pievo-faithful":
+        pievo_faithful(cfg)
     elif args.command == "run-all":
         run_all(cfg, force=args.force)
 
