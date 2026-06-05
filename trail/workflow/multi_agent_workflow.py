@@ -179,6 +179,22 @@ def summarize(
         ),
         "target_conditioned_strategy_policy_sparse_targets": target_conditioned_strategy_policy.get("sparse_targets", []),
         "target_conditioned_strategy_policy_sparse_target_count": target_conditioned_strategy_policy.get("sparse_target_count", 0),
+        "target_conditioned_strategy_policy_high_authority_evidence_status": target_conditioned_strategy_policy.get(
+            "target_high_authority_evidence_status",
+            "",
+        ),
+        "target_conditioned_strategy_policy_high_authority_budget_mode": target_conditioned_strategy_policy.get(
+            "target_high_authority_budget_mode",
+            "",
+        ),
+        "target_conditioned_strategy_policy_high_authority_rows_by_target": target_conditioned_strategy_policy.get(
+            "target_high_authority_rows_by_target",
+            {},
+        ),
+        "target_conditioned_strategy_policy_active_evidence_updates_pievo_posterior": target_conditioned_strategy_policy.get(
+            "active_evidence_updates_pievo_posterior",
+            False,
+        ),
         "sparse_target_replacement_expansion_targets": int(len(sparse_rows)),
         "sparse_target_replacement_expansion_target_values": [row.get("target_tg_c") for row in sparse_rows],
         "sparse_target_replacement_expansion_source_candidate_rows": int(sum(row.get("source_candidate_rows", 0) for row in sparse_rows)),

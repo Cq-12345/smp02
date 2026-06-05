@@ -29,15 +29,34 @@
 | transfer_budget_by_target | {'190.0': 23, '195.0': 25, '200.0': 23, '250.0': 13} |
 | sparse_targets | [] |
 | sparse_target_count | 0 |
+| target_high_authority_evidence_status | awaiting_target_high_authority_evidence |
+| target_high_authority_budget_mode | target_surrogate_backed_allocation |
+| target_high_authority_next_action | execute target-specific validation requests before changing target-conditioned budgets with high-authority evidence. |
+| target_high_authority_active_targets | [] |
+| target_high_authority_rows_by_target | {'190.0': 0, '195.0': 0, '200.0': 0, '250.0': 0} |
+| target_high_authority_authority_weight_by_target | {'190.0': 0.0, '195.0': 0.0, '200.0': 0.0, '250.0': 0.0} |
+| active_evidence_bridge_status | no_active_evidence_noop |
+| active_evidence_updates_pievo_posterior | False |
+
+## Target High-authority Evidence Gate
+
+- Status: `awaiting_target_high_authority_evidence`
+- Budget mode: `target_surrogate_backed_allocation`
+- Active target rows: `{'190.0': 0, '195.0': 0, '200.0': 0, '250.0': 0}`
+- Active evidence bridge status: `no_active_evidence_noop`
+- Active evidence updates PiEvo posterior: `False`
+- Next action: execute target-specific validation requests before changing target-conditioned budgets with high-authority evidence.
+
+当前 target-conditioned allocation 仍由 target sweep 和 global-transfer surrogate evidence 计算；高权重 evidence 进入 PiEvo posterior 后，应先按目标比较 posterior shift，再调整每个 Tg 的预算。
 
 ## Target Summary
 
-| target Tg C | target-specific budget | transferable budget | target successes | top strategy | top target-specific strategy | sparse |
-| ---: | ---: | ---: | ---: | --- | --- | --- |
-| 190.0 | 77 | 23 | 51 | vae_latent_local_search | vae_latent_local_search | False |
-| 195.0 | 75 | 25 | 53 | vae_latent_local_search | vae_latent_local_search | False |
-| 200.0 | 77 | 23 | 52 | vae_latent_local_search | vae_latent_local_search | False |
-| 250.0 | 87 | 13 | 47 | functional_group_replacement | functional_group_replacement | False |
+| target Tg C | target-specific budget | transferable budget | target successes | active high-authority rows | active authority weight | top strategy | top target-specific strategy | sparse |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |
+| 190.0 | 77 | 23 | 51 | 0 | 0.0 | vae_latent_local_search | vae_latent_local_search | False |
+| 195.0 | 75 | 25 | 53 | 0 | 0.0 | vae_latent_local_search | vae_latent_local_search | False |
+| 200.0 | 77 | 23 | 52 | 0 | 0.0 | vae_latent_local_search | vae_latent_local_search | False |
+| 250.0 | 87 | 13 | 47 | 0 | 0.0 | functional_group_replacement | functional_group_replacement | False |
 
 ## Policy
 

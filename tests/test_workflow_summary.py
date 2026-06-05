@@ -150,6 +150,10 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
                 },
                 "sparse_targets": [],
                 "sparse_target_count": 0,
+                "target_high_authority_evidence_status": "awaiting_target_high_authority_evidence",
+                "target_high_authority_budget_mode": "target_surrogate_backed_allocation",
+                "target_high_authority_rows_by_target": {"190.0": 0, "195.0": 0, "200.0": 0, "250.0": 0},
+                "active_evidence_updates_pievo_posterior": False,
             }
         ),
         encoding="utf-8",
@@ -451,6 +455,10 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["target_conditioned_strategy_policy_top_target_specific_strategy_by_target"]["190.0"] == "vae_latent_local_search"
     assert result["target_conditioned_strategy_policy_transfer_budget_by_target"]["250.0"] == 13
     assert result["target_conditioned_strategy_policy_sparse_target_count"] == 0
+    assert result["target_conditioned_strategy_policy_high_authority_evidence_status"] == "awaiting_target_high_authority_evidence"
+    assert result["target_conditioned_strategy_policy_high_authority_budget_mode"] == "target_surrogate_backed_allocation"
+    assert result["target_conditioned_strategy_policy_high_authority_rows_by_target"]["250.0"] == 0
+    assert result["target_conditioned_strategy_policy_active_evidence_updates_pievo_posterior"] is False
     assert result["sparse_target_replacement_expansion_targets"] == 1
     assert result["sparse_target_replacement_expansion_target_values"] == [250.0]
     assert result["sparse_target_replacement_expansion_harness_pass"] == 42

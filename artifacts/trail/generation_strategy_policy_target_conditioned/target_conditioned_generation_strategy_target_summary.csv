@@ -1,5 +1,5 @@
-target_tg_c,total_budget,target_specific_budget,transfer_budget,allocation_sum,target_specific_successes,target_specific_observations,top_strategy,top_target_specific_strategy,top_target_specific_map_principle,transfer_decay_weight,is_sparse_target
-190.0,100,77,23,100,51,51,vae_latent_local_search,vae_latent_local_search,maleimide_rigid_network,0.9394130628134758,False
-195.0,100,75,25,100,53,53,vae_latent_local_search,vae_latent_local_search,reaction_839cd29ef5d7,1.0,False
-200.0,100,77,23,100,52,52,vae_latent_local_search,vae_latent_local_search,sulfone_diamine_rigidity,0.9394130628134758,False
-250.0,100,87,13,100,47,47,functional_group_replacement,functional_group_replacement,reaction_cc7f1a60f1af,0.5028315779709409,False
+target_tg_c,total_budget,target_specific_budget,transfer_budget,allocation_sum,target_specific_successes,target_specific_observations,top_strategy,top_target_specific_strategy,top_target_specific_map_principle,transfer_decay_weight,is_sparse_target,active_high_authority_rows,active_high_authority_authority_weight_sum,active_high_authority_mean_target_distance_c,active_high_authority_source_counts
+190.0,100,77,23,100,51,51,vae_latent_local_search,vae_latent_local_search,maleimide_rigid_network,0.9394130628134758,False,0,0.0,,{}
+195.0,100,75,25,100,53,53,vae_latent_local_search,vae_latent_local_search,reaction_839cd29ef5d7,1.0,False,0,0.0,,{}
+200.0,100,77,23,100,52,52,vae_latent_local_search,vae_latent_local_search,sulfone_diamine_rigidity,0.9394130628134758,False,0,0.0,,{}
+250.0,100,87,13,100,47,47,functional_group_replacement,functional_group_replacement,reaction_cc7f1a60f1af,0.5028315779709409,False,0,0.0,,{}

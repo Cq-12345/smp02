@@ -458,6 +458,8 @@ transfer_budget(T) = base_transfer_budget * exp(-abs(T - 195) / transfer_decay)
 - 250 C 的 target-specific top strategy 变成 `functional_group_replacement`；原因是 250 C 下 VAE latent 只有 5 条 pass、best selected distance 为 0.511 C，而 sparse target replacement expansion 已得到 42 条 pass、best eval distance 0.034 C、best selected distance 0.099 C。
 - 195 C 可迁移 budget 为 25/100；190/200 C 衰减到 23/100；250 C 衰减到 13/100。
 - 250 C 曾被标记为 sparse target；本轮 source-pool expansion 后 `sparse_targets=[]`。后续仍应优先做真实/高保真 validation 和更多 high-Tg principle 探索，而不是把 surrogate pass 当作物理真值。
+- target-conditioned summary 现在也读取 active high-authority evidence；当前 `target_high_authority_evidence_status=awaiting_target_high_authority_evidence`、`target_high_authority_budget_mode=target_surrogate_backed_allocation`，190/195/200/250 C 的 active high-authority rows 都为 0。
+- 因此每个目标 Tg 的 allocation 仍由 target sweep 和 global-transfer surrogate evidence 计算；真实/高保真 evidence 进入 PiEvo posterior 后，应先按目标比较 posterior shift，再调整预算。
 
 ## 6. 近期优先级
 
@@ -469,4 +471,4 @@ transfer_budget(T) = base_transfer_budget * exp(-abs(T - 195) / transfer_decay)
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
 7. SFT dry-run、SFT trained projection、diffusion/flow dry-run 和轻量条件 flow-matching 训练 smoke 都已跑通；下一步应做真实 LLM/SFT fine-tune 输出对比、改进 flow 训练/投影质量，或加入有效 SMILES decoder。任何训练输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。
 8. 250 C sparse target source-pool expansion 已跑通，并已进入 `pre_experiment_validation_plan`、`validation_request_queue`、`validation_result_intake_template`、active evidence gate 和 PiEvo bridge：13 条 250 C 候选产生 26 个 request，其中 13 个补工艺、13 个高保真验证。下一步是真实执行这些 request；只有填写结果、工艺 ready、人工批准、observation ledger pass，且来源为高保真/真实/文献，才会进入 active high-authority evidence ledger 并通过 bridge 更新 PiEvo posterior。
-9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但当前是 `surrogate_backed_allocation`；每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。
+9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv` 和 `target_conditioned_generation_strategy_policy.csv`，但当前二者分别是 `surrogate_backed_allocation` 与 `target_surrogate_backed_allocation`；每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。

@@ -404,7 +404,8 @@ Target-conditioned generation strategy policy 已补充：
 - 250 C 曾被标记为 sparse target；`scripts/run_sparse_target_replacement_expansion.py` 已从全量 ratio candidates 中重新选择 40 条 250 C source candidates，生成 320 条 strict replacement proposals，其中 42 条通过 Harness，best eval distance 为 0.034 C。
 - 这 42 条 surrogate observations 进入 PiEvo 后，6 轮 selected 全部通过 target guard；best selected distance 为 0.099 C，MAP principle 为 `reaction_cc7f1a60f1af`。
 - sparse expansion 通过项已写回 `artifacts/trail/generation/sparse_target_replacement_records/target_250/generation_record_ledger.csv`，并纳入 SFT/diffusion-flow 训练语料；目标条件化 policy 重算后 `sparse_targets=[]`。
-- Workflow summary 已读取 `target_conditioned_generation_strategy_summary.json` 和 `sparse_target_replacement_expansion_summary.json`，记录每个目标的 top strategy、transfer budget、sparse target 和 250 C expansion 结果。
+- target-conditioned policy 也已读取 active high-authority evidence；当前 `target_high_authority_evidence_status=awaiting_target_high_authority_evidence`，每个目标 Tg 的 active high-authority rows 都是 0，因此 budget mode 仍为 `target_surrogate_backed_allocation`。
+- Workflow summary 已读取 `target_conditioned_generation_strategy_summary.json` 和 `sparse_target_replacement_expansion_summary.json`，记录每个目标的 top strategy、transfer budget、sparse target、high-authority rows 和 250 C expansion 结果。
 
 Human experiment review queue 已补充：
 

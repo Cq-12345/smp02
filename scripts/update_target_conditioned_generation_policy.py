@@ -38,6 +38,17 @@ def read_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path) if path.exists() else pd.DataFrame()
 
 
+def truthy(value: Any) -> bool:
+    try:
+        if pd.isna(value):
+            return False
+    except (TypeError, ValueError):
+        pass
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y", "pass", "passed"}
+    return bool(value)
+
+
 def bounded(value: float, lo: float = 0.0, hi: float = 1.0) -> float:
     return max(lo, min(hi, float(value)))
 
@@ -76,6 +87,79 @@ def coalesce_float(*values: Any) -> float | None:
             continue
         return float(value)
     return None
+
+
+def active_high_authority_by_target(active_ledger: pd.DataFrame) -> dict[float, dict[str, Any]]:
+    if active_ledger.empty or "target_tg_c" not in active_ledger.columns:
+        return {}
+    frame = active_ledger.copy()
+    frame["target_tg_c"] = pd.to_numeric(frame["target_tg_c"], errors="coerce")
+    frame = frame.dropna(subset=["target_tg_c"])
+    if "active_evidence" in frame.columns:
+        frame = frame[frame["active_evidence"].map(truthy)].copy()
+    if "source_type" in frame.columns:
+        frame = frame[frame["source_type"].fillna("").astype(str).isin({"high_fidelity_simulation", "real_dsc", "literature"})].copy()
+    if frame.empty:
+        return {}
+    if "authority_weight" not in frame.columns:
+        frame["authority_weight"] = 0.0
+    if "target_distance_c" not in frame.columns:
+        frame["target_distance_c"] = np.nan
+    by_target: dict[float, dict[str, Any]] = {}
+    for target, group in frame.groupby("target_tg_c"):
+        source_counts = group["source_type"].value_counts().to_dict() if "source_type" in group.columns else {}
+        by_target[float(target)] = {
+            "active_high_authority_rows": int(len(group)),
+            "active_high_authority_authority_weight_sum": float(pd.to_numeric(group["authority_weight"], errors="coerce").fillna(0).sum()),
+            "active_high_authority_mean_target_distance_c": (
+                float(pd.to_numeric(group["target_distance_c"], errors="coerce").mean())
+                if len(pd.to_numeric(group["target_distance_c"], errors="coerce").dropna())
+                else None
+            ),
+            "active_high_authority_source_counts": {str(key): int(value) for key, value in source_counts.items()},
+        }
+    return by_target
+
+
+def target_high_authority_summary(
+    targets: list[float],
+    active_by_target: dict[float, dict[str, Any]],
+    active_evidence_bridge_summary: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    active_evidence_bridge_summary = active_evidence_bridge_summary or {}
+    rows_by_target = {
+        f"{float(target):.1f}": int(active_by_target.get(float(target), {}).get("active_high_authority_rows", 0))
+        for target in targets
+    }
+    weight_by_target = {
+        f"{float(target):.1f}": float(active_by_target.get(float(target), {}).get("active_high_authority_authority_weight_sum", 0.0))
+        for target in targets
+    }
+    active_targets = [target for target, rows in rows_by_target.items() if rows > 0]
+    bridge_updates = bool(active_evidence_bridge_summary.get("active_evidence_updates_posterior", False))
+    bridge_status = str(active_evidence_bridge_summary.get("bridge_status", "missing_active_evidence_bridge_summary"))
+    if active_targets and bridge_updates:
+        status = "target_high_authority_posterior_active"
+        budget_mode = "target_surrogate_backed_allocation_with_high_authority_audit_ready"
+        next_action = "compare target-wise high-authority posterior shifts before changing target-conditioned budgets."
+    elif active_targets:
+        status = "target_high_authority_evidence_not_in_posterior"
+        budget_mode = "target_surrogate_backed_allocation_with_high_authority_audit"
+        next_action = "audit active evidence bridge because target high-authority rows exist but did not update posterior."
+    else:
+        status = "awaiting_target_high_authority_evidence"
+        budget_mode = "target_surrogate_backed_allocation"
+        next_action = "execute target-specific validation requests before changing target-conditioned budgets with high-authority evidence."
+    return {
+        "target_high_authority_evidence_status": status,
+        "target_high_authority_budget_mode": budget_mode,
+        "target_high_authority_next_action": next_action,
+        "target_high_authority_active_targets": active_targets,
+        "target_high_authority_rows_by_target": rows_by_target,
+        "target_high_authority_authority_weight_by_target": weight_by_target,
+        "active_evidence_bridge_status": bridge_status,
+        "active_evidence_updates_pievo_posterior": bridge_updates,
+    }
 
 
 def target_sweep_arm(strategy: str, target_tg_c: float, row: dict[str, Any]) -> dict[str, Any]:
@@ -328,6 +412,8 @@ def build_target_policy(
     replacement_rows: Any,
     latent_rows: Any,
     global_policy: pd.DataFrame,
+    active_by_target: dict[float, dict[str, Any]] | None = None,
+    active_evidence_bridge_summary: dict[str, Any] | None = None,
     total_budget: int = 100,
     base_transfer_budget: int = 25,
     min_transfer_budget: int = 8,
@@ -338,6 +424,7 @@ def build_target_policy(
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     replacement_by_target = rows_by_target(replacement_rows)
     latent_by_target = rows_by_target(latent_rows)
+    active_by_target = active_by_target or {}
     targets = sorted(set(replacement_by_target) | set(latent_by_target))
     all_rows = []
     target_summary_rows = []
@@ -408,6 +495,19 @@ def build_target_policy(
                         -abs(float(target) - float(reference_target_tg_c)) / max(float(transfer_decay_c), 1e-6)
                     ),
                     "is_sparse_target": bool((int(target_specific_only["successes"].sum()) if not target_specific_only.empty else 0) < 15),
+                    "active_high_authority_rows": int(
+                        active_by_target.get(float(target), {}).get("active_high_authority_rows", 0)
+                    ),
+                    "active_high_authority_authority_weight_sum": float(
+                        active_by_target.get(float(target), {}).get("active_high_authority_authority_weight_sum", 0.0)
+                    ),
+                    "active_high_authority_mean_target_distance_c": active_by_target.get(float(target), {}).get(
+                        "active_high_authority_mean_target_distance_c"
+                    ),
+                    "active_high_authority_source_counts": active_by_target.get(float(target), {}).get(
+                        "active_high_authority_source_counts",
+                        {},
+                    ),
                 }
             )
     policy = pd.concat(all_rows, ignore_index=True) if all_rows else pd.DataFrame()
@@ -438,6 +538,7 @@ def build_target_policy(
         ],
         "sparse_target_count": int(target_summary["is_sparse_target"].sum()) if not target_summary.empty else 0,
     }
+    summary.update(target_high_authority_summary(targets, active_by_target, active_evidence_bridge_summary))
     return policy, target_summary, summary
 
 
@@ -464,16 +565,33 @@ def write_report(policy: pd.DataFrame, target_summary: pd.DataFrame, summary: di
     lines.extend(
         [
             "",
+            "## Target High-authority Evidence Gate",
+            "",
+            f"- Status: `{summary.get('target_high_authority_evidence_status', '')}`",
+            f"- Budget mode: `{summary.get('target_high_authority_budget_mode', '')}`",
+            f"- Active target rows: `{summary.get('target_high_authority_rows_by_target', {})}`",
+            f"- Active evidence bridge status: `{summary.get('active_evidence_bridge_status', '')}`",
+            f"- Active evidence updates PiEvo posterior: `{summary.get('active_evidence_updates_pievo_posterior', False)}`",
+            f"- Next action: {summary.get('target_high_authority_next_action', '')}",
+            "",
+            "当前 target-conditioned allocation 仍由 target sweep 和 global-transfer surrogate evidence 计算；高权重 evidence 进入 PiEvo posterior 后，应先按目标比较 posterior shift，再调整每个 Tg 的预算。",
+        ]
+    )
+    lines.extend(
+        [
+            "",
             "## Target Summary",
             "",
-            "| target Tg C | target-specific budget | transferable budget | target successes | top strategy | top target-specific strategy | sparse |",
-            "| ---: | ---: | ---: | ---: | --- | --- | --- |",
+            "| target Tg C | target-specific budget | transferable budget | target successes | active high-authority rows | active authority weight | top strategy | top target-specific strategy | sparse |",
+            "| ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |",
         ]
     )
     for _, row in target_summary.iterrows():
         lines.append(
             f"| {float(row['target_tg_c']):.1f} | {int(row['target_specific_budget'])} | {int(row['transfer_budget'])} | "
-            f"{int(row['target_specific_successes'])} | {row['top_strategy']} | {row['top_target_specific_strategy']} | {bool(row['is_sparse_target'])} |"
+            f"{int(row['target_specific_successes'])} | {int(row.get('active_high_authority_rows', 0) or 0)} | "
+            f"{float(row.get('active_high_authority_authority_weight_sum', 0.0) or 0.0):.1f} | "
+            f"{row['top_strategy']} | {row['top_target_specific_strategy']} | {bool(row['is_sparse_target'])} |"
         )
     lines.extend(
         [
@@ -516,6 +634,8 @@ def run_target_conditioned_policy(args: argparse.Namespace) -> tuple[pd.DataFram
         replacement_rows,
         read_json(Path(args.vae_latent_target_sweep_summary)),
         read_csv(Path(args.global_policy)),
+        active_high_authority_by_target(read_csv(Path(args.active_observation_ledger))),
+        read_json(Path(args.active_evidence_pievo_bridge_summary)),
         total_budget=int(args.total_budget),
         base_transfer_budget=int(args.transferable_exploration_budget),
         min_transfer_budget=int(args.min_transferable_budget),
@@ -553,6 +673,14 @@ def main() -> None:
     parser.add_argument(
         "--global-policy",
         default="artifacts/trail/generation_strategy_policy/generation_strategy_bandit_policy.csv",
+    )
+    parser.add_argument(
+        "--active-observation-ledger",
+        default="artifacts/trail/human_review/active_high_authority_observation_ledger.csv",
+    )
+    parser.add_argument(
+        "--active-evidence-pievo-bridge-summary",
+        default="artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json",
     )
     parser.add_argument("--total-budget", type=int, default=100)
     parser.add_argument("--transferable-exploration-budget", type=int, default=25)

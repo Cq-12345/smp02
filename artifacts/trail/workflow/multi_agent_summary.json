@@ -291,6 +291,15 @@
   },
   "target_conditioned_strategy_policy_sparse_targets": [],
   "target_conditioned_strategy_policy_sparse_target_count": 0,
+  "target_conditioned_strategy_policy_high_authority_evidence_status": "awaiting_target_high_authority_evidence",
+  "target_conditioned_strategy_policy_high_authority_budget_mode": "target_surrogate_backed_allocation",
+  "target_conditioned_strategy_policy_high_authority_rows_by_target": {
+    "190.0": 0,
+    "195.0": 0,
+    "200.0": 0,
+    "250.0": 0
+  },
+  "target_conditioned_strategy_policy_active_evidence_updates_pievo_posterior": false,
   "sparse_target_replacement_expansion_targets": 1,
   "sparse_target_replacement_expansion_target_values": [
     250.0

@@ -6,7 +6,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from scripts.update_target_conditioned_generation_policy import build_target_policy, merge_replacement_evidence, run_target_conditioned_policy
+from scripts.update_target_conditioned_generation_policy import (
+    active_high_authority_by_target,
+    build_target_policy,
+    merge_replacement_evidence,
+    run_target_conditioned_policy,
+    target_high_authority_summary,
+)
 
 
 def replacement_row(target: float, harness_pass: int, mean_reward: float, best_reward: float, selected_distance: float) -> dict:
@@ -120,6 +126,49 @@ def global_policy_frame() -> pd.DataFrame:
     )
 
 
+def test_target_high_authority_context_counts_active_rows_by_target() -> None:
+    ledger = pd.DataFrame(
+        [
+            {
+                "target_tg_c": 250.0,
+                "source_type": "high_fidelity_simulation",
+                "authority_weight": 3.0,
+                "target_distance_c": 1.0,
+                "active_evidence": True,
+            },
+            {
+                "target_tg_c": 250.0,
+                "source_type": "real_dsc",
+                "authority_weight": 5.0,
+                "target_distance_c": 0.5,
+                "active_evidence": "true",
+            },
+            {
+                "target_tg_c": 195.0,
+                "source_type": "surrogate",
+                "authority_weight": 1.0,
+                "target_distance_c": 0.1,
+                "active_evidence": True,
+            },
+        ]
+    )
+
+    by_target = active_high_authority_by_target(ledger)
+    summary = target_high_authority_summary(
+        [195.0, 250.0],
+        by_target,
+        {"bridge_status": "active_evidence_updates_posterior", "active_evidence_updates_posterior": True},
+    )
+
+    assert by_target[250.0]["active_high_authority_rows"] == 2
+    assert by_target[250.0]["active_high_authority_authority_weight_sum"] == 8.0
+    assert by_target[250.0]["active_high_authority_source_counts"] == {"high_fidelity_simulation": 1, "real_dsc": 1}
+    assert 195.0 not in by_target
+    assert summary["target_high_authority_evidence_status"] == "target_high_authority_posterior_active"
+    assert summary["target_high_authority_rows_by_target"]["195.0"] == 0
+    assert summary["target_high_authority_rows_by_target"]["250.0"] == 2
+
+
 def test_target_conditioned_policy_allocates_per_target_and_preserves_target_evidence() -> None:
     replacement = [
         replacement_row(190.0, harness_pass=13, mean_reward=0.54, best_reward=0.99, selected_distance=0.06),
@@ -134,6 +183,8 @@ def test_target_conditioned_policy_allocates_per_target_and_preserves_target_evi
         replacement,
         latent,
         global_policy_frame(),
+        {250.0: {"active_high_authority_rows": 1, "active_high_authority_authority_weight_sum": 3.0}},
+        {"bridge_status": "active_evidence_updates_posterior", "active_evidence_updates_posterior": True},
         total_budget=100,
         base_transfer_budget=25,
         min_transfer_budget=8,
@@ -147,6 +198,9 @@ def test_target_conditioned_policy_allocates_per_target_and_preserves_target_evi
     assert target_summary.set_index("target_tg_c").loc[250.0, "transfer_budget"] < target_summary.set_index("target_tg_c").loc[190.0, "transfer_budget"]
     assert summary["top_target_specific_strategy_by_target"]["190.0"] == "vae_latent_local_search"
     assert summary["top_target_specific_strategy_by_target"]["250.0"] == "functional_group_replacement"
+    assert summary["target_high_authority_rows_by_target"]["190.0"] == 0
+    assert summary["target_high_authority_rows_by_target"]["250.0"] == 1
+    assert target_summary.set_index("target_tg_c").loc[250.0, "active_high_authority_rows"] == 1
     for _, group in policy.groupby("target_tg_c"):
         assert int(group["allocation_per_100"].sum()) == 100
         assert group[group["strategy"] == "llm_smiles_generation"].iloc[0]["allocation_per_100"] == 0
@@ -167,6 +221,23 @@ def test_run_target_conditioned_policy_writes_outputs(tmp_path: Path) -> None:
     global_policy_frame().to_csv(global_policy, index=False)
     sparse = tmp_path / "sparse.json"
     sparse.write_text("[]", encoding="utf-8")
+    active_ledger = tmp_path / "active_ledger.csv"
+    pd.DataFrame(
+        [
+            {
+                "target_tg_c": 250.0,
+                "source_type": "high_fidelity_simulation",
+                "authority_weight": 3.0,
+                "target_distance_c": 0.9,
+                "active_evidence": True,
+            }
+        ]
+    ).to_csv(active_ledger, index=False)
+    active_bridge = tmp_path / "active_bridge.json"
+    active_bridge.write_text(
+        json.dumps({"bridge_status": "active_evidence_updates_posterior", "active_evidence_updates_posterior": True}),
+        encoding="utf-8",
+    )
     out_dir = tmp_path / "out"
     report = tmp_path / "report.md"
 
@@ -176,6 +247,8 @@ def test_run_target_conditioned_policy_writes_outputs(tmp_path: Path) -> None:
             vae_latent_target_sweep_summary=str(latent),
             sparse_target_replacement_expansion_summary=str(sparse),
             global_policy=str(global_policy),
+            active_observation_ledger=str(active_ledger),
+            active_evidence_pievo_bridge_summary=str(active_bridge),
             total_budget=100,
             transferable_exploration_budget=25,
             min_transferable_budget=8,
@@ -191,6 +264,8 @@ def test_run_target_conditioned_policy_writes_outputs(tmp_path: Path) -> None:
     assert not policy.empty
     assert not target_summary.empty
     assert summary["top_target_specific_strategy_by_target"]["250.0"] == "functional_group_replacement"
+    assert summary["target_high_authority_evidence_status"] == "target_high_authority_posterior_active"
+    assert summary["target_high_authority_rows_by_target"]["250.0"] == 1
     assert (out_dir / "target_conditioned_generation_strategy_policy.csv").exists()
     assert (out_dir / "target_conditioned_generation_strategy_target_summary.csv").exists()
     assert (out_dir / "target_conditioned_generation_strategy_summary.json").exists()
