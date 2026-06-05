@@ -1,0 +1,233 @@
+{
+  "agents": {
+    "space_agent": "界定搜索空间：官能团、反应兼容性、摩尔比网格。",
+    "generator_agent": "生成候选假设：模板、VAE replacement、prompt/RAG、未来 SFT/扩散/流匹配。",
+    "predictor_agent": "评估假设：VAE-WVCM model zoo、GNN、uncertainty、OOD。",
+    "harness_agent": "硬约束过滤：RDKit、比例、目标窗口、官能团反应兼容性。",
+    "feedback_agent": "失败回流：统计 generation ledger 和 Harness rejection，给下一轮生成器约束。",
+    "principle_agent": "更新原则：PiEvo full-history posterior、MAP residual anomaly、IDS 选择。",
+    "human_review_agent": "人工闭环：审核候选、补工艺条件、决定是否进入真实/高保真 observation ledger。"
+  },
+  "candidate_rows": 10000,
+  "best_candidates": [
+    {
+      "smiles_a": "Nc1ccc(-c2ccc(N)c(C(F)(F)F)c2)c(C(F)(F)F)c1",
+      "smiles_b": "Cc1ccc(N=C=O)cc1N=C=O",
+      "groups_a": "aromatic;primary_amine",
+      "groups_b": "aromatic;isocyanate",
+      "compatibility_reason": "异氰酸酯-伯胺形成聚脲。",
+      "ratio_a": 0.65,
+      "ratio_b": 0.35,
+      "predicted_tg": 194.99681974863265,
+      "target_distance": 0.003180251367354,
+      "in_target_range": true
+    },
+    {
+      "smiles_a": "C=CC(=O)OCCOCCOc1ccccc1",
+      "smiles_b": "O=C1C=CC(=O)N(c2ccc(Cc3ccc(N4C(=O)C=CC4=O)cc3)cc2)C1=O",
+      "groups_a": "aromatic;ester;ether;vinyl",
+      "groups_b": "aromatic;imide;maleimide;vinyl",
+      "compatibility_reason": "马来酰亚胺与烯基共聚/加成。",
+      "ratio_a": 0.3,
+      "ratio_b": 0.7,
+      "predicted_tg": 195.005365464446,
+      "target_distance": 0.0053654644459584,
+      "in_target_range": true
+    },
+    {
+      "smiles_a": "CC(C)(c1ccc(OCCOCC2CO2)cc1)c1ccc(OCCOCC2CO2)cc1",
+      "smiles_b": "Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1",
+      "groups_a": "aromatic;epoxy;ether",
+      "groups_b": "aromatic;ether;primary_amine",
+      "compatibility_reason": "环氧-伯胺开环固化。",
+      "ratio_a": 0.1,
+      "ratio_b": 0.9,
+      "predicted_tg": 194.99270136027468,
+      "target_distance": 0.0072986397253202,
+      "in_target_range": true
+    },
+    {
+      "smiles_a": "C=CCc1ccc(OCC2CO2)c(-c2cc(CC=C)ccc2OCC2CO2)c1",
+      "smiles_b": "CC1(C)CC(CN)CC(C)(N)C1",
+      "groups_a": "aromatic;epoxy;ether;vinyl",
+      "groups_b": "primary_amine",
+      "compatibility_reason": "环氧-伯胺开环固化。",
+      "ratio_a": 0.7,
+      "ratio_b": 0.3,
+      "predicted_tg": 195.0074809970216,
+      "target_distance": 0.0074809970215881,
+      "in_target_range": true
+    },
+    {
+      "smiles_a": "Cc1cc(-c2cc(C)c(OCC3CO3)c(C)c2)c(C)cc1OCC1CO1",
+      "smiles_b": "OCCOCCO",
+      "groups_a": "aromatic;epoxy;ether",
+      "groups_b": "ether;hydroxyl",
+      "compatibility_reason": "环氧-羟基醚化，常需催化剂。",
+      "ratio_a": 0.35,
+      "ratio_b": 0.65,
+      "predicted_tg": 195.01964735721148,
+      "target_distance": 0.0196473572114825,
+      "in_target_range": true
+    },
+    {
+      "smiles_a": "Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1",
+      "smiles_b": "CC(C)(c1ccc(OC#N)cc1)c1ccc(OC#N)cc1",
+      "groups_a": "aromatic;ether;primary_amine",
+      "groups_b": "aromatic;cyanate_ester;ether;nitrile",
+      "compatibility_reason": "氰酸酯-胺共反应。",
+      "ratio_a": 0.8,
+      "ratio_b": 0.1999999999999999,
+      "predicted_tg": 195.02246564460987,
+      "target_distance": 0.0224656446098663,
+      "in_target_range": true
+    },
+    {
+      "smiles_a": "CC(C)(c1ccc(OC#N)cc1)c1ccc(OC#N)cc1",
+      "smiles_b": "Nc1ccc(-c2ccc(N)cc2)cc1",
+      "groups_a": "aromatic;cyanate_ester;ether;nitrile",
+      "groups_b": "aromatic;primary_amine",
+      "compatibility_reason": "氰酸酯-胺共反应。",
+      "ratio_a": 0.45,
+      "ratio_b": 0.55,
+      "predicted_tg": 194.9718692273616,
+      "target_distance": 0.0281307726383772,
+      "in_target_range": true
+    },
+    {
+      "smiles_a": "CCC(CO)(CO)CO",
+      "smiles_b": "O=C1OC(=O)c2cc(-c3ccc4c(c3)C(=O)OC4=O)ccc21",
+      "groups_a": "hydroxyl",
+      "groups_b": "anhydride;aromatic;ester;ether",
+      "compatibility_reason": "酸酐-羟基酯化。",
+      "ratio_a": 0.4,
+      "ratio_b": 0.6,
+      "predicted_tg": 194.97172510691192,
+      "target_distance": 0.0282748930880814,
+      "in_target_range": true
+    },
+    {
+      "smiles_a": "Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1",
+      "smiles_b": "O=C1OC(=O)c2cc(-c3ccc4c(c3)C(=O)OC4=O)ccc21",
+      "groups_a": "aromatic;ether;primary_amine",
+      "groups_b": "anhydride;aromatic;ester;ether",
+      "compatibility_reason": "酸酐-胺形成聚酰胺酸/聚酰亚胺前体。",
+      "ratio_a": 0.45,
+      "ratio_b": 0.55,
+      "predicted_tg": 194.9706255175603,
+      "target_distance": 0.0293744824396924,
+      "in_target_range": true
+    },
+    {
+      "smiles_a": "Nc1ccc(Cc2ccc(N)cc2)cc1",
+      "smiles_b": "COc1ccc(OCC2CO2)c(CCC(=O)OCCCCOC(=O)CCc2ccc(OCC3CO3)c(OC)c2)c1",
+      "groups_a": "aromatic;primary_amine",
+      "groups_b": "aromatic;epoxy;ester;ether",
+      "compatibility_reason": "环氧-伯胺开环固化。",
+      "ratio_a": 0.8,
+      "ratio_b": 0.1999999999999999,
+      "predicted_tg": 194.9680933755005,
+      "target_distance": 0.0319066244994985,
+      "in_target_range": true
+    }
+  ],
+  "closed_loop_history": [
+    {
+      "iteration": 1,
+      "selected": 50,
+      "best_predicted_tg": 194.99681974863265,
+      "principles": {
+        "环氧-伯胺开环固化。": 21,
+        "环氧-羟基醚化，常需催化剂。": 5,
+        "酸酐-胺形成聚酰胺酸/聚酰亚胺前体。": 5,
+        "氰酸酯-胺共反应。": 4,
+        "异氰酸酯-伯胺形成聚脲。": 3,
+        "酸酐-羟基酯化。": 3,
+        "环氧-羧酸开环酯化。": 3,
+        "环氧-酸酐固化，常需催化剂。": 2,
+        "马来酰亚胺-胺 Michael 加成。": 2,
+        "马来酰亚胺与烯基共聚/加成。": 1
+      }
+    },
+    {
+      "iteration": 2,
+      "selected": 50,
+      "best_predicted_tg": 194.89248093238396,
+      "principles": {
+        "环氧-伯胺开环固化。": 63,
+        "环氧-羟基醚化，常需催化剂。": 8,
+        "酸酐-胺形成聚酰胺酸/聚酰亚胺前体。": 7,
+        "氰酸酯-胺共反应。": 5,
+        "异氰酸酯-伯胺形成聚脲。": 3,
+        "酸酐-羟基酯化。": 3,
+        "环氧-酸酐固化，常需催化剂。": 3,
+        "环氧-羧酸开环酯化。": 3,
+        "马来酰亚胺-胺 Michael 加成。": 2,
+        "异氰酸酯-羟基形成聚氨酯。": 2
+      }
+    },
+    {
+      "iteration": 3,
+      "selected": 50,
+      "best_predicted_tg": 195.13383449768136,
+      "principles": {
+        "环氧-伯胺开环固化。": 87,
+        "环氧-羟基醚化，常需催化剂。": 15,
+        "酸酐-胺形成聚酰胺酸/聚酰亚胺前体。": 11,
+        "氰酸酯-胺共反应。": 6,
+        "环氧-酸酐固化，常需催化剂。": 6,
+        "异氰酸酯-伯胺形成聚脲。": 5,
+        "酸酐-羟基酯化。": 5,
+        "马来酰亚胺与烯基共聚/加成。": 4,
+        "环氧-羧酸开环酯化。": 4,
+        "马来酰亚胺-胺 Michael 加成。": 4
+      }
+    },
+    {
+      "iteration": 4,
+      "selected": 50,
+      "best_predicted_tg": 194.7130743541351,
+      "principles": {
+        "环氧-伯胺开环固化。": 105,
+        "环氧-羟基醚化，常需催化剂。": 21,
+        "酸酐-胺形成聚酰胺酸/聚酰亚胺前体。": 21,
+        "马来酰亚胺与烯基共聚/加成。": 8,
+        "氰酸酯-胺共反应。": 8,
+        "环氧-酸酐固化，常需催化剂。": 8,
+        "异氰酸酯-伯胺形成聚脲。": 6,
+        "酸酐-羟基酯化。": 6,
+        "环氧-羧酸开环酯化。": 6,
+        "马来酰亚胺-胺 Michael 加成。": 5
+      }
+    },
+    {
+      "iteration": 5,
+      "selected": 50,
+      "best_predicted_tg": 195.4009399581064,
+      "principles": {
+        "环氧-伯胺开环固化。": 126,
+        "酸酐-胺形成聚酰胺酸/聚酰亚胺前体。": 28,
+        "环氧-羟基醚化，常需催化剂。": 26,
+        "马来酰亚胺与烯基共聚/加成。": 10,
+        "环氧-酸酐固化，常需催化剂。": 10,
+        "酸酐-羟基酯化。": 9,
+        "异氰酸酯-伯胺形成聚脲。": 8,
+        "氰酸酯-胺共反应。": 8,
+        "环氧-羧酸开环酯化。": 7,
+        "马来酰亚胺-胺 Michael 加成。": 6
+      }
+    }
+  ],
+  "generation_ledger_rows": 4,
+  "generation_harness_pass": 3,
+  "generation_feedback": {
+    "generation_records": 4,
+    "generation_harness_pass": 3,
+    "generation_harness_fail": 1,
+    "replacement_rejections": 13,
+    "failure_reason_types": 3,
+    "strategies_analyzed": 3,
+    "top_failure_reason": "replacement_formula_failed_reaction_or_ratio_constraints",
+    "lowest_policy_strategy": "llm_smiles_generation"
+  }
+}

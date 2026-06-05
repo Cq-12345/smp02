@@ -137,7 +137,33 @@ Prompt/RAG smoke 结果：
 - 最佳 generation record 预测 Tg 为 195.00 C，距 195 C 目标 0.003 C。
 - 这一步没有调用外部 LLM；它固定的是未来 LLM/SFT/扩散/流匹配生成器必须遵守的记录契约。
 
-### 3.5 SFT / 内部微调
+### 3.5 失败回流
+
+已有脚本：
+
+- `scripts/analyze_generation_feedback.py`
+
+输入：
+
+- `artifacts/trail/generation/prompt_records/generation_record_ledger.csv`
+- `artifacts/trail/generation/replacement_eval/replacement_proposal_rejections.csv`
+
+输出：
+
+- `artifacts/trail/generation_feedback/strategy_feedback.csv`
+- `artifacts/trail/generation_feedback/failure_reason_counts.csv`
+- `artifacts/trail/generation_feedback/replacement_failure_groups.csv`
+- `reports/generation_failure_feedback.md`
+
+当前结果：
+
+- 4 条 prompt/RAG generation records 中 3 条通过 Harness。
+- replacement rejections 为 13 条。
+- 主失败原因为 `replacement_formula_failed_reaction_or_ratio_constraints`，共 14 次。
+- `llm_smiles_generation` 当前 policy delta 为 -0.25，必须先补 prediction 和 chemistry evidence。
+- `functional_group_replacement` 当前 policy delta 为 -0.10，下一轮应加入“替换后必须保留互补反应对”的约束。
+
+### 3.6 SFT / 内部微调
 
 只有当积累足够高质量样本后才值得做：
 
@@ -147,7 +173,7 @@ Prompt/RAG smoke 结果：
 
 短期内不建议优先 SFT，因为数据规模和真实标签不足。
 
-### 3.6 扩散/流匹配
+### 3.7 扩散/流匹配
 
 当前阶段只作为研究路线，不立即训练：
 
@@ -195,5 +221,5 @@ PYTHONPATH=src python trail/harness/constraints.py \
 1. 将真实 LLM/RAG agent 接到 `generation_record_schema.yaml`，要求先输出 generation record，再进入 predictor/Harness/PiEvo。
 2. 将 LLM 生成限制在“提出 principle/官能团组合/候选模板”，SMILES 草案必须由 RDKit、预测模型和 Harness 再验证。
 3. 对 replacement 的失败原因做回流：13 条失败均为反应/比例约束失败，应改进官能团匹配或比例搜索。
-4. 将 generation ledger 的失败统计接入 PiEvo anomaly/principle posterior，用失败案例压低弱生成规则。
+4. 将 `generation_feedback/strategy_feedback.csv` 接入下一轮 prompt/RAG 和 replacement proposal 生成器，用失败案例压低弱生成规则。
 5. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。

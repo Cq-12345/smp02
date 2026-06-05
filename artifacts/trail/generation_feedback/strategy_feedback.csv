@@ -1,0 +1,4 @@
+strategy,records,harness_pass,harness_fail,pass_rate,mean_generation_reward,top_failure_reason,policy_weight_delta,next_constraint
+llm_rag_principle_generation,2,2,0,1.0,0.9991458173163537,,0.1,retain: keep strategy in candidate generator pool.
+functional_group_replacement,14,1,13,0.07142857142857142,0.9280694624481634,replacement_formula_failed_reaction_or_ratio_constraints,-0.1,"replacement_feedback: preserve complementary reactive pair, not only shared groups."
+llm_smiles_generation,1,0,1,0.0,,prediction_missing,-0.25,predictor_feedback: run VAE-WVCM/GNN predictor before recommendation.

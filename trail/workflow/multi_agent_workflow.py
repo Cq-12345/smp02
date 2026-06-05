@@ -9,20 +9,32 @@ import pandas as pd
 
 AGENTS = {
     "space_agent": "界定搜索空间：官能团、反应兼容性、摩尔比网格。",
-    "generator_agent": "生成候选假设：单体对和替换策略。",
-    "predictor_agent": "评估假设：VAE-WVCM-SVR/RF/CNN Tg 预测。",
-    "principle_agent": "更新原则：统计高分候选的反应规则并调整下一轮优先级。",
+    "generator_agent": "生成候选假设：模板、VAE replacement、prompt/RAG、未来 SFT/扩散/流匹配。",
+    "predictor_agent": "评估假设：VAE-WVCM model zoo、GNN、uncertainty、OOD。",
+    "harness_agent": "硬约束过滤：RDKit、比例、目标窗口、官能团反应兼容性。",
+    "feedback_agent": "失败回流：统计 generation ledger 和 Harness rejection，给下一轮生成器约束。",
+    "principle_agent": "更新原则：PiEvo full-history posterior、MAP residual anomaly、IDS 选择。",
+    "human_review_agent": "人工闭环：审核候选、补工艺条件、决定是否进入真实/高保真 observation ledger。",
 }
 
 
-def summarize(candidate_space: Path, closed_loop_history: Path) -> dict:
+def read_json(path: Path, default):
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
+
+
+def summarize(candidate_space: Path, closed_loop_history: Path, generation_feedback: Path, generation_ledger: Path) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
-    history = json.loads(closed_loop_history.read_text(encoding="utf-8")) if closed_loop_history.exists() else []
+    history = read_json(closed_loop_history, [])
+    feedback = read_json(generation_feedback, {})
+    ledger = pd.read_csv(generation_ledger) if generation_ledger.exists() else pd.DataFrame()
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
         "best_candidates": candidates.head(10).to_dict(orient="records") if not candidates.empty else [],
         "closed_loop_history": history,
+        "generation_ledger_rows": int(len(ledger)),
+        "generation_harness_pass": int(ledger["harness_pass"].fillna(False).astype(bool).sum()) if not ledger.empty and "harness_pass" in ledger else 0,
+        "generation_feedback": feedback,
     }
 
 
@@ -30,9 +42,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidate-space", default="artifacts/reproduce/discovery/candidate_space_top_scored.csv")
     parser.add_argument("--history", default="artifacts/reproduce/closed_loop/closed_loop_history.json")
+    parser.add_argument("--generation-feedback", default="artifacts/trail/generation_feedback/generation_feedback_summary.json")
+    parser.add_argument("--generation-ledger", default="artifacts/trail/generation/prompt_records/generation_record_ledger.csv")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
-    result = summarize(Path(args.candidate_space), Path(args.history))
+    result = summarize(Path(args.candidate_space), Path(args.history), Path(args.generation_feedback), Path(args.generation_ledger))
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -40,4 +54,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

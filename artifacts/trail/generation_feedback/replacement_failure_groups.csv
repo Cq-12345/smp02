@@ -1,0 +1,6 @@
+shared_groups,failures,mean_tanimoto,top_reason,feedback
+aromatic;cyanate_ester;ether;nitrile,5,0.40370370370370373,replacement_formula_failed_reaction_or_ratio_constraints,Require a complementary co-reactant check after replacement; shared groups alone are insufficient.
+aromatic;epoxy;ester;ether,3,0.24731934731934727,replacement_formula_failed_reaction_or_ratio_constraints,Require a complementary co-reactant check after replacement; shared groups alone are insufficient.
+aromatic;ether;hydroxyl;phenol,2,0.3355368589743589,replacement_formula_failed_reaction_or_ratio_constraints,Require a complementary co-reactant check after replacement; shared groups alone are insufficient.
+aromatic;isocyanate,2,0.28465116279069763,replacement_formula_failed_reaction_or_ratio_constraints,Require a complementary co-reactant check after replacement; shared groups alone are insufficient.
+aromatic;imide;maleimide;vinyl,1,0.28125,replacement_formula_failed_reaction_or_ratio_constraints,Require a complementary co-reactant check after replacement; shared groups alone are insufficient.

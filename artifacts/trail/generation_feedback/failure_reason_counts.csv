@@ -1,0 +1,4 @@
+failure_reason,count,strategy_counts,recommended_action
+replacement_formula_failed_reaction_or_ratio_constraints,14,"{""functional_group_replacement"": 13, ""llm_smiles_generation"": 1}","replacement_feedback: preserve complementary reactive pair, not only shared groups."
+prediction_missing,1,"{""llm_smiles_generation"": 1}",predictor_feedback: run VAE-WVCM/GNN predictor before recommendation.
+chemistry_evidence_missing,1,"{""llm_smiles_generation"": 1}",chemistry_feedback: require compatibility_reasons from functional-group rules.
