@@ -90,12 +90,38 @@ def build_wvcm_features(records: Iterable[SMPRecord], vectors: dict[str, np.ndar
     return np.vstack(features), np.asarray(targets, dtype=np.float32)
 
 
+KELVIN_OFFSET = 273.15
+
+
 def mape(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    y_true = np.asarray(y_true, dtype=float)
+    y_pred = np.asarray(y_pred, dtype=float)
     denom = np.maximum(np.abs(y_true), 1e-6)
     return float(np.mean(np.abs((y_true - y_pred) / denom)) * 100.0)
 
 
+def mapek(y_true_celsius: np.ndarray, y_pred_celsius: np.ndarray) -> float:
+    y_true_celsius = np.asarray(y_true_celsius, dtype=float)
+    y_pred_celsius = np.asarray(y_pred_celsius, dtype=float)
+    denom = np.maximum(y_true_celsius + KELVIN_OFFSET, 1e-6)
+    return float(np.mean(np.abs(y_true_celsius - y_pred_celsius) / denom) * 100.0)
+
+
+def mae(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    y_true = np.asarray(y_true, dtype=float)
+    y_pred = np.asarray(y_pred, dtype=float)
+    return float(np.mean(np.abs(y_true - y_pred)))
+
+
+def rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    y_true = np.asarray(y_true, dtype=float)
+    y_pred = np.asarray(y_pred, dtype=float)
+    return float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
+
+
 def pcp(y_true: np.ndarray, y_pred: np.ndarray, tolerance: float = 0.15) -> float:
+    y_true = np.asarray(y_true, dtype=float)
+    y_pred = np.asarray(y_pred, dtype=float)
     denom = np.maximum(np.abs(y_true), 1e-6)
     return float(np.mean((np.abs(y_true - y_pred) / denom) <= tolerance) * 100.0)
 
@@ -106,6 +132,12 @@ def regression_metrics(y_train: np.ndarray, pred_train: np.ndarray, y_test: np.n
         "PCP test dataset (%)": pcp(y_test, pred_test, tolerance),
         "MAPE training dataset (%)": mape(y_train, pred_train),
         "MAPE test dataset (%)": mape(y_test, pred_test),
+        "MAPEK training dataset (%)": mapek(y_train, pred_train),
+        "MAPEK test dataset (%)": mapek(y_test, pred_test),
+        "MAE training dataset (C)": mae(y_train, pred_train),
+        "MAE test dataset (C)": mae(y_test, pred_test),
+        "RMSE training dataset (C)": rmse(y_train, pred_train),
+        "RMSE test dataset (C)": rmse(y_test, pred_test),
         "R2 training": float(r2_score(y_train, pred_train)),
         "R2 test": float(r2_score(y_test, pred_test)),
     }

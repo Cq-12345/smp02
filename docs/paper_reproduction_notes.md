@@ -70,6 +70,12 @@ RF：
 
 因此本仓库默认 discovery 使用 `latent_size=64` 和 SVR。
 
+本仓库保留原始 `MAPE`/`PCP` 字段用于复现和兼容历史结果。由于当前扩充数据集中的 Tg 是摄氏度，且存在负数与接近 0°C 的样本，摄氏度分母的百分比误差会被低温样本严重放大；新训练结果会额外报告：
+
+- `MAPEK training/test dataset (%)`: 使用 Kelvin 温标分母，即 `abs(y_true_C - y_pred_C) / (y_true_C + 273.15)`。
+- `MAE training/test dataset (C)`: 摄氏度绝对误差。
+- `RMSE training/test dataset (C)`: 摄氏度均方根误差。
+
 ## 扩展 predictor model zoo
 
 用户要求不局限于论文中的 CNN/SVR/RF。本仓库在复现论文三类模型后，额外训练并排行以下模型家族：
