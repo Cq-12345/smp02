@@ -18,6 +18,7 @@
 Schema 文件：
 
 - `trail/experiments/observation_schema.yaml`
+- `trail/experiments/process_record_schema.yaml`
 
 核心字段：
 
@@ -38,6 +39,8 @@ real_dsc: 5
 ```
 
 这个权重不是最终科学结论，只是告诉 PiEvo posterior：真实实验比 surrogate 更有解释权。
+
+Process record 不直接改变 authority weight。它判断一个 Tg observation 是否有足够工艺细节可以被复现或升级为 active high-authority ledger。
 
 ## 3. Reward
 
@@ -61,6 +64,20 @@ PYTHONPATH=src python trail/experiments/import_observations.py \
 
 - `observation_ledger.csv`
 - `observation_ledger_summary.json`
+
+工艺/人工审核记录：
+
+```bash
+PYTHONPATH=src python trail/experiments/import_process_records.py \
+  --input trail/experiments/example_process_records.csv \
+  --out artifacts/trail/experiments/process_record_ledger.csv \
+  --summary artifacts/trail/experiments/process_record_summary.json
+```
+
+输出：
+
+- `process_record_ledger.csv`
+- `process_record_summary.json`
 
 ## 5. 与 PiEvo 的连接
 
@@ -114,5 +131,14 @@ Smoke 结果：
 - 固化程序是否完整。
 - 样品是否降解。
 - 是否应进入 active ledger。
+
+当前 process record smoke：
+
+- 3 条记录全部通过基础格式检查。
+- 0 条 `ready_for_active_ledger`。
+- Paper Table 6 A/B 缺少 `solvent;imidization_temperature_c;imidization_time_h`。
+- Replacement surrogate 107 缺少 `trimerization_temperature_c;catalyst_loading;post_cure_temperature_c`。
+
+这意味着：即使已有文献 Tg 或 surrogate Tg，也不能绕过工艺完整性审核直接作为高权重真实证据进入 PiEvo posterior。
 
 人工审核不是替代模型，而是控制数据质量，避免错误实验记录污染 posterior。

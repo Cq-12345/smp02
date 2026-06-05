@@ -1,0 +1,98 @@
+schema_name: smp_process_record_ledger
+version: 1
+representation_scope: single_small_molecule_smiles_or_molecode
+deferred:
+  - commodity_grade_component_hypergraph
+  - polymer_repeat_unit_hypergraph
+purpose: >
+  Structure synthesis, curing, literature validation, and human review metadata
+  around an observed Tg. This complements observation_schema.yaml: observation
+  records carry Tg/reward authority, while process records carry whether the
+  formulation has enough process detail to trust or reproduce.
+required_fields:
+  process_record_id:
+    type: string
+  linked_observation_id:
+    type: string
+  source_type:
+    type: enum
+    values: [surrogate_review, literature, high_fidelity_simulation, real_dsc]
+  target_tg_c:
+    type: float
+  observed_tg_c:
+    type: float
+  smiles:
+    type: string
+    description: Component SMILES joined by "|".
+  ratios:
+    type: string
+    description: Component ratios joined by ":".
+  reaction_principle:
+    type: string
+  process_template:
+    type: string
+    description: One key from knowledge.process_condition_templates.
+  review_status:
+    type: enum
+    values:
+      - needs_process_details
+      - needs_human_review
+      - approved_for_active_ledger
+      - rejected_process_incomplete
+recommended_fields:
+  literature_source:
+    type: string
+  operator:
+    type: string
+  catalyst:
+    type: string
+  catalyst_loading:
+    type: string
+  cure_temperature_c:
+    type: float
+  cure_time_h:
+    type: float
+  post_cure_temperature_c:
+    type: float
+  post_cure_time_h:
+    type: float
+  imidization_temperature_c:
+    type: float
+  imidization_time_h:
+    type: float
+  trimerization_temperature_c:
+    type: float
+  initiator_type:
+    type: string
+  initiator_loading:
+    type: string
+  moisture_control:
+    type: string
+  nco_index:
+    type: string
+  notes:
+    type: string
+computed_fields:
+  valid_smiles:
+    type: boolean
+  ratio_ok:
+    type: boolean
+  process_template_known:
+    type: boolean
+  required_process_fields:
+    type: string
+  missing_process_fields:
+    type: string
+  process_fields_complete:
+    type: boolean
+  target_distance_c:
+    type: float
+  process_record_pass:
+    type: boolean
+  ready_for_active_ledger:
+    type: boolean
+usage:
+  human_loop:
+    description: Human reviewers should resolve missing_process_fields before promoting literature/real records to the active high-authority ledger.
+  pievo:
+    description: PiEvo may use incomplete process records as low-authority context, but high-authority posterior updates should require ready_for_active_ledger.

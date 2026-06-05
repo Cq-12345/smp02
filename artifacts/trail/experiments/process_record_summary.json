@@ -1,0 +1,19 @@
+{
+  "input_rows": 3,
+  "process_record_pass_rows": 3,
+  "ready_for_active_ledger_rows": 0,
+  "process_incomplete_rows": 3,
+  "source_counts": {
+    "literature": 2,
+    "surrogate_review": 1
+  },
+  "review_status_counts": {
+    "needs_process_details": 2,
+    "needs_human_review": 1
+  },
+  "process_template_counts": {
+    "anhydride_amine_imidization": 2,
+    "cyanate_ester_triazine_cure": 1
+  },
+  "mean_target_distance_c": 14.767747828701923
+}
