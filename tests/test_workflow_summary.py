@@ -238,6 +238,25 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    validation_execution = tmp_path / "validation_execution.json"
+    validation_execution.write_text(
+        json.dumps(
+            {
+                "schedule_rows": 55,
+                "immediate_executable_rows": 30,
+                "immediate_batch_rows": 12,
+                "blocked_rows": 25,
+                "process_completion_unlock_rows": 25,
+                "blocked_observation_rows": 25,
+                "immediate_batch_target_counts": {"195.0": 5, "250.0": 7},
+                "phase_counts": {
+                    "process_completion_now": 30,
+                    "blocked_until_process_completion": 25,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
     validation_result_intake = tmp_path / "validation_result_intake.json"
     validation_result_intake.write_text(
         json.dumps(
@@ -402,6 +421,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         sparse_target_replacement,
         human_validation,
         validation_requests,
+        validation_execution,
         validation_result_intake,
         active_observations,
         active_evidence_pievo_bridge,
@@ -492,6 +512,14 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["validation_request_expected_observation_source_counts"]["high_fidelity_simulation"] == 25
     assert result["validation_request_target_counts"]["250.0"] == 26
     assert result["validation_request_max_authority_weight_if_completed"] == 3.0
+    assert result["validation_execution_schedule_rows"] == 55
+    assert result["validation_execution_immediate_rows"] == 30
+    assert result["validation_execution_immediate_batch_rows"] == 12
+    assert result["validation_execution_blocked_rows"] == 25
+    assert result["validation_execution_process_completion_unlock_rows"] == 25
+    assert result["validation_execution_blocked_observation_rows"] == 25
+    assert result["validation_execution_immediate_batch_target_counts"]["250.0"] == 7
+    assert result["validation_execution_phase_counts"]["blocked_until_process_completion"] == 25
     assert result["validation_result_template_rows"] == 25
     assert result["validation_result_rows"] == 0
     assert result["validation_result_accepted_rows"] == 0

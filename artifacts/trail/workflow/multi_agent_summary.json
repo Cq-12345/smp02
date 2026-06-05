@@ -368,6 +368,20 @@
     "250.0": 26
   },
   "validation_request_max_authority_weight_if_completed": 3.0,
+  "validation_execution_schedule_rows": 55,
+  "validation_execution_immediate_rows": 30,
+  "validation_execution_immediate_batch_rows": 12,
+  "validation_execution_blocked_rows": 25,
+  "validation_execution_process_completion_unlock_rows": 25,
+  "validation_execution_blocked_observation_rows": 25,
+  "validation_execution_immediate_batch_target_counts": {
+    "195.0": 4,
+    "250.0": 8
+  },
+  "validation_execution_phase_counts": {
+    "process_completion_now": 30,
+    "blocked_until_process_completion": 25
+  },
   "validation_result_template_rows": 25,
   "validation_result_rows": 0,
   "validation_result_accepted_rows": 0,

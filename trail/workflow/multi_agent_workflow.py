@@ -55,6 +55,7 @@ def summarize(
     ),
     human_review_validation_summary: Path = Path("artifacts/trail/human_review/pre_experiment_validation_plan_summary.json"),
     validation_request_summary: Path = Path("artifacts/trail/human_review/validation_request_summary.json"),
+    validation_execution_schedule_summary: Path = Path("artifacts/trail/human_review/validation_execution_schedule_summary.json"),
     validation_result_intake_summary: Path = Path("artifacts/trail/human_review/validation_result_intake_summary.json"),
     active_observation_summary: Path = Path("artifacts/trail/human_review/active_high_authority_observation_summary.json"),
     active_evidence_pievo_bridge_summary: Path = Path(
@@ -80,6 +81,7 @@ def summarize(
     human_review = read_json(human_review_queue_summary, {})
     human_validation = read_json(human_review_validation_summary, {})
     validation_requests = read_json(validation_request_summary, {})
+    validation_execution = read_json(validation_execution_schedule_summary, {})
     validation_result_intake = read_json(validation_result_intake_summary, {})
     active_observations = read_json(active_observation_summary, {})
     active_evidence_pievo_bridge = read_json(active_evidence_pievo_bridge_summary, {})
@@ -237,6 +239,14 @@ def summarize(
         "validation_request_expected_observation_source_counts": validation_requests.get("expected_observation_source_counts", {}),
         "validation_request_target_counts": validation_requests.get("target_counts", {}),
         "validation_request_max_authority_weight_if_completed": validation_requests.get("max_authority_weight_if_completed", 0),
+        "validation_execution_schedule_rows": validation_execution.get("schedule_rows", 0),
+        "validation_execution_immediate_rows": validation_execution.get("immediate_executable_rows", 0),
+        "validation_execution_immediate_batch_rows": validation_execution.get("immediate_batch_rows", 0),
+        "validation_execution_blocked_rows": validation_execution.get("blocked_rows", 0),
+        "validation_execution_process_completion_unlock_rows": validation_execution.get("process_completion_unlock_rows", 0),
+        "validation_execution_blocked_observation_rows": validation_execution.get("blocked_observation_rows", 0),
+        "validation_execution_immediate_batch_target_counts": validation_execution.get("immediate_batch_target_counts", {}),
+        "validation_execution_phase_counts": validation_execution.get("phase_counts", {}),
         "validation_result_template_rows": validation_result_intake.get("template_rows", 0),
         "validation_result_rows": validation_result_intake.get("result_rows", 0),
         "validation_result_accepted_rows": validation_result_intake.get("accepted_result_rows", 0),
@@ -332,6 +342,10 @@ def main() -> None:
         default="artifacts/trail/human_review/validation_request_summary.json",
     )
     parser.add_argument(
+        "--validation-execution-schedule-summary",
+        default="artifacts/trail/human_review/validation_execution_schedule_summary.json",
+    )
+    parser.add_argument(
         "--validation-result-intake-summary",
         default="artifacts/trail/human_review/validation_result_intake_summary.json",
     )
@@ -387,6 +401,7 @@ def main() -> None:
         Path(args.sparse_target_replacement_expansion_summary),
         Path(args.human_review_validation_summary),
         Path(args.validation_request_summary),
+        Path(args.validation_execution_schedule_summary),
         Path(args.validation_result_intake_summary),
         Path(args.active_observation_summary),
         Path(args.active_evidence_pievo_bridge_summary),

@@ -124,6 +124,21 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_active_e
 - `active_evidence_pievo_bridge_summary.json`
 - `reports/active_evidence_pievo_bridge.md`
 
+Validation execution schedule：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_validation_execution_schedule.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/validation_execution_schedule.md \
+  --immediate-batch-size 12
+```
+
+输出：
+
+- `validation_execution_schedule.csv`
+- `validation_execution_schedule_summary.json`
+- `reports/validation_execution_schedule.md`
+
 ## 5. 与 PiEvo 的连接
 
 当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
@@ -210,6 +225,13 @@ Smoke 结果：
 - 当前共有 55 个 request：30 个 `process_completion` 只用于补齐工艺记录，25 个 `high_fidelity_validation` 完成后才可能以 `source_type=high_fidelity_simulation` 写入 observation ledger。
 - 25 个 high-fidelity request 全部 `blocked_by_process_completion=true`，说明高保真复核也必须等工艺字段补齐和人工批准后才能成为高权重证据。
 - 当前 `real_dsc_request_rows=0`；这不是没有候选，而是说明还没有候选通过工艺完整性和人工质量门，不能直接排真实 DSC。
+
+当前 validation execution schedule：
+
+- `scripts/build_validation_execution_schedule.py` 把 request queue 转成执行顺序和 immediate batch；它不把任务标记为完成，也不产生 observation。
+- 当前 55 个 request 全部进入 schedule；30 个 `process_completion_now` 可立即推进，25 个 `blocked_until_process_completion` 仍等待工艺补全。
+- 当前 immediate batch size 为 12，12 个任务全部是 `process_completion`；目标分布为 250 C 8 个、195 C 4 个。
+- 25 个 blocked observation request 完成后最高 authority weight 可到 3.0，但必须等对应 process completion 和 reviewer approval 之后才能进入 result intake。
 
 当前 validation result intake：
 
