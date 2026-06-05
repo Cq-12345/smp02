@@ -1,0 +1,56 @@
+# GNN 指标对齐 Smoke 报告
+
+本文档回应 TODO 中“预测模型：GNN”的部分。本轮没有引入超图/聚合物表示，仍然使用当前小分子 SMILES 图：每个配方由多个小分子图拼接，节点特征包含原子信息和该组分摩尔比例。
+
+## 1. 运行配置
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/gnn/train_gnn.py \
+  --epochs 10 \
+  --batch-size 32 \
+  --out artifacts/trail/gnn_aligned_smoke
+```
+
+输出：
+
+- `artifacts/trail/gnn_aligned_smoke/metrics.json`
+- `artifacts/trail/gnn_aligned_smoke/metrics.csv`
+- `artifacts/trail/gnn_aligned_smoke/train_predictions.csv`
+- `artifacts/trail/gnn_aligned_smoke/test_predictions.csv`
+- `artifacts/trail/gnn_aligned_smoke/gnn_tg_regressor.pt`
+
+## 2. 指标
+
+| metric | value |
+| --- | ---: |
+| MAPEK training dataset (%) | 14.6723 |
+| MAPEK test dataset (%) | 16.3492 |
+| MAE training dataset (C) | 55.7873 |
+| MAE test dataset (C) | 65.8156 |
+| RMSE training dataset (C) | 68.6622 |
+| RMSE test dataset (C) | 78.8365 |
+| PCP training dataset (%) | 20.2632 |
+| PCP test dataset (%) | 16.1765 |
+| R2 training | 0.2833 |
+| R2 test | 0.3285 |
+
+## 3. 解释
+
+这个 smoke GNN 不应直接作为最终候选模型。它只有 10 epochs，且结构很简单，性能明显弱于当前最佳 VAE-WVCM model zoo：
+
+- `VAE(512)+GaussianProcess_RBF`: MAPEK test 3.9778%，MAE test 18.7641 C。
+- `VAE(512)+NuSVR_RBF`: MAPEK test 4.1379%，MAE test 17.9836 C。
+- GNN smoke: MAPEK test 16.3492%，MAE test 65.8156 C。
+
+但本轮已经完成关键对齐：
+
+- GNN 使用 85/15 train/test split。
+- GNN 输出 MAPEK、MAE、RMSE、PCP、R2，与 model zoo 一致。
+- 后续可以把 GNN 纳入同一 leaderboard，而不是只给单独 R2。
+
+## 4. 下一步
+
+- 加入边特征和 bond type。
+- 加入 global formulation features，如组分数、官能团统计、reaction principle。
+- 尝试 GIN/GAT/MPNN，而不是简单 GCN。
+- 与 VAE-WVCM ensemble：GNN disagreement 可作为 PiEvo 的 epistemic/OOD 信号。

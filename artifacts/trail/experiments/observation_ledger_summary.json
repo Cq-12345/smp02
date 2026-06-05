@@ -1,0 +1,11 @@
+{
+  "input_rows": 2,
+  "ledger_pass_rows": 2,
+  "source_counts": {
+    "surrogate": 1,
+    "real_dsc": 1
+  },
+  "mean_target_distance_c": 0.7500500000000017,
+  "mean_weighted_reward": 2.3520355518042937,
+  "reward_temperature_c": 5.0
+}

@@ -1,0 +1,22 @@
+{
+  "MAPEK training dataset (%)": 14.67230675675029,
+  "MAPEK test dataset (%)": 16.349191546058385,
+  "MAE training dataset (C)": 55.78730991514106,
+  "MAE test dataset (C)": 65.81562021462356,
+  "RMSE training dataset (C)": 68.66215878721209,
+  "RMSE test dataset (C)": 78.8365292288069,
+  "PCP training dataset (%)": 20.263157894736842,
+  "PCP test dataset (%)": 16.176470588235293,
+  "R2 training": 0.2832925282569637,
+  "R2 test": 0.3285306619464272,
+  "ML method": "SmallMoleculeGraphGCN",
+  "model_family": "gnn",
+  "epochs": 10,
+  "batch_size": 32,
+  "test_size": 0.15,
+  "seed": 42,
+  "n_graphs": 448,
+  "n_train": 380,
+  "n_test": 68,
+  "final_train_loss": 4670.361673990886
+}

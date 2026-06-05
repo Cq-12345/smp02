@@ -1,0 +1,58 @@
+schema_name: smp_observation_ledger
+version: 1
+representation_scope: single_small_molecule_smiles_or_molecode
+deferred:
+  - commodity_grade_component_hypergraph
+  - polymer_repeat_unit_hypergraph
+required_fields:
+  observation_id:
+    type: string
+    description: Stable unique id for this observation.
+  source_type:
+    type: enum
+    values: [surrogate, real_dsc, high_fidelity_simulation, literature]
+    description: Authority of the observation.
+  target_tg_c:
+    type: float
+    description: Target Tg for reward computation. Not fixed globally.
+  observed_tg_c:
+    type: float
+    description: Observed or predicted Tg in Celsius.
+  smiles:
+    type: string
+    description: Component SMILES joined by "|".
+  ratios:
+    type: string
+    description: Component molar ratios joined by ":" and summing to 1.
+recommended_fields:
+  predicted_tg_mean_c:
+    type: float
+    description: Surrogate mean, when available.
+  predicted_tg_sigma_c:
+    type: float
+    description: Surrogate uncertainty, when available.
+  experiment_date:
+    type: string
+    description: ISO date for real or literature observations.
+  operator:
+    type: string
+    description: Human operator or agent id.
+  method:
+    type: string
+    description: DSC, DMA, surrogate model, simulation method, etc.
+  notes:
+    type: string
+    description: Free-form notes, including synthesis and curing conditions.
+authority_weights:
+  surrogate: 1.0
+  literature: 2.0
+  high_fidelity_simulation: 3.0
+  real_dsc: 5.0
+reward:
+  form: exp(-abs(observed_tg_c - target_tg_c) / reward_temperature_c)
+  default_reward_temperature_c: 5.0
+usage:
+  pievo:
+    description: Real/high-authority observations should be appended to history and may be weighted more strongly in posterior updates.
+  human_loop:
+    description: Human review can approve, reject, or annotate candidate observations before they enter the active ledger.
