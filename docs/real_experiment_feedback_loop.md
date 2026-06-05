@@ -173,3 +173,10 @@ Smoke 结果：
 - 当前 30 条候选全部 `process_completion_required=true`，说明都必须补齐工艺字段后才能考虑真实 DSC。
 - 25 条 `high_fidelity_required=true`，主要来自高 Tg 稀疏目标、较高 predictor sigma、OOD 或新组分风险，应先做高保真/扩展模型集成复核。
 - 0 条 `dsc_ready_without_process_completion`，因此当前没有任何 surrogate 候选可以绕过人工工艺补全直接进入真实实验或 active ledger。
+
+当前 validation request packet：
+
+- `scripts/build_validation_request_packet.py` 把 validation plan 转成 `validation_request_queue.csv` 和 `reports/validation_request_packet.md`。
+- 当前共有 55 个 request：30 个 `process_completion` 只用于补齐工艺记录，25 个 `high_fidelity_validation` 完成后才可能以 `source_type=high_fidelity_simulation` 写入 observation ledger。
+- 25 个 high-fidelity request 全部 `blocked_by_process_completion=true`，说明高保真复核也必须等工艺字段补齐和人工批准后才能成为高权重证据。
+- 当前 `real_dsc_request_rows=0`；这不是没有候选，而是说明还没有候选通过工艺完整性和人工质量门，不能直接排真实 DSC。

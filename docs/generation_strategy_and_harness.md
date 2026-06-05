@@ -466,5 +466,5 @@ transfer_budget(T) = base_transfer_budget * exp(-abs(T - 195) / transfer_decay)
 5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
 7. SFT dry-run、SFT trained projection、diffusion/flow dry-run 和轻量条件 flow-matching 训练 smoke 都已跑通；下一步应做真实 LLM/SFT fine-tune 输出对比、改进 flow 训练/投影质量，或加入有效 SMILES decoder。任何训练输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。
-8. 250 C sparse target source-pool expansion 已跑通，并已进入 `pre_experiment_validation_plan`：13 条 250 C 候选全部需要工艺补全和高保真/扩展集成模型复核。下一步是真实执行这些验证并把结果写入 observation ledger，而不是继续把 surrogate pass 当作物理真值。
+8. 250 C sparse target source-pool expansion 已跑通，并已进入 `pre_experiment_validation_plan` 和 `validation_request_queue`：13 条 250 C 候选产生 26 个 request，其中 13 个补工艺、13 个高保真验证。下一步是真实执行这些 request，并只在工艺补全和人工批准后把结果写入 observation ledger。
 9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。

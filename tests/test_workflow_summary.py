@@ -207,6 +207,29 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    validation_requests = tmp_path / "validation_requests.json"
+    validation_requests.write_text(
+        json.dumps(
+            {
+                "request_rows": 55,
+                "process_completion_request_rows": 30,
+                "high_fidelity_request_rows": 25,
+                "real_dsc_request_rows": 0,
+                "blocked_by_process_completion_rows": 25,
+                "task_type_counts": {
+                    "process_completion": 30,
+                    "high_fidelity_validation": 25,
+                },
+                "expected_observation_source_counts": {
+                    "none": 30,
+                    "high_fidelity_simulation": 25,
+                },
+                "target_counts": {"195.0": 29, "250.0": 26},
+                "max_authority_weight_if_completed": 3.0,
+            }
+        ),
+        encoding="utf-8",
+    )
     gnn_global = tmp_path / "gnn_global.json"
     gnn_global.write_text(
         json.dumps(
@@ -323,6 +346,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         target_conditioned_policy,
         sparse_target_replacement,
         human_validation,
+        validation_requests,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -393,6 +417,15 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["human_validation_candidate_origin_counts"]["sparse_target_replacement_250"] == 13
     assert result["human_validation_best_target_distance_c"] == 0.034
     assert result["human_validation_best_score"] == 0.955
+    assert result["validation_request_rows"] == 55
+    assert result["validation_request_process_completion_rows"] == 30
+    assert result["validation_request_high_fidelity_rows"] == 25
+    assert result["validation_request_real_dsc_rows"] == 0
+    assert result["validation_request_blocked_by_process_completion_rows"] == 25
+    assert result["validation_request_task_type_counts"]["process_completion"] == 30
+    assert result["validation_request_expected_observation_source_counts"]["high_fidelity_simulation"] == 25
+    assert result["validation_request_target_counts"]["250.0"] == 26
+    assert result["validation_request_max_authority_weight_if_completed"] == 3.0
     assert result["gnn_global_feature_architecture"] == "mpnn"
     assert result["gnn_global_feature_best_case"] == "mpnn_global"
     assert result["gnn_global_feature_mapek_delta_pct"] == -0.5
