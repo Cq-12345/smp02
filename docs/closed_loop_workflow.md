@@ -128,6 +128,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_gnn_glob
   --out-dir artifacts/trail/gnn_global_feature_smoke \
   --report reports/gnn_global_feature_smoke.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_generative_training_sets.py \
+  --out-dir artifacts/trail/generation/generative_training_sets \
+  --report reports/generative_training_set_readiness.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
@@ -139,6 +143,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --expanded-replacement-summary artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json \
   --expanded-generation-summary artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
+  --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
 ```
 
@@ -194,5 +199,13 @@ GNN global feature smoke 已补充：
 - `scripts/run_gnn_global_feature_smoke.py` 对比 `mpnn_baseline` 与 `mpnn_global`，并输出 `artifacts/trail/gnn_global_feature_smoke/*` 和 `reports/gnn_global_feature_smoke.md`。
 - 5 epoch smoke 下 global-feature MPNN 的 MAPEK test 为 11.6125%，baseline 为 11.0512%；短训下没有改善 MAPEK/MAE，但 RMSE/R2 略好。
 - Workflow summary 已读取 `gnn_global_feature_summary.json`；该 GNN 当前是结构视角和 OOD/ensemble 候选信号，不替代 VAE-WVCM-GPR/NuSVR。
+
+SFT / diffusion / flow readiness 已补充：
+
+- `scripts/build_generative_training_sets.py` 从 generation record ledgers 中筛选 `record_pass + harness_pass + prediction_available` 的记录，生成 SFT JSONL 和 diffusion/flow seed table。
+- 当前 8 条 generation ledger 输入中有 7 条通过 Harness，去重后得到 5 条训练候选。
+- SFT JSONL 为 4 条 train、1 条 eval，`sft_ready=false`；当前门槛 20 条，还缺 15 条。
+- diffusion/flow seed table 为 4 条 train、1 条 eval，`diffusion_flow_ready=false`；当前门槛 100 条，还缺 95 条。
+- 这一步不是训练生成模型，而是建立训练数据合同和 readiness gate，防止用过小的 smoke 数据训练出不可泛化生成器。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

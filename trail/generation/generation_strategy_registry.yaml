@@ -95,15 +95,31 @@ strategies:
     harness_required: true
     best_use: draft candidates only; never trust without RDKit and reaction validation
   sft_candidate_generator:
-    maturity: deferred
-    generator: future_internal_sft
+    maturity: training_corpus_contract_implemented
+    generator: scripts/build_generative_training_sets.py
     harness_required: true
     best_use: only after enough validated generation records
+    training_corpus:
+      jsonl: artifacts/trail/generation/generative_training_sets/sft_generation_records.jsonl
+      summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
+      examples: 5
+      train_examples: 4
+      eval_examples: 1
+      readiness_gate_pass: false
+      min_examples: 20
   diffusion_or_flow_matching:
-    maturity: deferred
-    generator: future
+    maturity: seed_table_contract_implemented
+    generator: scripts/build_generative_training_sets.py
     harness_required: true
-    best_use: not prioritized until larger molecule/polymer dataset exists
+    best_use: not prioritized until more harness-passing small-molecule formulation records exist
+    training_seed_table:
+      table: artifacts/trail/generation/generative_training_sets/diffusion_flow_seed_table.csv
+      summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
+      seed_rows: 5
+      train_rows: 4
+      eval_rows: 1
+      readiness_gate_pass: false
+      min_examples: 100
 record_schema:
   schema_path: trail/generation/generation_record_schema.yaml
   importer: trail/generation/import_generation_records.py

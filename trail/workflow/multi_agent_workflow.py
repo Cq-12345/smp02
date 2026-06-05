@@ -36,6 +36,7 @@ def summarize(
     expanded_replacement_summary: Path,
     expanded_generation_summary: Path,
     gnn_global_feature_summary: Path,
+    generative_training_summary: Path,
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -49,6 +50,7 @@ def summarize(
     expanded_replacement = read_json(expanded_replacement_summary, {})
     expanded_generation = read_json(expanded_generation_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
+    generative_training = read_json(generative_training_summary, {})
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
@@ -93,6 +95,12 @@ def summarize(
         "gnn_global_feature_global_mapek_test_pct": gnn_global.get("global_mapek_test_pct"),
         "gnn_global_feature_mapek_delta_pct": gnn_global.get("global_minus_baseline_mapek_test_pct"),
         "gnn_global_feature_mae_delta_c": gnn_global.get("global_minus_baseline_mae_test_c"),
+        "generative_training_sft_examples": generative_training.get("sft_examples", 0),
+        "generative_training_sft_ready": generative_training.get("sft_ready", False),
+        "generative_training_diffusion_flow_seed_rows": generative_training.get("diffusion_flow_seed_rows", 0),
+        "generative_training_diffusion_flow_ready": generative_training.get("diffusion_flow_ready", False),
+        "generative_training_next_sft_needed": generative_training.get("next_data_needed_for_sft", 0),
+        "generative_training_next_diffusion_flow_needed": generative_training.get("next_data_needed_for_diffusion_flow", 0),
         "generation_feedback": feedback,
     }
 
@@ -111,6 +119,7 @@ def main() -> None:
     parser.add_argument("--expanded-replacement-summary", default="artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json")
     parser.add_argument("--expanded-generation-summary", default="artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json")
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
+    parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
     result = summarize(
@@ -126,6 +135,7 @@ def main() -> None:
         Path(args.expanded_replacement_summary),
         Path(args.expanded_generation_summary),
         Path(args.gnn_global_feature_summary),
+        Path(args.generative_training_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

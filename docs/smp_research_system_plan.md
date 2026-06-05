@@ -102,6 +102,7 @@
 - Expanded replacement：从 expanded inventory 选择替换分子，保留 source/template provenance，并用 strict counterpart compatibility 过滤。
 - VAE latent 邻域搜索：未来可在 latent space 中扰动，再 decode。
 - LLM/RAG 生成：未来可用知识库检索约束 prompt，生成 SMILES 或候选规则。
+- SFT / diffusion / flow 数据契约：`scripts/build_generative_training_sets.py` 已把通过 Harness 的 generation records 转成 SFT JSONL 和 diffusion/flow seed table，并用 readiness gate 阻止小样本过早训练。
 - Harness 控制：所有生成结果必须通过 RDKit、charset、元素、官能团、反应兼容、ratio simplex 等约束。
 
 生成不是最终决策；生成只产生候选 `h`，评估和选择由 predictor、PiEvo posterior、IDS 共同完成。
@@ -167,3 +168,4 @@ Agent 分工：
 - 对 dormant principle 做剪枝策略。
 - 对不同目标 Tg 批量运行，观察 posterior 是否随目标变化。
 - 对 GNN global features 做更长训练，并评估是否作为结构视角加入 predictor ensemble disagreement。
+- 持续扩大通过 Harness 且进入 observation ledger 的 generation records，直到 SFT 和 diffusion/flow readiness gate 通过。

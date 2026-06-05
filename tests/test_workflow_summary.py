@@ -83,6 +83,20 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    generative_training = tmp_path / "generative_training.json"
+    generative_training.write_text(
+        json.dumps(
+            {
+                "sft_examples": 7,
+                "sft_ready": False,
+                "diffusion_flow_seed_rows": 7,
+                "diffusion_flow_ready": False,
+                "next_data_needed_for_sft": 13,
+                "next_data_needed_for_diffusion_flow": 93,
+            }
+        ),
+        encoding="utf-8",
+    )
 
     result = summarize(
         candidates,
@@ -97,6 +111,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         expanded_replacement,
         expanded_generation,
         gnn_global,
+        generative_training,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -120,3 +135,9 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["gnn_global_feature_best_case"] == "mpnn_global"
     assert result["gnn_global_feature_mapek_delta_pct"] == -0.5
     assert result["gnn_global_feature_mae_delta_c"] == -2.0
+    assert result["generative_training_sft_examples"] == 7
+    assert result["generative_training_sft_ready"] is False
+    assert result["generative_training_diffusion_flow_seed_rows"] == 7
+    assert result["generative_training_diffusion_flow_ready"] is False
+    assert result["generative_training_next_sft_needed"] == 13
+    assert result["generative_training_next_diffusion_flow_needed"] == 93

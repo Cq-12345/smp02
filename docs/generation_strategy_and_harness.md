@@ -220,21 +220,44 @@ Feedback-aware LLM/RAG agent 状态：
 
 ### 3.6 SFT / 内部微调
 
-只有当积累足够高质量样本后才值得做：
+当前已落地训练语料契约，但 readiness gate 尚未通过：
 
-- 输入：目标 Tg、约束、active principles、历史 observation。
-- 输出：候选配方 JSON。
-- 训练标签：通过 Harness 且经 surrogate/真实实验验证的候选。
+- `scripts/build_generative_training_sets.py`
+- `artifacts/trail/generation/generative_training_sets/sft_generation_records.jsonl`
+- `artifacts/trail/generation/generative_training_sets/generative_training_summary.json`
+- `reports/generative_training_set_readiness.md`
 
-短期内不建议优先 SFT，因为数据规模和真实标签不足。
+语料构建规则：
+
+- 输入：已导入的 generation record ledgers。
+- 训练标签：必须 `record_pass=true`、`harness_pass=true`、有 predictor 输出和 generation reward。
+- 输出：OpenAI-style `messages` JSONL，其中 assistant 消息是 auditable generation record JSON，不是自由文本推荐。
+
+当前 readiness：
+
+- 8 条 generation ledger 输入中，7 条通过 Harness；去重和 reward 过滤后得到 5 条训练候选。
+- SFT JSONL 为 4 条 train、1 条 eval。
+- `sft_ready=false`，因为当前最小门槛设为 20 条样本；还缺 15 条通过 Harness 且最好有 observation ledger 证据的 records。
+- 因此当前不训练内部 SFT 模型，只保留可审计训练集契约和 readiness gate。
 
 ### 3.7 扩散/流匹配
 
-当前阶段只作为研究路线，不立即训练：
+当前已落地 diffusion/flow seed table 契约，但不训练模型：
 
-- 分子扩散/流匹配需要更大的有效单体数据集。
-- 还需要约束生成反应官能团和可合成性。
-- 若未来引入 polymer/超图表示，再考虑图扩散或 flow matching。
+- `artifacts/trail/generation/generative_training_sets/diffusion_flow_seed_table.csv`
+- `reports/generative_training_set_readiness.md`
+
+Seed table 记录：
+
+- 目标 Tg、窗口、候选 SMILES、比例。
+- surrogate predicted Tg、sigma、target distance、generation reward。
+- compatibility evidence 和 source ledger。
+
+当前 readiness：
+
+- diffusion/flow seed rows 为 5，4 条 train、1 条 eval。
+- `diffusion_flow_ready=false`，因为当前最小门槛设为 100 条 seed rows；还缺 95 条。
+- 这一步把扩散/流匹配从“空泛未来项”推进为数据契约；在样本不足前不训练，避免生成器学习到过窄的 195 C smoke 分布。
 
 ## 4. Harness 约束
 
@@ -279,4 +302,4 @@ PYTHONPATH=src python trail/harness/constraints.py \
 4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 和 feedback-aware LLM/RAG 侧都已完成 observation ledger -> PiEvo posterior 的 smoke 闭环。
 5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
-7. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。
+7. 持续运行 `scripts/build_generative_training_sets.py`，等 SFT 样本达到 20 条、diffusion/flow seed rows 达到 100 条且有 eval split 后，再考虑训练对应生成模型。
