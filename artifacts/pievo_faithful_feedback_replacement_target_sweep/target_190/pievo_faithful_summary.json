@@ -1,0 +1,47 @@
+{
+  "target_tg_c": 190.0,
+  "target_window_c": 5.0,
+  "reward_temperature_c": 5.0,
+  "target_guard_enabled": true,
+  "target_guard_max_distance_c": 5.0,
+  "target_guard_min_candidates": 1,
+  "pool_stats": [
+    "library=80",
+    "generated=10",
+    "chembl=60",
+    "chembl_scanned=875"
+  ],
+  "rounds": 6,
+  "selected_rows": 6,
+  "history_rows": 19,
+  "external_observation_summary": {
+    "enabled": true,
+    "ledger_path": "artifacts/trail/generation/feedback_guided_replacement_target_sweep/target_190/replacement_eval/replacement_observation_ledger.csv",
+    "input_rows": 13,
+    "candidate_rows_after_filter": 13,
+    "accepted_rows": 13,
+    "rejected_rows": 0,
+    "rejected": [],
+    "source_counts": {
+      "surrogate": 13
+    },
+    "total_authority_weight": 13.0,
+    "mean_reward": 0.5398062288199927
+  },
+  "total_authority_weight": 19.0,
+  "posterior_entropy": 3.284225785311335,
+  "map_principle": "reaction_a5dd26ae10ad",
+  "best_selected_target_distance_c": 0.057095111886866334,
+  "selected_within_target_guard": 6,
+  "all_selected_within_target_guard": true,
+  "top25_diversity": 0.8917186637002716,
+  "validation": {
+    "selected_rows": 6,
+    "ratio_sum_ok": 6,
+    "has_out_of_library": 6,
+    "n_range_ok": 6,
+    "compatibility_nonempty": 6,
+    "rdkit_valid": 6,
+    "all_selected_pass": true
+  }
+}

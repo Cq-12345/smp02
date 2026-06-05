@@ -56,6 +56,11 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/compare_piev
   --out-dir artifacts/trail/generation/feedback_guided_replacement_pievo_compare \
   --report reports/feedback_guided_replacement_pievo_comparison.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_feedback_replacement_target_sweep.py \
+  --targets 190 195 200 250 \
+  --rounds 6 \
+  --candidate-batch-size 260
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
@@ -74,5 +79,11 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
 - Feedback-guided strict replacement ledger：11 条外部 surrogate observations，posterior entropy 为 1.4358。
 - 两者 MAP principle 均为 `long_aliphatic_penalty`，但 strict ledger 把其 posterior 从 0.4749 推至 0.7454。
 - 4 轮 smoke 的 IDS 选择集合相同，说明这个短程实验中 feedback 主要改变 posterior 置信分布；更长 rounds 和更多目标 Tg 才能验证它是否改变最终选择路径。
+
+多目标 replacement 反馈闭环已经补充：
+
+- 190/195/200/250 C 每个目标都重新计算 replacement Harness、external observation ledger、PiEvo reward 和 posterior。
+- 6 轮 smoke 的最佳新选择分别距目标 0.057、0.006、0.204、0.099 C。
+- MAP principle 随目标变化，说明目标 Tg 已经影响 full-history posterior，而不是只影响候选表排序。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

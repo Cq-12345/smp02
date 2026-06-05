@@ -84,6 +84,10 @@ h = (m_1..m_n, r_1..r_n)
 - `configs/pievo_faithful_feedback_replacement_195_smoke.yaml`
 - `artifacts/pievo_faithful_feedback_replacement_195_smoke/*`
 - `reports/feedback_guided_replacement_pievo_comparison.md`
+- `scripts/run_feedback_replacement_target_sweep.py`
+- `artifacts/trail/generation/feedback_guided_replacement_target_sweep/*`
+- `artifacts/pievo_faithful_feedback_replacement_target_sweep/*`
+- `reports/feedback_guided_replacement_target_sweep.md`
 
 结果：
 
@@ -97,6 +101,9 @@ h = (m_1..m_n, r_1..r_n)
 - Strict replacement 的重建失败从 13 条降到 0 条，Harness 通过从 10 条增至 11 条；最佳距离仍为 0.37 C，说明互补反应对约束没有牺牲当前最佳近目标候选。
 - Strict replacement observation ledger 已进入 PiEvo-faithful：外部 observation 从 10 条变为 11 条，posterior entropy 从 2.4869 降为 1.4358，MAP principle 仍为 `long_aliphatic_penalty`，其 posterior 从 0.4749 升至 0.7454。
 - 在相同 seed、目标 Tg 和 target guard 下，4 轮 IDS 选择集合没有变化，最佳新选择仍为 194.99 C、距 195 C 目标 0.01 C；这说明本轮 feedback 主要改变 posterior 置信分布，而不是短 smoke 的选择路径。
+- 多目标 strict replacement + PiEvo sweep 已覆盖 190/195/200/250 C，且每个目标都重新计算 replacement target window、external ledger reward 和 PiEvo posterior。
+- 6 轮 smoke 中最佳新选择分别为 190.06、194.99、199.80、249.90 C；对应目标距离为 0.057、0.006、0.204、0.099 C，所有 selected 都通过 Harness。
+- 目标不同会改变 MAP principle：190 C 为 `reaction_a5dd26ae10ad`，195 C 为 `long_aliphatic_penalty`，200 C 为 `too_flexible_penalty`，250 C 为 `heavy_halogen_practical_risk`。这说明可变目标 Tg 已进入 posterior 层，而不是只做同一候选表重排序。
 
 ### 3.3 VAE latent 生成
 
@@ -233,6 +240,6 @@ PYTHONPATH=src python trail/harness/constraints.py \
 
 1. 将真实 LLM/RAG agent 接到 `generation_record_schema.yaml`，要求先输出 generation record，再进入 predictor/Harness/PiEvo。
 2. 将 LLM 生成限制在“提出 principle/官能团组合/候选模板”，SMILES 草案必须由 RDKit、预测模型和 Harness 再验证。
-3. 对 feedback-guided replacement 做更多目标温度和更长 rounds 的 PiEvo sweep，确认 posterior 收缩是否会在更大候选池中改变 IDS 选择路径。
+3. 对 feedback-guided replacement 做更大候选池和真实/高保真 observation 版本的 PiEvo sweep，确认 surrogate posterior 规律是否能被物理证据保留。
 4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 侧已完成互补反应对约束和 PiEvo posterior 对比。
 5. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。

@@ -1,0 +1,47 @@
+{
+  "target_tg_c": 200.0,
+  "target_window_c": 5.0,
+  "reward_temperature_c": 5.0,
+  "target_guard_enabled": true,
+  "target_guard_max_distance_c": 5.0,
+  "target_guard_min_candidates": 1,
+  "pool_stats": [
+    "library=80",
+    "generated=10",
+    "chembl=60",
+    "chembl_scanned=875"
+  ],
+  "rounds": 6,
+  "selected_rows": 6,
+  "history_rows": 17,
+  "external_observation_summary": {
+    "enabled": true,
+    "ledger_path": "artifacts/trail/generation/feedback_guided_replacement_target_sweep/target_200/replacement_eval/replacement_observation_ledger.csv",
+    "input_rows": 11,
+    "candidate_rows_after_filter": 11,
+    "accepted_rows": 11,
+    "rejected_rows": 0,
+    "rejected": [],
+    "source_counts": {
+      "surrogate": 11
+    },
+    "total_authority_weight": 11.0,
+    "mean_reward": 0.6782616226556897
+  },
+  "total_authority_weight": 17.0,
+  "posterior_entropy": 2.8777742408867395,
+  "map_principle": "too_flexible_penalty",
+  "best_selected_target_distance_c": 0.2044494365432854,
+  "selected_within_target_guard": 6,
+  "all_selected_within_target_guard": true,
+  "top25_diversity": 0.912707136373018,
+  "validation": {
+    "selected_rows": 6,
+    "ratio_sum_ok": 6,
+    "has_out_of_library": 6,
+    "n_range_ok": 6,
+    "compatibility_nonempty": 6,
+    "rdkit_valid": 6,
+    "all_selected_pass": true
+  }
+}

@@ -266,6 +266,20 @@ def write_replacement_observation_ledger(scored: pd.DataFrame, out_dir: Path, ta
     observation_input = out_dir / "replacement_observations_input.csv"
     ledger_path = out_dir / "replacement_observation_ledger.csv"
     summary_path = out_dir / "replacement_observation_ledger_summary.json"
+    columns = [
+        "observation_id",
+        "source_type",
+        "target_tg_c",
+        "observed_tg_c",
+        "smiles",
+        "ratios",
+        "predicted_tg_mean_c",
+        "predicted_tg_sigma_c",
+        "experiment_date",
+        "operator",
+        "method",
+        "notes",
+    ]
     rows = []
     for _, row in passed.sort_values(["target_distance_c", "ood_penalty", "predicted_tg_sigma_c"]).iterrows():
         rows.append(
@@ -284,7 +298,7 @@ def write_replacement_observation_ledger(scored: pd.DataFrame, out_dir: Path, ta
                 "notes": f"VAE replacement proposal {int(row['proposal_index'])}; replace_side={row['replace_side']}; tanimoto={float(row['replacement_tanimoto']):.3f}",
             }
         )
-    pd.DataFrame(rows).to_csv(observation_input, index=False)
+    pd.DataFrame(rows, columns=columns).to_csv(observation_input, index=False)
     ledger, ledger_summary = import_observations(observation_input, Path("trail/experiments/observation_schema.yaml"), reward_temperature_c)
     ledger.to_csv(ledger_path, index=False)
     save_json(ledger_summary, summary_path)

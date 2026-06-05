@@ -29,8 +29,11 @@ strategies:
         - artifacts/trail/generation/feedback_guided_replacement_eval/replacement_eval_summary.json
         - artifacts/pievo_faithful_feedback_replacement_195_smoke/pievo_faithful_summary.json
         - artifacts/trail/generation/feedback_guided_replacement_pievo_compare/pievo_feedback_ledger_comparison.json
+        - artifacts/trail/generation/feedback_guided_replacement_target_sweep/feedback_replacement_target_sweep_summary.json
+        - artifacts/pievo_faithful_feedback_replacement_target_sweep/target_195/pievo_faithful_summary.json
         - reports/feedback_guided_replacement_comparison.md
         - reports/feedback_guided_replacement_pievo_comparison.md
+        - reports/feedback_guided_replacement_target_sweep.md
   vae_latent_local_search:
     maturity: planned
     generator: future
