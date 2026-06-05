@@ -1,0 +1,4 @@
+source,registered,source_type,authority_level,components,functional_groups,top_functional_groups,role
+library,True,literature_dataset,4,225,17,ether:155;aromatic:110;ester:73;primary_amine:62;vinyl:58;epoxy:39;hydroxyl:38;secondary_amine:8,Monomers appearing in the SMP dataset used for model reproduction and candidate discovery.
+generated,True,rule_template_seed,2,10,15,aromatic:10;ether:4;primary_amine:2;hydroxyl:2;phenol:2;anhydride:1;ester:1;cyanate_ester:1,Thermoset-inspired small-molecule seeds used to expand sparse but important functional groups.
+chembl,True,database_screen,1,459,16,aromatic:365;ether:261;hydroxyl:248;secondary_amine:224;vinyl:142;ester:139;primary_amine:103;carboxylic_acid:85,"External molecule pool screened into small-molecule candidates by allowed atoms, one-fragment, reactive group, and size filters."

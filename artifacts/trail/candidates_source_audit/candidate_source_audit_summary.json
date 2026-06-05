@@ -1,0 +1,18 @@
+{
+  "inventory_rows": 694,
+  "registered_sources": 4,
+  "inventory_sources": {
+    "chembl": 459,
+    "library": 225,
+    "generated": 10
+  },
+  "unregistered_inventory_sources": [],
+  "functional_groups": 18,
+  "sparse_high_value_groups_needing_expansion": [
+    "cyanate_ester",
+    "maleimide",
+    "isocyanate",
+    "anhydride",
+    "thiol"
+  ]
+}
