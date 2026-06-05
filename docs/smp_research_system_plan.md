@@ -167,7 +167,8 @@ Agent 分工：
 - `scripts/build_validation_request_packet.py` 已把验证计划转成 55 个可分派 request：30 个 `process_completion`、25 个 `high_fidelity_validation`、0 个 `real_dsc_planning`；25 个 high-fidelity request 都被 process completion gate 阻塞。
 - `scripts/import_validation_request_results.py` 已生成 25 条 high-fidelity result intake template；当前没有完成结果，`accepted_result_rows=0`、`observation_ledger_pass_rows=0`。
 - `scripts/build_active_observation_ledger.py` 已把 result intake 后的 observation ledger 再收敛为 active high-authority evidence ledger；当前 `active_rows=0`、`authority_weight_sum=0.0`，因为尚无完成且获批的高保真/真实/文献观测。
-- Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts`、`human_validation_*`、`validation_request_*`、`validation_result_*` 和 `active_observation_*`；这一步把“真实实验结果迭代优化”前的人工质量门禁落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
+- `scripts/run_active_evidence_pievo_bridge.py` 已验证 active ledger 可进入 PiEvo 外部观测加载和 full-history posterior 更新路径；当前 `bridge_status=no_active_evidence_noop`、`external_accepted_rows=0`、`active_evidence_updates_posterior=false`。
+- Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts`、`human_validation_*`、`validation_request_*`、`validation_result_*`、`active_observation_*` 和 `active_evidence_pievo_bridge_*`；这一步把“真实实验结果迭代优化”前的人工质量门禁和 posterior 消费路径落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
 
 ## 6. PiEvo-faithful 要求
 

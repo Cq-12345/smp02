@@ -171,6 +171,39 @@ def test_load_external_observations_adds_weighted_history(tmp_path: Path) -> Non
     assert observations[0].row["feature_aromatic_backbone"] is True
 
 
+def test_load_external_observations_can_require_active_high_authority_evidence(tmp_path: Path) -> None:
+    ledger = tmp_path / "active_ledger.csv"
+    ledger.write_text(
+        "\n".join(
+            [
+                "observation_id,source_type,target_tg_c,observed_tg_c,smiles,ratios,ledger_pass,active_evidence",
+                "hf_001,high_fidelity_simulation,250,249,CC(C)(c1ccc(OCC2CO2)cc1)c1ccc(OCC2CO2)cc1|Nc1ccc(N)cc1,0.5:0.5,True,True",
+                "dsc_not_active,real_dsc,250,248,CC(C)(c1ccc(OCC2CO2)cc1)c1ccc(OCC2CO2)cc1|Nc1ccc(N)cc1,0.5:0.5,True,False",
+                "surrogate_not_allowed,surrogate,250,250,CC(C)(c1ccc(OCC2CO2)cc1)c1ccc(OCC2CO2)cc1|Nc1ccc(N)cc1,0.5:0.5,True,True",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    cfg = fake_pievo_cfg()
+    cfg.external_observation_ledger = ledger
+    cfg.external_observation_allowed_source_types = ("high_fidelity_simulation", "real_dsc", "literature")
+    cfg.external_observation_require_active_evidence = True
+
+    observations, summary = load_external_observations(cfg, [], fake_agent_cfg())
+
+    assert summary["input_rows"] == 3
+    assert summary["candidate_rows_after_ledger_pass"] == 3
+    assert summary["candidate_rows_after_source_filter"] == 2
+    assert summary["candidate_rows_after_active_filter"] == 1
+    assert summary["accepted_rows"] == 1
+    assert summary["allowed_source_types"] == ["high_fidelity_simulation", "real_dsc", "literature"]
+    assert summary["require_active_evidence"] is True
+    assert observations[0].observation_id == "hf_001"
+    assert observations[0].source_type == "high_fidelity_simulation"
+    assert observations[0].authority_weight == 3.0
+
+
 def test_target_guard_limits_warmup_selection_to_near_target_candidates() -> None:
     principles = [Principle("target_guard_test", "soft", "test principle", "feature_a", 1.0, 1.0, 1.0)]
     candidates = pd.DataFrame(

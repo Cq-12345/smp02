@@ -1,0 +1,29 @@
+{
+  "config_path": "configs/pievo_faithful_active_evidence_bridge_smoke.yaml",
+  "external_ledger_path": "artifacts/trail/human_review/active_high_authority_observation_ledger.csv",
+  "target_tg_c": 195.0,
+  "reward_temperature_c": 5.0,
+  "allowed_source_types": [
+    "high_fidelity_simulation",
+    "real_dsc",
+    "literature"
+  ],
+  "require_active_evidence": true,
+  "external_input_rows": 0,
+  "external_candidate_rows_after_ledger_pass": 0,
+  "external_candidate_rows_after_source_filter": 0,
+  "external_candidate_rows_after_active_filter": 0,
+  "external_accepted_rows": 0,
+  "external_rejected_rows": 0,
+  "external_source_counts": {},
+  "posterior_history_rows": 0,
+  "total_authority_weight": 0.0,
+  "posterior_entropy": 3.663561646129646,
+  "map_principle": "aromatic_backbones_raise_tg",
+  "active_evidence_updates_posterior": false,
+  "bridge_status": "no_active_evidence_noop",
+  "observations_path": "artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_external_observations_used.csv",
+  "posterior_path": "artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_principle_posterior.json",
+  "summary_path": "artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json",
+  "report_path": "reports/active_evidence_pievo_bridge.md"
+}

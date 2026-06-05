@@ -65,6 +65,8 @@ class PiEvoFaithfulConfig:
     external_observation_ledger: Path | None = None
     external_observation_limit: int | None = None
     external_observation_require_pass: bool = True
+    external_observation_allowed_source_types: tuple[str, ...] | None = None
+    external_observation_require_active_evidence: bool = False
     target_guard_enabled: bool = False
     target_guard_max_distance_c: float = 5.0
     target_guard_min_candidates: int = 1
@@ -153,6 +155,13 @@ def parse_pievo_faithful_config(cfg: dict, agent_cfg: AgentConfig) -> PiEvoFaith
     default_out = agent_cfg.output_dir.parent / f"{agent_cfg.output_dir.name}_pievo_faithful"
     external_ledger = raw.get("external_observation_ledger")
     external_limit = raw.get("external_observation_limit")
+    allowed_sources_raw = raw.get("external_observation_allowed_source_types")
+    if allowed_sources_raw is None or allowed_sources_raw == "":
+        allowed_source_types = None
+    elif isinstance(allowed_sources_raw, str):
+        allowed_source_types = tuple(part.strip() for part in allowed_sources_raw.split(",") if part.strip())
+    else:
+        allowed_source_types = tuple(str(part).strip() for part in allowed_sources_raw if str(part).strip())
     ensemble_metrics = raw.get("ensemble_metrics_path", "artifacts/reproduce/predictors/all_predictor_metrics.csv")
     return PiEvoFaithfulConfig(
         output_dir=Path(raw.get("output_dir", default_out)),
@@ -170,6 +179,8 @@ def parse_pievo_faithful_config(cfg: dict, agent_cfg: AgentConfig) -> PiEvoFaith
         external_observation_ledger=None if external_ledger in {None, ""} else Path(external_ledger),
         external_observation_limit=None if external_limit in {None, ""} else int(external_limit),
         external_observation_require_pass=bool(raw.get("external_observation_require_pass", True)),
+        external_observation_allowed_source_types=allowed_source_types,
+        external_observation_require_active_evidence=bool(raw.get("external_observation_require_active_evidence", False)),
         target_guard_enabled=bool(raw.get("target_guard_enabled", False)),
         target_guard_max_distance_c=float(raw.get("target_guard_max_distance_c", agent_cfg.target_window_c)),
         target_guard_min_candidates=int(raw.get("target_guard_min_candidates", 1)),
@@ -497,8 +508,26 @@ def load_external_observations(
         raise FileNotFoundError(f"Missing external observation ledger: {path}")
     df = pd.read_csv(path, low_memory=False)
     input_rows = int(len(df))
+    candidate_rows_after_ledger_pass = input_rows
     if pievo_cfg.external_observation_require_pass and "ledger_pass" in df.columns:
         df = df[df["ledger_pass"].map(truthy)].copy()
+    candidate_rows_after_ledger_pass = int(len(df))
+    candidate_rows_after_source_filter = int(len(df))
+    if pievo_cfg.external_observation_allowed_source_types is not None:
+        allowed_sources = set(pievo_cfg.external_observation_allowed_source_types)
+        if "source_type" in df.columns:
+            df = df[df["source_type"].fillna("").astype(str).isin(allowed_sources)].copy()
+        else:
+            df = df.iloc[0:0].copy()
+        candidate_rows_after_source_filter = int(len(df))
+    candidate_rows_after_active_filter = int(len(df))
+    if pievo_cfg.external_observation_require_active_evidence:
+        if "active_evidence" in df.columns:
+            df = df[df["active_evidence"].map(truthy)].copy()
+        else:
+            df = df.iloc[0:0].copy()
+        candidate_rows_after_active_filter = int(len(df))
+    candidate_rows_before_limit = int(len(df))
     if pievo_cfg.external_observation_limit is not None:
         df = df.head(pievo_cfg.external_observation_limit).copy()
     observations: list[Observation] = []
@@ -518,6 +547,15 @@ def load_external_observations(
         "enabled": True,
         "ledger_path": str(path),
         "input_rows": input_rows,
+        "candidate_rows_after_ledger_pass": candidate_rows_after_ledger_pass,
+        "allowed_source_types": None
+        if pievo_cfg.external_observation_allowed_source_types is None
+        else list(pievo_cfg.external_observation_allowed_source_types),
+        "candidate_rows_after_source_filter": candidate_rows_after_source_filter,
+        "require_active_evidence": bool(pievo_cfg.external_observation_require_active_evidence),
+        "candidate_rows_after_active_filter": candidate_rows_after_active_filter,
+        "candidate_rows_before_limit": candidate_rows_before_limit,
+        "external_observation_limit": pievo_cfg.external_observation_limit,
         "candidate_rows_after_filter": int(len(df)),
         "accepted_rows": int(len(observations)),
         "rejected_rows": int(len(rejected)),

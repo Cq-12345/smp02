@@ -261,6 +261,22 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    active_evidence_pievo_bridge = tmp_path / "active_evidence_pievo_bridge.json"
+    active_evidence_pievo_bridge.write_text(
+        json.dumps(
+            {
+                "bridge_status": "active_evidence_updates_posterior",
+                "external_accepted_rows": 1,
+                "external_rejected_rows": 0,
+                "posterior_history_rows": 1,
+                "total_authority_weight": 3.0,
+                "posterior_entropy": 2.5,
+                "map_principle": "cyanate_ester_triazine",
+                "active_evidence_updates_posterior": True,
+            }
+        ),
+        encoding="utf-8",
+    )
     gnn_global = tmp_path / "gnn_global.json"
     gnn_global.write_text(
         json.dumps(
@@ -380,6 +396,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         validation_requests,
         validation_result_intake,
         active_observations,
+        active_evidence_pievo_bridge,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -472,6 +489,14 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["active_observation_max_authority_weight"] == 3.0
     assert result["active_observation_mean_target_distance_c"] == 1.2
     assert result["active_observation_mean_weighted_reward"] == 2.1
+    assert result["active_evidence_pievo_bridge_status"] == "active_evidence_updates_posterior"
+    assert result["active_evidence_pievo_bridge_accepted_rows"] == 1
+    assert result["active_evidence_pievo_bridge_rejected_rows"] == 0
+    assert result["active_evidence_pievo_bridge_posterior_history_rows"] == 1
+    assert result["active_evidence_pievo_bridge_total_authority_weight"] == 3.0
+    assert result["active_evidence_pievo_bridge_posterior_entropy"] == 2.5
+    assert result["active_evidence_pievo_bridge_map_principle"] == "cyanate_ester_triazine"
+    assert result["active_evidence_updates_pievo_posterior"] is True
     assert result["gnn_global_feature_architecture"] == "mpnn"
     assert result["gnn_global_feature_best_case"] == "mpnn_global"
     assert result["gnn_global_feature_mapek_delta_pct"] == -0.5

@@ -108,6 +108,22 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_active
 - `active_high_authority_observation_summary.json`
 - `reports/active_high_authority_observation_ledger.md`
 
+Active evidence 到 PiEvo posterior 的 bridge：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_active_evidence_pievo_bridge.py \
+  --config configs/pievo_faithful_active_evidence_bridge_smoke.yaml \
+  --out-dir artifacts/pievo_faithful_active_evidence_bridge_smoke \
+  --report reports/active_evidence_pievo_bridge.md
+```
+
+输出：
+
+- `active_evidence_pievo_external_observations_used.csv`
+- `active_evidence_principle_posterior.json`
+- `active_evidence_pievo_bridge_summary.json`
+- `reports/active_evidence_pievo_bridge.md`
+
 ## 5. 与 PiEvo 的连接
 
 当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
@@ -208,3 +224,10 @@ Smoke 结果：
 - 默认只允许 `high_fidelity_simulation`、`real_dsc`、`literature` 三类来源成为 active evidence；`surrogate` 即使通过 Harness，也不能进入这一层。
 - 当前输入 ledger 为 `validation_result_observation_ledger.csv`，其中 0 条完成观测；因此 `active_rows=0`、`authority_weight_sum=0.0`。
 - 这层 ledger 才是后续 PiEvo posterior、strategy update 或真实实验总结应读取的高权重 evidence source。当前为空表示质量门没有被绕过，而不是说明候选生成链路失败。
+
+当前 active evidence -> PiEvo bridge：
+
+- `scripts/run_active_evidence_pievo_bridge.py` 使用 PiEvo 自身的 `load_external_observations` 和 `update_posterior_full_history`，验证 active ledger 是否会改变 principle posterior。
+- `configs/pievo_faithful_active_evidence_bridge_smoke.yaml` 显式要求 `external_observation_allowed_source_types=[high_fidelity_simulation, real_dsc, literature]` 且 `external_observation_require_active_evidence=true`。
+- 当前 `external_accepted_rows=0`、`posterior_history_rows=0`、`active_evidence_updates_posterior=false`、`bridge_status=no_active_evidence_noop`。
+- 这意味着当前 PiEvo posterior 没有新增高权重 evidence；未来一旦高保真/真实/文献结果通过 gate，同一脚本会记录 accepted rows、authority weight、MAP principle 和 posterior entropy。

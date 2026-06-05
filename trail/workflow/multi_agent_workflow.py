@@ -57,6 +57,9 @@ def summarize(
     validation_request_summary: Path = Path("artifacts/trail/human_review/validation_request_summary.json"),
     validation_result_intake_summary: Path = Path("artifacts/trail/human_review/validation_result_intake_summary.json"),
     active_observation_summary: Path = Path("artifacts/trail/human_review/active_high_authority_observation_summary.json"),
+    active_evidence_pievo_bridge_summary: Path = Path(
+        "artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json"
+    ),
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -79,6 +82,7 @@ def summarize(
     validation_requests = read_json(validation_request_summary, {})
     validation_result_intake = read_json(validation_result_intake_summary, {})
     active_observations = read_json(active_observation_summary, {})
+    active_evidence_pievo_bridge = read_json(active_evidence_pievo_bridge_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
     generative_training = read_json(generative_training_summary, {})
     sft_candidate_generation = read_json(sft_candidate_generation_summary, {})
@@ -225,6 +229,14 @@ def summarize(
         "active_observation_max_authority_weight": active_observations.get("max_authority_weight"),
         "active_observation_mean_target_distance_c": active_observations.get("mean_target_distance_c"),
         "active_observation_mean_weighted_reward": active_observations.get("mean_weighted_reward"),
+        "active_evidence_pievo_bridge_status": active_evidence_pievo_bridge.get("bridge_status", ""),
+        "active_evidence_pievo_bridge_accepted_rows": active_evidence_pievo_bridge.get("external_accepted_rows", 0),
+        "active_evidence_pievo_bridge_rejected_rows": active_evidence_pievo_bridge.get("external_rejected_rows", 0),
+        "active_evidence_pievo_bridge_posterior_history_rows": active_evidence_pievo_bridge.get("posterior_history_rows", 0),
+        "active_evidence_pievo_bridge_total_authority_weight": active_evidence_pievo_bridge.get("total_authority_weight", 0),
+        "active_evidence_pievo_bridge_posterior_entropy": active_evidence_pievo_bridge.get("posterior_entropy"),
+        "active_evidence_pievo_bridge_map_principle": active_evidence_pievo_bridge.get("map_principle", ""),
+        "active_evidence_updates_pievo_posterior": active_evidence_pievo_bridge.get("active_evidence_updates_posterior", False),
         "gnn_global_feature_architecture": gnn_global.get("architecture"),
         "gnn_global_feature_best_case": gnn_global.get("best_case"),
         "gnn_global_feature_baseline_mapek_test_pct": gnn_global.get("baseline_mapek_test_pct"),
@@ -304,6 +316,10 @@ def main() -> None:
         "--active-observation-summary",
         default="artifacts/trail/human_review/active_high_authority_observation_summary.json",
     )
+    parser.add_argument(
+        "--active-evidence-pievo-bridge-summary",
+        default="artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json",
+    )
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--sft-candidate-generation-summary", default="artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json")
@@ -350,6 +366,7 @@ def main() -> None:
         Path(args.validation_request_summary),
         Path(args.validation_result_intake_summary),
         Path(args.active_observation_summary),
+        Path(args.active_evidence_pievo_bridge_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

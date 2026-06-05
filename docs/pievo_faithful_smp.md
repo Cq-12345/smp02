@@ -106,6 +106,18 @@ real_dsc: 5
 
 这些权重不是物理真理，只是 posterior 更新时的证据强度。真实实验记录必须先经过人工/脚本审核，标记为 `ledger_pass` 后再进入 active history。
 
+为了防止 active evidence ledger 被错误混入 surrogate 或草稿行，PiEvo 外部观测配置现在支持二级过滤：
+
+```yaml
+external_observation_allowed_source_types:
+  - high_fidelity_simulation
+  - real_dsc
+  - literature
+external_observation_require_active_evidence: true
+```
+
+这两个字段默认不启用，因此既有 surrogate smoke ledger 不受影响；只有 active-evidence bridge 或真实实验配置显式打开时才收紧来源。
+
 ### 2.5 MAP Residual Anomaly
 
 异常不再定义为“低先验但接近目标”，而是 MAP principle 对历史观测解释失败：
@@ -245,6 +257,17 @@ smp02 pievo-faithful --config configs/pievo_faithful_ledger_smoke.yaml
 ```
 
 该 smoke 会读取 `artifacts/trail/experiments/observation_ledger.csv`，并把通过审核的外部观测作为 round 0 history。注意：当前示例 ledger 中的 `real_dsc` 行是 schema 占位行，不代表真实 DSC 已经完成。
+
+如果要验证 active high-authority evidence 是否已经接入 PiEvo posterior 输入路径，可以运行：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_active_evidence_pievo_bridge.py \
+  --config configs/pievo_faithful_active_evidence_bridge_smoke.yaml \
+  --out-dir artifacts/pievo_faithful_active_evidence_bridge_smoke \
+  --report reports/active_evidence_pievo_bridge.md
+```
+
+该 bridge 只执行外部观测加载和 full-history posterior 更新，不生成新候选。当前 active ledger 为空，因此 `bridge_status=no_active_evidence_noop`、`external_accepted_rows=0`、`active_evidence_updates_posterior=false`；这表示质量门没有被绕过，而不是 PiEvo 失效。
 
 ## 4. 如何理解“发现新规律、抛弃没用规律”
 
