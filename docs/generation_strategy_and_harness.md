@@ -63,6 +63,7 @@ h = (m_1..m_n, r_1..r_n)
 - 从高分候选出发。
 - 按共享官能团找可替换小分子。
 - 用 Morgan fingerprint Tanimoto 排序。
+- 可选 feedback-guided strict 模式：替换分子必须继续和未替换的另一侧单体形成 `compatibility_reason` 可映射反应对。
 
 用途：
 
@@ -76,6 +77,10 @@ h = (m_1..m_n, r_1..r_n)
 - `artifacts/trail/generation/replacement_eval/replacement_observation_ledger.csv`
 - `reports/replacement_proposal_evaluation.md`
 - `reports/replacement_pievo_feedback_smoke.md`
+- `artifacts/trail/generation/feedback_guided_replacement_proposals.csv`
+- `artifacts/trail/generation/feedback_guided_replacement_eval/replacement_observation_ledger.csv`
+- `reports/feedback_guided_replacement_evaluation.md`
+- `reports/feedback_guided_replacement_comparison.md`
 
 结果：
 
@@ -85,6 +90,8 @@ h = (m_1..m_n, r_1..r_n)
 - `scripts/evaluate_replacement_proposals.py` 默认使用 CPU deterministic VAE encoding，避免 CUDA 数值路径导致 surrogate ledger 漂移。
 - 最佳 replacement 预测 Tg 为 194.63 C，距 195 C 目标 0.37 C；4 条在 1 C 内，10 条在 5 C 内。
 - 通过项已写入 observation ledger，并进入 `configs/pievo_faithful_replacement_195_smoke.yaml` 的 PiEvo-faithful external history。
+- 失败回流后的 strict replacement 仍生成 120 条 proposal，但每条都带非空 `counterpart_compatibility_reason`。
+- Strict replacement 的重建失败从 13 条降到 0 条，Harness 通过从 10 条增至 11 条；最佳距离仍为 0.37 C，说明互补反应对约束没有牺牲当前最佳近目标候选。
 
 ### 3.3 VAE latent 生成
 
@@ -162,6 +169,7 @@ Prompt/RAG smoke 结果：
 - 主失败原因为 `replacement_formula_failed_reaction_or_ratio_constraints`，共 14 次。
 - `llm_smiles_generation` 当前 policy delta 为 -0.25，必须先补 prediction 和 chemistry evidence。
 - `functional_group_replacement` 当前 policy delta 为 -0.10，下一轮应加入“替换后必须保留互补反应对”的约束。
+- 该约束已在 `trail/generation/vae_replacement_strategy.py --require-counterpart-compatibility` 中落地；strict evaluation 中 replacement 重建拒绝数为 0。
 
 ### 3.6 SFT / 内部微调
 
@@ -220,6 +228,6 @@ PYTHONPATH=src python trail/harness/constraints.py \
 
 1. 将真实 LLM/RAG agent 接到 `generation_record_schema.yaml`，要求先输出 generation record，再进入 predictor/Harness/PiEvo。
 2. 将 LLM 生成限制在“提出 principle/官能团组合/候选模板”，SMILES 草案必须由 RDKit、预测模型和 Harness 再验证。
-3. 对 replacement 的失败原因做回流：13 条失败均为反应/比例约束失败，应改进官能团匹配或比例搜索。
-4. 将 `generation_feedback/strategy_feedback.csv` 接入下一轮 prompt/RAG 和 replacement proposal 生成器，用失败案例压低弱生成规则。
+3. 将 strict replacement observation ledger 接入下一轮 PiEvo target sweep，并比较原始 replacement ledger 与 feedback-guided ledger 对 principle posterior 的影响。
+4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 侧已完成互补反应对约束接入。
 5. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。

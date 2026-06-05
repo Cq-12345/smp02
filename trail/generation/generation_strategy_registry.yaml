@@ -17,6 +17,17 @@ strategies:
     generator: trail/generation/vae_replacement_strategy.py + scripts/evaluate_replacement_proposals.py
     harness_required: true
     best_use: local exploration around high-scoring formulations
+    feedback_guided_mode:
+      cli_flag: --require-counterpart-compatibility
+      constraint: replacement must preserve a mapped complementary reactive pair with the unchanged co-monomer
+      audit_fields:
+        - counterpart_groups
+        - counterpart_compatibility_reason
+        - feedback_constraint
+      outputs:
+        - artifacts/trail/generation/feedback_guided_replacement_proposals.csv
+        - artifacts/trail/generation/feedback_guided_replacement_eval/replacement_eval_summary.json
+        - reports/feedback_guided_replacement_comparison.md
   vae_latent_local_search:
     maturity: planned
     generator: future

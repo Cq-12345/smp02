@@ -181,6 +181,9 @@ def build_replacement_formulas(
                 "replacement_smiles": replacement,
                 "replacement_tanimoto": float(proposal["tanimoto"]),
                 "shared_groups": proposal["shared_groups"],
+                "counterpart_groups": proposal.get("counterpart_groups", ""),
+                "counterpart_compatibility_reason": proposal.get("counterpart_compatibility_reason", ""),
+                "feedback_constraint": proposal.get("feedback_constraint", ""),
                 "source_smiles_a": source["smiles_a"],
                 "source_smiles_b": source["smiles_b"],
                 "source_ratio_a": float(source["ratio_a"]),
@@ -188,7 +191,16 @@ def build_replacement_formulas(
                 "source_compatibility_reason": source["compatibility_reason"],
             }
         )
-    return formulas, metadata, pd.DataFrame(rejections)
+    rejection_df = pd.DataFrame(rejections)
+    if rejection_df.empty:
+        rejection_df = pd.DataFrame(
+            columns=[
+                "proposal_index",
+                "reason",
+                *[column for column in proposals.columns if column not in {"proposal_index", "reason"}],
+            ]
+        )
+    return formulas, metadata, rejection_df
 
 
 def write_report(scored: pd.DataFrame, rejections: pd.DataFrame, summary: dict[str, object], report_path: Path, target_tg_c: float) -> None:
