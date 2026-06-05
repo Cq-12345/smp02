@@ -6,16 +6,15 @@ __pycache__/
 .ruff_cache/
 .ipynb_checkpoints/
 
-artifacts/
-results/
-logs/
-*.pt
-*.pth
-*.joblib
-*.pkl
+# artifacts/
+# results/
+# logs/
+# *.pt
+# *.pth
+# *.joblib
+# *.pkl
 
 .DS_Store
 .env
 .venv/
 venv/
-

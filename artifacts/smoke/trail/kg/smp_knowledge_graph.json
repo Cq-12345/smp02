@@ -1,0 +1,272 @@
+{
+  "directed": true,
+  "multigraph": true,
+  "graph": {},
+  "nodes": [
+    {
+      "kind": "class",
+      "description": "Small molecule reactant represented by SMILES.",
+      "id": "Monomer"
+    },
+    {
+      "kind": "class",
+      "description": "Reactive or structural group detected by SMARTS.",
+      "id": "FunctionalGroup"
+    },
+    {
+      "kind": "class",
+      "description": "Rule linking compatible functional groups to a plausible thermoset network.",
+      "id": "ReactionPrinciple"
+    },
+    {
+      "kind": "class",
+      "description": "Candidate shape memory polymer formulation with molar ratios.",
+      "id": "SMPRecipe"
+    },
+    {
+      "kind": "class",
+      "description": "Tg predictor trained on WVCM latent vectors.",
+      "id": "PredictionModel"
+    },
+    {
+      "kind": "relation",
+      "domain": "Monomer",
+      "range": "FunctionalGroup",
+      "id": "has_functional_group"
+    },
+    {
+      "kind": "relation",
+      "domain": "FunctionalGroup",
+      "range": "ReactionPrinciple",
+      "id": "compatible_via"
+    },
+    {
+      "kind": "relation",
+      "domain": "SMPRecipe",
+      "range": "Monomer",
+      "id": "uses_monomer"
+    },
+    {
+      "kind": "relation",
+      "domain": "SMPRecipe",
+      "range": "PredictionModel",
+      "id": "predicted_by"
+    },
+    {
+      "kind": "relation",
+      "domain": "PredictionModel",
+      "range": "glass_transition_temperature",
+      "id": "optimizes_property"
+    },
+    {
+      "kind": "prior_feature",
+      "effect": "raises_Tg",
+      "id": "aromatic_backbones"
+    },
+    {
+      "id": "glass_transition_temperature"
+    },
+    {
+      "kind": "prior_feature",
+      "effect": "raises_Tg",
+      "id": "imide_or_anhydride_derived_networks"
+    },
+    {
+      "kind": "prior_feature",
+      "effect": "raises_Tg",
+      "id": "cyanate_ester_triazine_networks"
+    },
+    {
+      "kind": "prior_feature",
+      "effect": "raises_Tg",
+      "id": "high_crosslink_density"
+    },
+    {
+      "kind": "prior_feature",
+      "effect": "raises_Tg",
+      "id": "rigid_biphenyl_or_bisphenol_units"
+    },
+    {
+      "kind": "prior_feature",
+      "effect": "lowers_Tg_risk",
+      "id": "long_aliphatic_ether_segments"
+    },
+    {
+      "kind": "prior_feature",
+      "effect": "lowers_Tg_risk",
+      "id": "flexible_polyethylene_glycol_segments"
+    },
+    {
+      "kind": "prior_feature",
+      "effect": "lowers_Tg_risk",
+      "id": "low_functionality_linear_monomers"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "crosslinked_epoxy",
+      "id": "epoxy_amine"
+    },
+    {
+      "kind": "functional_group",
+      "id": "epoxy"
+    },
+    {
+      "kind": "functional_group",
+      "id": "primary_amine"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "polyimide_or_polyamic_acid_precursor",
+      "id": "anhydride_amine"
+    },
+    {
+      "kind": "functional_group",
+      "id": "anhydride"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "polyurethane",
+      "id": "isocyanate_hydroxyl"
+    },
+    {
+      "kind": "functional_group",
+      "id": "isocyanate"
+    },
+    {
+      "kind": "functional_group",
+      "id": "hydroxyl"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "triazine",
+      "id": "cyanate_ester_self"
+    },
+    {
+      "kind": "functional_group",
+      "id": "cyanate_ester"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "radical_crosslinked",
+      "id": "acrylate_radical"
+    },
+    {
+      "kind": "functional_group",
+      "id": "acrylate_or_methacrylate"
+    },
+    {
+      "kind": "functional_group",
+      "id": "vinyl"
+    }
+  ],
+  "edges": [
+    {
+      "relation": "influences",
+      "source": "aromatic_backbones",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "imide_or_anhydride_derived_networks",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "cyanate_ester_triazine_networks",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "high_crosslink_density",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "rigid_biphenyl_or_bisphenol_units",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "long_aliphatic_ether_segments",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "flexible_polyethylene_glycol_segments",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "low_functionality_linear_monomers",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "epoxy",
+      "target": "epoxy_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "primary_amine",
+      "target": "epoxy_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "primary_amine",
+      "target": "anhydride_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "anhydride",
+      "target": "anhydride_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "isocyanate",
+      "target": "isocyanate_hydroxyl",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "hydroxyl",
+      "target": "isocyanate_hydroxyl",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "cyanate_ester",
+      "target": "cyanate_ester_self",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "cyanate_ester",
+      "target": "cyanate_ester_self",
+      "key": 1
+    },
+    {
+      "relation": "compatible_via",
+      "source": "acrylate_or_methacrylate",
+      "target": "acrylate_radical",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "vinyl",
+      "target": "acrylate_radical",
+      "key": 0
+    }
+  ]
+}

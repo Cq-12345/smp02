@@ -1,0 +1,18 @@
+[
+  {
+    "iteration": 1,
+    "selected": 10,
+    "best_predicted_tg": 206.99999594781556,
+    "principles": {
+      "硫醇-烯点击反应。": 10
+    }
+  },
+  {
+    "iteration": 2,
+    "selected": 10,
+    "best_predicted_tg": 206.99999594781556,
+    "principles": {
+      "硫醇-烯点击反应。": 20
+    }
+  }
+]

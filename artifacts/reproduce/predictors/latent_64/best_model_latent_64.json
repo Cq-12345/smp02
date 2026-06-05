@@ -1,0 +1,21 @@
+{
+  "ML method": "VAE (64) + ExtraTrees_600",
+  "latent_size": 64,
+  "model_family": "model_zoo",
+  "predictor_kind": "joblib",
+  "model_path": "artifacts/reproduce/predictors/latent_64/zoo_extratrees_600_latent_64.joblib",
+  "PCP training dataset (%)": 100.0,
+  "PCP test dataset (%)": 57.35294117647059,
+  "MAPE training dataset (%)": 3.5037650681521446e-06,
+  "MAPE test dataset (%)": 77.78797797587224,
+  "MAPEK training dataset (%)": 9.457556102163987e-07,
+  "MAPEK test dataset (%)": 5.6158543921814,
+  "MAE training dataset (C)": 4.063518525266933e-06,
+  "MAE test dataset (C)": 25.87271174696199,
+  "RMSE training dataset (C)": 6.142868983933008e-06,
+  "RMSE test dataset (C)": 50.21454574904838,
+  "R2 training": 0.9999999999999942,
+  "R2 test": 0.7275854688548126,
+  "selection_metric": "MAPEK test dataset (%)",
+  "selection_higher_is_better": false
+}

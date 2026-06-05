@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d6" for="edge" attr.name="relation" attr.type="string"/>
+<key id="d5" for="node" attr.name="expected_network" attr.type="string"/>
+<key id="d4" for="node" attr.name="effect" attr.type="string"/>
+<key id="d3" for="node" attr.name="range" attr.type="string"/>
+<key id="d2" for="node" attr.name="domain" attr.type="string"/>
+<key id="d1" for="node" attr.name="description" attr.type="string"/>
+<key id="d0" for="node" attr.name="kind" attr.type="string"/>
+<graph edgedefault="directed"><node id="Monomer">
+  <data key="d0">class</data>
+  <data key="d1">Small molecule reactant represented by SMILES.</data>
+</node>
+<node id="FunctionalGroup">
+  <data key="d0">class</data>
+  <data key="d1">Reactive or structural group detected by SMARTS.</data>
+</node>
+<node id="ReactionPrinciple">
+  <data key="d0">class</data>
+  <data key="d1">Rule linking compatible functional groups to a plausible thermoset network.</data>
+</node>
+<node id="SMPRecipe">
+  <data key="d0">class</data>
+  <data key="d1">Candidate shape memory polymer formulation with molar ratios.</data>
+</node>
+<node id="PredictionModel">
+  <data key="d0">class</data>
+  <data key="d1">Tg predictor trained on WVCM latent vectors.</data>
+</node>
+<node id="has_functional_group">
+  <data key="d0">relation</data>
+  <data key="d2">Monomer</data>
+  <data key="d3">FunctionalGroup</data>
+</node>
+<node id="compatible_via">
+  <data key="d0">relation</data>
+  <data key="d2">FunctionalGroup</data>
+  <data key="d3">ReactionPrinciple</data>
+</node>
+<node id="uses_monomer">
+  <data key="d0">relation</data>
+  <data key="d2">SMPRecipe</data>
+  <data key="d3">Monomer</data>
+</node>
+<node id="predicted_by">
+  <data key="d0">relation</data>
+  <data key="d2">SMPRecipe</data>
+  <data key="d3">PredictionModel</data>
+</node>
+<node id="optimizes_property">
+  <data key="d0">relation</data>
+  <data key="d2">PredictionModel</data>
+  <data key="d3">glass_transition_temperature</data>
+</node>
+<node id="aromatic_backbones">
+  <data key="d0">prior_feature</data>
+  <data key="d4">raises_Tg</data>
+</node>
+<node id="glass_transition_temperature"/>
+<node id="imide_or_anhydride_derived_networks">
+  <data key="d0">prior_feature</data>
+  <data key="d4">raises_Tg</data>
+</node>
+<node id="cyanate_ester_triazine_networks">
+  <data key="d0">prior_feature</data>
+  <data key="d4">raises_Tg</data>
+</node>
+<node id="high_crosslink_density">
+  <data key="d0">prior_feature</data>
+  <data key="d4">raises_Tg</data>
+</node>
+<node id="rigid_biphenyl_or_bisphenol_units">
+  <data key="d0">prior_feature</data>
+  <data key="d4">raises_Tg</data>
+</node>
+<node id="long_aliphatic_ether_segments">
+  <data key="d0">prior_feature</data>
+  <data key="d4">lowers_Tg_risk</data>
+</node>
+<node id="flexible_polyethylene_glycol_segments">
+  <data key="d0">prior_feature</data>
+  <data key="d4">lowers_Tg_risk</data>
+</node>
+<node id="low_functionality_linear_monomers">
+  <data key="d0">prior_feature</data>
+  <data key="d4">lowers_Tg_risk</data>
+</node>
+<node id="epoxy_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d5">crosslinked_epoxy</data>
+</node>
+<node id="epoxy">
+  <data key="d0">functional_group</data>
+</node>
+<node id="primary_amine">
+  <data key="d0">functional_group</data>
+</node>
+<node id="anhydride_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d5">polyimide_or_polyamic_acid_precursor</data>
+</node>
+<node id="anhydride">
+  <data key="d0">functional_group</data>
+</node>
+<node id="isocyanate_hydroxyl">
+  <data key="d0">reaction_principle</data>
+  <data key="d5">polyurethane</data>
+</node>
+<node id="isocyanate">
+  <data key="d0">functional_group</data>
+</node>
+<node id="hydroxyl">
+  <data key="d0">functional_group</data>
+</node>
+<node id="cyanate_ester_self">
+  <data key="d0">reaction_principle</data>
+  <data key="d5">triazine</data>
+</node>
+<node id="cyanate_ester">
+  <data key="d0">functional_group</data>
+</node>
+<node id="acrylate_radical">
+  <data key="d0">reaction_principle</data>
+  <data key="d5">radical_crosslinked</data>
+</node>
+<node id="acrylate_or_methacrylate">
+  <data key="d0">functional_group</data>
+</node>
+<node id="vinyl">
+  <data key="d0">functional_group</data>
+</node>
+<edge source="aromatic_backbones" target="glass_transition_temperature" id="0">
+  <data key="d6">influences</data>
+</edge>
+<edge source="imide_or_anhydride_derived_networks" target="glass_transition_temperature" id="0">
+  <data key="d6">influences</data>
+</edge>
+<edge source="cyanate_ester_triazine_networks" target="glass_transition_temperature" id="0">
+  <data key="d6">influences</data>
+</edge>
+<edge source="high_crosslink_density" target="glass_transition_temperature" id="0">
+  <data key="d6">influences</data>
+</edge>
+<edge source="rigid_biphenyl_or_bisphenol_units" target="glass_transition_temperature" id="0">
+  <data key="d6">influences</data>
+</edge>
+<edge source="long_aliphatic_ether_segments" target="glass_transition_temperature" id="0">
+  <data key="d6">influences</data>
+</edge>
+<edge source="flexible_polyethylene_glycol_segments" target="glass_transition_temperature" id="0">
+  <data key="d6">influences</data>
+</edge>
+<edge source="low_functionality_linear_monomers" target="glass_transition_temperature" id="0">
+  <data key="d6">influences</data>
+</edge>
+<edge source="epoxy" target="epoxy_amine" id="0">
+  <data key="d6">compatible_via</data>
+</edge>
+<edge source="primary_amine" target="epoxy_amine" id="0">
+  <data key="d6">compatible_via</data>
+</edge>
+<edge source="primary_amine" target="anhydride_amine" id="0">
+  <data key="d6">compatible_via</data>
+</edge>
+<edge source="anhydride" target="anhydride_amine" id="0">
+  <data key="d6">compatible_via</data>
+</edge>
+<edge source="isocyanate" target="isocyanate_hydroxyl" id="0">
+  <data key="d6">compatible_via</data>
+</edge>
+<edge source="hydroxyl" target="isocyanate_hydroxyl" id="0">
+  <data key="d6">compatible_via</data>
+</edge>
+<edge source="cyanate_ester" target="cyanate_ester_self" id="0">
+  <data key="d6">compatible_via</data>
+</edge>
+<edge source="cyanate_ester" target="cyanate_ester_self" id="1">
+  <data key="d6">compatible_via</data>
+</edge>
+<edge source="acrylate_or_methacrylate" target="acrylate_radical" id="0">
+  <data key="d6">compatible_via</data>
+</edge>
+<edge source="vinyl" target="acrylate_radical" id="0">
+  <data key="d6">compatible_via</data>
+</edge>
+</graph></graphml>

@@ -1,0 +1,10 @@
+{
+  "n_monomers": 231,
+  "n_compatible_pairs": 6467,
+  "n_ratio_candidates": 64670,
+  "n_selected": 0,
+  "target_range": [
+    190.0,
+    200.0
+  ]
+}

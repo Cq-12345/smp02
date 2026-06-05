@@ -1,0 +1,21 @@
+{
+  "ML method": "VAE (512) + GaussianProcess_RBF",
+  "latent_size": 512,
+  "model_family": "model_zoo",
+  "predictor_kind": "joblib",
+  "model_path": "artifacts/reproduce/predictors/latent_512/zoo_gaussianprocess_rbf_latent_512.joblib",
+  "PCP training dataset (%)": 98.94736842105263,
+  "PCP test dataset (%)": 66.17647058823529,
+  "MAPE training dataset (%)": 2.370094910761169,
+  "MAPE test dataset (%)": 16.596516907559035,
+  "MAPEK training dataset (%)": 0.5524222541665399,
+  "MAPEK test dataset (%)": 3.9778051975274606,
+  "MAE training dataset (C)": 2.1529905030731875,
+  "MAE test dataset (C)": 18.764057961351714,
+  "RMSE training dataset (C)": 3.5093217546047577,
+  "RMSE test dataset (C)": 40.43710014932832,
+  "R2 training": 0.9981277949961282,
+  "R2 test": 0.823342857763097,
+  "selection_metric": "MAPEK test dataset (%)",
+  "selection_higher_is_better": false
+}
