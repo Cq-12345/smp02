@@ -128,7 +128,7 @@ h = (m_1..m_n, r_1..r_n)
 
 当前可用基础：
 
-- `trail/rag/simple_retriever.py`
+- `trail/rag/simple_retriever.py`：RAG smoke 检索器，已过滤单字符和纯数字 query token，避免 `C`、`0` 这类噪声压过 strict feedback 上下文。
 - `trail/knowledge/smp_prior_knowledge.yaml`
 - `artifacts/trail/candidates_smoke/component_inventory.csv`
 - `trail/generation/generation_record_schema.yaml`
@@ -136,6 +136,11 @@ h = (m_1..m_n, r_1..r_n)
 - `scripts/build_prompt_generation_records.py`
 - `artifacts/trail/generation/prompt_records/generation_record_ledger.csv`
 - `reports/generation_record_schema_smoke.md`
+- `scripts/run_feedback_aware_llm_rag_agent.py`
+- `artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv`
+- `artifacts/trail/generation_feedback_strict/strategy_feedback.csv`
+- `reports/feedback_aware_llm_rag_agent.md`
+- `reports/generation_failure_feedback_strict.md`
 
 当前 record schema 已覆盖：
 
@@ -156,6 +161,14 @@ Prompt/RAG smoke 结果：
 - 最佳 generation record 预测 Tg 为 195.00 C，距 195 C 目标 0.003 C。
 - 这一步没有调用外部 LLM；它固定的是未来 LLM/SFT/扩散/流匹配生成器必须遵守的记录契约。
 
+Feedback-aware LLM/RAG agent 状态：
+
+- `scripts/run_feedback_aware_llm_rag_agent.py` 会读取 RAG 上下文、`strategy_feedback.csv`，再输出 generation records。
+- 默认 RAG 上下文聚焦 `generation_strategy_registry.yaml`、strict failure feedback、PiEvo 数学说明和 target sweep 结果，避免旧 replacement rejection 历史压过最新 strict policy。
+- 默认 provider 为 `offline_policy`，用于可复现 smoke；若设置 `OPENAI_API_KEY`，可切换到 `openai_compatible` provider，但输出仍必须写入同一 generation ledger。
+- 当前 strict feedback 中，`functional_group_replacement` 和 `llm_rag_principle_generation` 均被保留，`llm_smiles_generation` 因缺 predictor/chemistry evidence 被抑制。
+- Agent smoke 生成 2 条 `llm_rag_principle_generation` records，2 条都通过 Harness；最佳距离为 0.003 C，mean generation reward 为 0.9637。
+
 ### 3.5 失败回流
 
 已有脚本：
@@ -173,6 +186,8 @@ Prompt/RAG smoke 结果：
 - `artifacts/trail/generation_feedback/failure_reason_counts.csv`
 - `artifacts/trail/generation_feedback/replacement_failure_groups.csv`
 - `reports/generation_failure_feedback.md`
+- `artifacts/trail/generation_feedback_strict/strategy_feedback.csv`
+- `reports/generation_failure_feedback_strict.md`
 
 当前结果：
 
@@ -182,6 +197,7 @@ Prompt/RAG smoke 结果：
 - `llm_smiles_generation` 当前 policy delta 为 -0.25，必须先补 prediction 和 chemistry evidence。
 - `functional_group_replacement` 当前 policy delta 为 -0.10，下一轮应加入“替换后必须保留互补反应对”的约束。
 - 该约束已在 `trail/generation/vae_replacement_strategy.py --require-counterpart-compatibility` 中落地；strict evaluation 中 replacement 重建拒绝数为 0。
+- strict feedback 版本中，replacement rejection 输入为 0，`functional_group_replacement` pass rate 回升到 1.0，policy delta 为 +0.10；`llm_smiles_generation` 仍为 -0.25。
 
 ### 3.6 SFT / 内部微调
 
@@ -238,8 +254,8 @@ PYTHONPATH=src python trail/harness/constraints.py \
 
 ## 6. 近期优先级
 
-1. 将真实 LLM/RAG agent 接到 `generation_record_schema.yaml`，要求先输出 generation record，再进入 predictor/Harness/PiEvo。
-2. 将 LLM 生成限制在“提出 principle/官能团组合/候选模板”，SMILES 草案必须由 RDKit、预测模型和 Harness 再验证。
+1. 若接入外部 LLM，使用 `scripts/run_feedback_aware_llm_rag_agent.py --provider openai_compatible`，并保持 generation record -> predictor/Harness/PiEvo 的审计链。
+2. 将 LLM 生成继续限制在“提出 principle/官能团组合/候选模板”，SMILES 草案必须由 RDKit、预测模型和 Harness 再验证。
 3. 对 feedback-guided replacement 做更大候选池和真实/高保真 observation 版本的 PiEvo sweep，确认 surrogate posterior 规律是否能被物理证据保留。
 4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 侧已完成互补反应对约束和 PiEvo posterior 对比。
 5. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。

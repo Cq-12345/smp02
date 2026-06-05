@@ -1,0 +1,10 @@
+{
+  "generation_records": 4,
+  "generation_harness_pass": 3,
+  "generation_harness_fail": 1,
+  "replacement_rejections": 0,
+  "failure_reason_types": 3,
+  "strategies_analyzed": 3,
+  "top_failure_reason": "prediction_missing",
+  "lowest_policy_strategy": "llm_smiles_generation"
+}

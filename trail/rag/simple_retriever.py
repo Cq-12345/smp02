@@ -17,7 +17,11 @@ def chunks(paths: list[Path]) -> list[tuple[str, str]]:
 
 
 def retrieve(query: str, docs: list[tuple[str, str]], top_k: int) -> list[tuple[str, str, int]]:
-    terms = {t.lower() for t in re.findall(r"[A-Za-z0-9_+-]+", query)}
+    terms = {
+        token
+        for token in (t.lower() for t in re.findall(r"[A-Za-z0-9_+-]+", query))
+        if len(token) > 1 and not token.isdigit()
+    }
     scored = []
     for ref, text in docs:
         hay = text.lower()
@@ -40,4 +44,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -2,6 +2,7 @@
   "agents": {
     "space_agent": "界定搜索空间：官能团、反应兼容性、摩尔比网格。",
     "generator_agent": "生成候选假设：模板、VAE replacement、prompt/RAG、未来 SFT/扩散/流匹配。",
+    "rag_generator_agent": "读取 RAG 上下文和 strict strategy feedback，生成 auditable generation records。",
     "predictor_agent": "评估假设：VAE-WVCM model zoo、GNN、uncertainty、OOD。",
     "harness_agent": "硬约束过滤：RDKit、比例、目标窗口、官能团反应兼容性。",
     "feedback_agent": "失败回流：统计 generation ledger 和 Harness rejection，给下一轮生成器约束。",
@@ -220,14 +221,16 @@
   ],
   "generation_ledger_rows": 4,
   "generation_harness_pass": 3,
+  "feedback_aware_llm_rag_rows": 2,
+  "feedback_aware_llm_rag_harness_pass": 2,
   "generation_feedback": {
     "generation_records": 4,
     "generation_harness_pass": 3,
     "generation_harness_fail": 1,
-    "replacement_rejections": 13,
+    "replacement_rejections": 0,
     "failure_reason_types": 3,
     "strategies_analyzed": 3,
-    "top_failure_reason": "replacement_formula_failed_reaction_or_ratio_constraints",
+    "top_failure_reason": "prediction_missing",
     "lowest_policy_strategy": "llm_smiles_generation"
   }
 }

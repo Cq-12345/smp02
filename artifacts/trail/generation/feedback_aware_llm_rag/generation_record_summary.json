@@ -1,0 +1,16 @@
+{
+  "input_rows": 2,
+  "record_pass_rows": 2,
+  "ready_for_prediction_rows": 0,
+  "harness_pass_rows": 2,
+  "harness_fail_rows": 0,
+  "strategy_counts": {
+    "llm_rag_principle_generation": 2
+  },
+  "stage_counts": {
+    "harnessed": 2
+  },
+  "best_distance_c": 0.0031802513673540034,
+  "mean_generation_reward": 0.9637168072058939,
+  "reward_temperature_c": 5.0
+}

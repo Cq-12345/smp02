@@ -10,6 +10,15 @@ import numpy as np
 import pandas as pd
 
 
+REPLACEMENT_FAILURE_GROUP_COLUMNS = [
+    "shared_groups",
+    "failures",
+    "mean_tanimoto",
+    "top_reason",
+    "feedback",
+]
+
+
 def split_reasons(value: object) -> list[str]:
     if pd.isna(value):
         return []
@@ -142,7 +151,7 @@ def strategy_feedback(generation: pd.DataFrame, replacement_rejections: pd.DataF
 
 def replacement_failure_groups(rejections: pd.DataFrame) -> pd.DataFrame:
     if rejections.empty or "shared_groups" not in rejections.columns:
-        return pd.DataFrame()
+        return pd.DataFrame(columns=REPLACEMENT_FAILURE_GROUP_COLUMNS)
     rows = []
     for groups, frame in rejections.groupby("shared_groups"):
         rows.append(
@@ -154,7 +163,7 @@ def replacement_failure_groups(rejections: pd.DataFrame) -> pd.DataFrame:
                 "feedback": "Require a complementary co-reactant check after replacement; shared groups alone are insufficient.",
             }
         )
-    return pd.DataFrame(rows).sort_values("failures", ascending=False)
+    return pd.DataFrame(rows, columns=REPLACEMENT_FAILURE_GROUP_COLUMNS).sort_values("failures", ascending=False)
 
 
 def write_report(
@@ -232,10 +241,17 @@ def write_report(
             "",
             "- 失败回流现在是一个可运行的审计步骤，而不是只在报告里口头说明。",
             "- `policy_weight_delta` 不是物理真理或最终 RL policy；它是下一轮生成器排序/人工审核优先级的建议权重。",
-            "- 当前 replacement 失败集中在 `replacement_formula_failed_reaction_or_ratio_constraints`，说明“共享官能团相似”不足以保证完整配方可反应。",
-            "- `llm_smiles_generation` 草案必须先补预测和化学兼容证据，再允许进入 PiEvo IDS 或实验推荐。",
         ]
     )
+    if int(summary.get("replacement_rejections", 0)) > 0:
+        lines.append(
+            "- 当前 replacement 失败集中在 `replacement_formula_failed_reaction_or_ratio_constraints`，说明“共享官能团相似”不足以保证完整配方可反应。"
+        )
+    else:
+        lines.append(
+            "- 当前 replacement rejection 输入为 0；若 replacement strategy pass rate 上升，说明前一轮互补反应对约束已经修复了主要失败路径。"
+        )
+    lines.append("- `llm_smiles_generation` 草案必须先补预测和化学兼容证据，再允许进入 PiEvo IDS 或实验推荐。")
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

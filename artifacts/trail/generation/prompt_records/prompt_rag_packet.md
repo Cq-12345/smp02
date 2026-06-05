@@ -8,7 +8,7 @@ This packet is a reproducible stand-in for a future LLM call. It records the pro
 - prompt_id: `smp_rag_formula_contract_v1`
 - prompt_hash: `101886fbef93bc6b`
 - rag_query: `SMP target Tg 195 C functional group compatibility rigid aromatic epoxy amine cyanate ester Harness`
-- rag_context_refs: `trail/knowledge/smp_prior_knowledge.yaml:0|docs/generation_strategy_and_harness.md:43|docs/generation_strategy_and_harness.md:31|docs/generation_strategy_and_harness.md:45`
+- rag_context_refs: `trail/knowledge/smp_prior_knowledge.yaml:0|docs/generation_strategy_and_harness.md:31|docs/generation_strategy_and_harness.md:43|docs/smp_knowledge_base_and_ontology.md:22`
 
 Prompt:
 
@@ -28,7 +28,7 @@ Candidate JSON:
 - prompt_id: `smp_rag_formula_contract_v1`
 - prompt_hash: `101886fbef93bc6b`
 - rag_query: `SMP target Tg 195 C functional group compatibility rigid aromatic epoxy amine cyanate ester Harness`
-- rag_context_refs: `trail/knowledge/smp_prior_knowledge.yaml:0|docs/generation_strategy_and_harness.md:43|docs/generation_strategy_and_harness.md:31|docs/generation_strategy_and_harness.md:45`
+- rag_context_refs: `trail/knowledge/smp_prior_knowledge.yaml:0|docs/generation_strategy_and_harness.md:31|docs/generation_strategy_and_harness.md:43|docs/smp_knowledge_base_and_ontology.md:22`
 
 Prompt:
 
@@ -48,7 +48,7 @@ Candidate JSON:
 - prompt_id: `replacement_audit_contract_v1`
 - prompt_hash: `128702d2ed079903`
 - rag_query: `SMP target Tg 195 C functional group compatibility rigid aromatic epoxy amine cyanate ester Harness`
-- rag_context_refs: `trail/knowledge/smp_prior_knowledge.yaml:0|docs/generation_strategy_and_harness.md:43|docs/generation_strategy_and_harness.md:31|docs/generation_strategy_and_harness.md:45`
+- rag_context_refs: `trail/knowledge/smp_prior_knowledge.yaml:0|docs/generation_strategy_and_harness.md:31|docs/generation_strategy_and_harness.md:43|docs/smp_knowledge_base_and_ontology.md:22`
 
 Prompt:
 
@@ -68,7 +68,7 @@ Candidate JSON:
 - prompt_id: `smp_rag_smiles_draft_contract_v1`
 - prompt_hash: `0d4c9d4cb5055d0d`
 - rag_query: `SMP target Tg 195 C functional group compatibility rigid aromatic epoxy amine cyanate ester Harness`
-- rag_context_refs: `trail/knowledge/smp_prior_knowledge.yaml:0|docs/generation_strategy_and_harness.md:43|docs/generation_strategy_and_harness.md:31|docs/generation_strategy_and_harness.md:45`
+- rag_context_refs: `trail/knowledge/smp_prior_knowledge.yaml:0|docs/generation_strategy_and_harness.md:31|docs/generation_strategy_and_harness.md:43|docs/smp_knowledge_base_and_ontology.md:22`
 
 Prompt:
 

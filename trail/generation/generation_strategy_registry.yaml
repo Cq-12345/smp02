@@ -40,10 +40,24 @@ strategies:
     harness_required: true
     best_use: local decode around high-reward latent neighborhoods
   llm_rag_principle_generation:
-    maturity: record_contract_implemented
-    generator: scripts/build_prompt_generation_records.py
+    maturity: feedback_aware_agent_implemented
+    generator: scripts/build_prompt_generation_records.py + scripts/run_feedback_aware_llm_rag_agent.py
     harness_required: true
     best_use: propose new principles or functional group combinations from anomalies
+    feedback_aware_mode:
+      provider_default: offline_policy
+      optional_provider: openai_compatible
+      policy_input: artifacts/trail/generation_feedback_strict/strategy_feedback.csv
+      rag_context_default_docs:
+        - trail/generation/generation_strategy_registry.yaml
+        - reports/generation_failure_feedback_strict.md
+        - docs/pievo_faithful_smp.md
+        - reports/feedback_guided_replacement_target_sweep.md
+        - trail/knowledge/smp_prior_knowledge.yaml
+      outputs:
+        - artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv
+        - artifacts/trail/generation/feedback_aware_llm_rag/feedback_aware_policy.json
+        - reports/feedback_aware_llm_rag_agent.md
   llm_smiles_generation:
     maturity: draft_record_contract_implemented
     generator: scripts/build_prompt_generation_records.py

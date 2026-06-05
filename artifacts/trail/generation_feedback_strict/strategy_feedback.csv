@@ -1,0 +1,4 @@
+strategy,records,harness_pass,harness_fail,pass_rate,mean_generation_reward,top_failure_reason,policy_weight_delta,next_constraint
+functional_group_replacement,1,1,0,1.0,0.9280694624481634,,0.1,retain: keep strategy in candidate generator pool.
+llm_rag_principle_generation,2,2,0,1.0,0.9991458173163537,,0.1,retain: keep strategy in candidate generator pool.
+llm_smiles_generation,1,0,1,0.0,,prediction_missing,-0.25,predictor_feedback: run VAE-WVCM/GNN predictor before recommendation.

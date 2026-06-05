@@ -20,6 +20,7 @@
    - Generation feedback analyzer 统计 Harness 失败原因和 generation strategy pass rate。
    - VAE replacement 生成器读取失败回流后，可用 `--require-counterpart-compatibility` 保留互补反应对。
    - feedback-guided replacement ledger 已进入 PiEvo posterior 对比；失败回流现在不只是报告建议，而会改变 posterior 置信分布。
+   - Feedback-aware LLM/RAG agent 读取 strict strategy feedback，保留已修复的 replacement/RAG 策略，并抑制缺 predictor/chemistry evidence 的 SMILES 草案。
    - 人工审核优先查看高 reward、低 OOD、通过 Harness 的候选，以及失败原因集中的规则。
 
 脚本入口：
@@ -61,9 +62,19 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_feedback
   --rounds 6 \
   --candidate-batch-size 260
 
-PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
-  --generation-feedback artifacts/trail/generation_feedback/generation_feedback_summary.json \
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/analyze_generation_feedback.py \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
+  --replacement-rejections artifacts/trail/generation/feedback_guided_replacement_eval/replacement_proposal_rejections.csv \
+  --out-dir artifacts/trail/generation_feedback_strict \
+  --report reports/generation_failure_feedback_strict.md
+
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_feedback_aware_llm_rag_agent.py \
+  --provider offline_policy
+
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
+  --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
+  --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
+  --feedback-aware-ledger artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv \
   --out artifacts/trail/workflow/multi_agent_summary.json
 ```
 
@@ -71,6 +82,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
 
 - `harness_agent`：硬约束过滤，不被 posterior 学习弱化。
 - `feedback_agent`：把 generation ledger 和 Harness rejection 转成下一轮生成器约束。
+- `rag_generator_agent`：读取 RAG refs 和 strict strategy feedback，产出 generation records，而不是直接推荐。
 - `human_review_agent`：补工艺条件、决定是否进入真实/高保真 observation ledger。
 
 当前 replacement 反馈闭环的观测结果：
@@ -85,5 +97,11 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
 - 190/195/200/250 C 每个目标都重新计算 replacement Harness、external observation ledger、PiEvo reward 和 posterior。
 - 6 轮 smoke 的最佳新选择分别距目标 0.057、0.006、0.204、0.099 C。
 - MAP principle 随目标变化，说明目标 Tg 已经影响 full-history posterior，而不是只影响候选表排序。
+
+LLM/RAG 反馈闭环已经补充：
+
+- strict feedback 中 `functional_group_replacement` 和 `llm_rag_principle_generation` 均为保留策略，`llm_smiles_generation` 继续被抑制。
+- feedback-aware LLM/RAG agent 生成 2 条 `llm_rag_principle_generation` records，2 条都通过 Harness。
+- 当前运行使用 `offline_policy` provider 保持可复现；外部 LLM 只替换候选 JSON 生成步骤，不改变 ledger/Harness/PiEvo 审计链。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。
