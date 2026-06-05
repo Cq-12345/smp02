@@ -2,31 +2,36 @@
   "input_ledgers": [
     "artifacts/trail/generation/prompt_records/generation_record_ledger.csv",
     "artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv",
-    "artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv"
+    "artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv",
+    "artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv",
+    "artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv"
   ],
-  "input_rows": 8,
-  "harness_pass_rows": 7,
-  "training_candidate_rows": 5,
+  "input_rows": 408,
+  "harness_pass_rows": 67,
+  "training_candidate_rows": 64,
   "min_reward": 0.0,
-  "sft_examples": 5,
-  "sft_train_examples": 4,
-  "sft_eval_examples": 1,
-  "sft_ready": false,
+  "sft_examples": 64,
+  "sft_train_examples": 52,
+  "sft_eval_examples": 12,
+  "sft_ready": true,
   "sft_min_examples": 20,
-  "diffusion_flow_seed_rows": 5,
-  "diffusion_flow_train_rows": 4,
-  "diffusion_flow_eval_rows": 1,
+  "diffusion_flow_seed_rows": 64,
+  "diffusion_flow_train_rows": 52,
+  "diffusion_flow_eval_rows": 12,
   "diffusion_flow_ready": false,
   "diffusion_flow_min_examples": 100,
   "strategy_counts": {
-    "llm_rag_principle_generation": 4,
-    "functional_group_replacement": 1
+    "vae_latent_local_search": 42,
+    "functional_group_replacement": 18,
+    "llm_rag_principle_generation": 4
   },
   "source_ledger_counts": {
+    "artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv": 42,
+    "artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv": 17,
     "artifacts/trail/generation/prompt_records/generation_record_ledger.csv": 3,
     "artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv": 1,
     "artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv": 1
   },
-  "next_data_needed_for_sft": 15,
-  "next_data_needed_for_diffusion_flow": 95
+  "next_data_needed_for_sft": 0,
+  "next_data_needed_for_diffusion_flow": 36
 }

@@ -17,13 +17,13 @@ strategy_policy:
     - reports/generation_strategy_bandit_policy.md
   current_summary:
     top_strategy: llm_rag_principle_generation
-    eligible_active_strategies: 3
+    eligible_active_strategies: 4
     suppressed_strategies: 1
-    data_collection_only_strategies: 2
+    data_collection_only_strategies: 1
     total_budget: 100
   guardrails:
     - llm_smiles_generation remains suppressed until predictor and chemistry evidence are present
-    - sft_candidate_generator gets no training/generation budget until SFT readiness gate passes
+    - sft_candidate_generator is active only after SFT readiness passes and still stays behind predictor/Harness/PiEvo gates
     - diffusion_or_flow_matching gets no training/generation budget until seed-table readiness gate passes
     - allocation_per_100 is a proposal-budget hint, not a final formulation recommendation
 strategies:
@@ -49,6 +49,7 @@ strategies:
         - artifacts/trail/generation/feedback_guided_replacement_eval/replacement_eval_summary.json
         - artifacts/trail/generation/expanded_inventory_replacement_proposals.csv
         - artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json
+        - artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv
         - artifacts/pievo_faithful_feedback_replacement_195_smoke/pievo_faithful_summary.json
         - artifacts/trail/generation/feedback_guided_replacement_pievo_compare/pievo_feedback_ledger_comparison.json
         - artifacts/trail/generation/feedback_guided_replacement_target_sweep/feedback_replacement_target_sweep_summary.json
@@ -57,6 +58,7 @@ strategies:
         - reports/feedback_guided_replacement_pievo_comparison.md
         - reports/feedback_guided_replacement_target_sweep.md
         - reports/expanded_inventory_replacement_evaluation.md
+        - reports/expanded_inventory_replacement_generation_records.md
       expanded_inventory_mode:
         cli_flag: --component-inventory artifacts/trail/candidates_expanded/component_inventory.csv
         replacement_pool: artifacts/trail/candidates_expanded/component_inventory.csv
@@ -91,10 +93,12 @@ strategies:
         - artifacts/trail/generation/vae_latent_local_search/latent_local_search_proposals.csv
         - artifacts/trail/generation/vae_latent_local_search/latent_local_search_summary.json
         - artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json
+        - artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv
         - artifacts/trail/generation/vae_latent_local_search_eval/replacement_observation_ledger.csv
         - artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json
         - reports/vae_latent_local_search.md
         - reports/vae_latent_local_search_evaluation.md
+        - reports/vae_latent_local_search_generation_records.md
         - reports/vae_latent_local_search_pievo_feedback.md
       smoke_result:
         proposals: 200
@@ -151,15 +155,21 @@ strategies:
     maturity: training_corpus_contract_implemented
     generator: scripts/build_generative_training_sets.py
     harness_required: true
-    best_use: only after enough validated generation records
+    best_use: SFT dry-run/training with auditable generation_record JSONL, followed by predictor/Harness/PiEvo validation
     training_corpus:
       jsonl: artifacts/trail/generation/generative_training_sets/sft_generation_records.jsonl
       summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
-      examples: 5
-      train_examples: 4
-      eval_examples: 1
-      readiness_gate_pass: false
+      examples: 64
+      train_examples: 52
+      eval_examples: 12
+      readiness_gate_pass: true
       min_examples: 20
+      source_ledgers:
+        - artifacts/trail/generation/prompt_records/generation_record_ledger.csv
+        - artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv
+        - artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv
+        - artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv
+        - artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv
   diffusion_or_flow_matching:
     maturity: seed_table_contract_implemented
     generator: scripts/build_generative_training_sets.py
@@ -168,11 +178,12 @@ strategies:
     training_seed_table:
       table: artifacts/trail/generation/generative_training_sets/diffusion_flow_seed_table.csv
       summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
-      seed_rows: 5
-      train_rows: 4
-      eval_rows: 1
+      seed_rows: 64
+      train_rows: 52
+      eval_rows: 12
       readiness_gate_pass: false
       min_examples: 100
+      next_data_needed: 36
 record_schema:
   schema_path: trail/generation/generation_record_schema.yaml
   importer: trail/generation/import_generation_records.py

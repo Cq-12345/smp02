@@ -13,6 +13,8 @@ DEFAULT_LEDGERS = [
     "artifacts/trail/generation/prompt_records/generation_record_ledger.csv",
     "artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv",
     "artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv",
+    "artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv",
+    "artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv",
 ]
 
 
@@ -304,8 +306,8 @@ def write_report(summary: dict[str, Any], report_path: Path, out_dir: Path) -> N
             "",
             "- SFT JSONL 只使用已经通过 generation record/Harness 的 records；draft 或缺 predictor/chemistry evidence 的样本不会进入训练目标。",
             "- Diffusion/flow seed table 是未来条件生成模型的数据契约，记录目标 Tg、SMILES、比例、预测 Tg、reward 和 compatibility evidence；本轮不训练扩散/流匹配模型。",
-            "- readiness gate 的作用是阻止在样本过少时训练一个看似可用但不可泛化的生成模型。",
-            "- 当前结果如果显示 `sft_ready=false` 或 `diffusion_flow_ready=false`，含义是训练数据契约已落地，但还需要更多通过 Harness 且最好被 observation ledger 验证的 records。",
+            "- readiness gate 的作用是阻止在样本过少时训练一个看似可用但不可泛化的生成模型；若某个 gate 已通过，仍必须在训练后让新候选重新经过 predictor/Harness/PiEvo。",
+            "- 未通过的 gate 继续要求更多通过 Harness 且最好被 observation ledger 验证的 records。",
         ]
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)

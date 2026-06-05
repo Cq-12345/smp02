@@ -134,14 +134,18 @@ def arm_from_training_readiness(strategy: str, summary: dict[str, Any]) -> dict[
         "attempts": examples,
         "successes": examples if ready else 0,
         "failures": needed,
-        "raw_pass_rate": examples / max(minimum, 1) if minimum else 0.0,
+        "raw_pass_rate": bounded(examples / max(minimum, 1)) if minimum else 0.0,
         "mean_reward": None,
         "best_distance_c": None,
         "observations": examples,
         "feedback_delta": 0.0,
         "readiness_gate": ready,
         "readiness_reason": "ready for training" if ready else f"not ready; need {needed} more validated records before training.",
-        "next_constraint": "collect more Harness-passing, prediction-backed generation records before training.",
+        "next_constraint": (
+            "run SFT dry-run or training job with generation_record JSONL, then evaluate behind predictor/Harness/PiEvo gates."
+            if ready
+            else "collect more Harness-passing, prediction-backed generation records before training."
+        ),
     }
 
 
@@ -288,7 +292,8 @@ def write_report(policy: pd.DataFrame, summary: dict[str, Any], out_dir: Path, r
             "## 解释",
             "",
             "- `allocation_per_100` 是下一轮生成预算建议，不是最终推荐配方。",
-            "- `sft_candidate_generator` 和 `diffusion_or_flow_matching` 在 readiness gate 未通过前不获得训练/生成预算，只获得数据收集建议。",
+            "- `sft_candidate_generator` 只有在 SFT JSONL 达到最小样本和 eval split 后才会成为 active arm；否则只保留数据收集建议。",
+            "- `diffusion_or_flow_matching` 在 seed table 未达到最小样本前不获得训练/生成预算，只获得数据收集建议。",
             "- `llm_smiles_generation` 若仍缺 predictor 或 chemistry evidence，会被压到 gate review，而不是进入 PiEvo 或实验推荐。",
             "- 高 allocation 的策略仍必须把候选写入 generation/proposal ledger，再经过 predictor、Harness、PiEvo 和人工审核。",
         ]

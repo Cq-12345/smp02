@@ -102,7 +102,7 @@
 - Expanded replacement：从 expanded inventory 选择替换分子，保留 source/template provenance，并用 strict counterpart compatibility 过滤。
 - VAE latent 邻域搜索：`trail/generation/vae_latent_local_search.py` 已在 expanded inventory 内按 VAE latent 距离检索局部替换单体；当前是 decoder-free inventory search，不声称直接 decoder 生成新 SMILES。
 - LLM/RAG 生成：未来可用知识库检索约束 prompt，生成 SMILES 或候选规则。
-- SFT / diffusion / flow 数据契约：`scripts/build_generative_training_sets.py` 已把通过 Harness 的 generation records 转成 SFT JSONL 和 diffusion/flow seed table，并用 readiness gate 阻止小样本过早训练。
+- SFT / diffusion / flow 数据契约：`scripts/import_proposal_eval_generation_records.py` 先把已评分 proposals 写回 generation record ledger，`scripts/build_generative_training_sets.py` 再把通过 Harness 的 records 转成 SFT JSONL 和 diffusion/flow seed table；当前 SFT readiness 已通过，diffusion/flow 仍受 seed-table gate 约束。
 - Strategy-level bandit policy：`scripts/update_generation_strategy_policy.py` 会把各生成策略的 Harness pass、target reward、失败回流和 readiness gate 汇总成下一轮 proposal 预算建议。
 - Harness 控制：所有生成结果必须通过 RDKit、charset、元素、官能团、反应兼容、ratio simplex 等约束。
 
@@ -114,6 +114,7 @@ VAE latent local search 当前 195 C smoke：
 - 42 条通过 Harness，最佳 target distance 为 0.200 C。
 - `literature_template` 有 39 条 proposals、7 条通过 Harness。
 - 42 条通过项进入 PiEvo-faithful external observation ledger 后，4 轮 selected 全部通过 target guard，最佳 selected distance 为 0.059 C。
+- scored latent proposals 已写回 generation record ledger，并和 expanded replacement records 一起把 SFT 训练候选扩展到 64 条。
 
 ## 5. 闭环 autonomous workflow
 
@@ -141,9 +142,9 @@ Agent 分工：
 当前 bandit policy 状态：
 
 - 6 个策略被纳入 arm：VAE latent local search、functional-group replacement、LLM/RAG principle generation、LLM SMILES draft、SFT candidate generator、diffusion/flow matching。
-- 3 个策略 eligible active；1 个 suppressed；2 个 data_collection_only。
+- 4 个策略 eligible active；1 个 suppressed；1 个 data_collection_only。
 - top strategy 为 `llm_rag_principle_generation`。
-- `llm_smiles_generation` 在缺 predictor/chemistry evidence 时不进入下一轮预算；SFT 和 diffusion/flow 在 readiness gate 未通过前只进入数据收集目标。
+- `sft_candidate_generator` 已因 64 条 SFT 样本通过 readiness gate 而进入 active arm；`diffusion_or_flow_matching` 仍因 seed rows 不足只进入数据收集目标；`llm_smiles_generation` 在缺 predictor/chemistry evidence 时不进入下一轮预算。
 
 当前 human review queue 状态：
 
@@ -190,4 +191,4 @@ Agent 分工：
 - 对 dormant principle 做剪枝策略。
 - 对不同目标 Tg 批量运行，观察 posterior 是否随目标变化。
 - 对 GNN global features 做更长训练，并评估是否作为结构视角加入 predictor ensemble disagreement。
-- 持续扩大通过 Harness 且进入 observation ledger 的 generation records，直到 SFT 和 diffusion/flow readiness gate 通过。
+- SFT 已可进入 dry-run/训练作业；继续扩大通过 Harness 且进入 observation ledger 的 generation records，把 diffusion/flow seed rows 从 64 条补到 100 条以上。

@@ -79,6 +79,14 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/evaluate_rep
   --target-window-c 5 \
   --device cpu
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_proposal_eval_generation_records.py \
+  --scored artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_proposals_scored.csv \
+  --strategy functional_group_replacement \
+  --source-context expanded_inventory_replacement_eval \
+  --generator-id trail/generation/vae_replacement_strategy.py \
+  --out-dir artifacts/trail/generation/expanded_inventory_replacement_records \
+  --report reports/expanded_inventory_replacement_generation_records.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/generation/vae_latent_local_search.py \
   --candidates artifacts/reproduce/discovery/selected_candidates.csv \
   --component-inventory artifacts/trail/candidates_expanded/component_inventory.csv \
@@ -96,6 +104,14 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/evaluate_rep
   --target-tg-c 195 \
   --target-window-c 5 \
   --device cpu
+
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_proposal_eval_generation_records.py \
+  --scored artifacts/trail/generation/vae_latent_local_search_eval/replacement_proposals_scored.csv \
+  --strategy vae_latent_local_search \
+  --source-context vae_latent_local_search_eval \
+  --generator-id trail/generation/vae_latent_local_search.py \
+  --out-dir artifacts/trail/generation/vae_latent_local_search_records \
+  --report reports/vae_latent_local_search_generation_records.md
 
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python -m smp02.pievo_faithful \
   --config configs/pievo_faithful_vae_latent_local_search_195_smoke.yaml
@@ -246,18 +262,20 @@ GNN global feature smoke 已补充：
 SFT / diffusion / flow readiness 已补充：
 
 - `scripts/build_generative_training_sets.py` 从 generation record ledgers 中筛选 `record_pass + harness_pass + prediction_available` 的记录，生成 SFT JSONL 和 diffusion/flow seed table。
-- 当前 8 条 generation ledger 输入中有 7 条通过 Harness，去重后得到 5 条训练候选。
-- SFT JSONL 为 4 条 train、1 条 eval，`sft_ready=false`；当前门槛 20 条，还缺 15 条。
-- diffusion/flow seed table 为 4 条 train、1 条 eval，`diffusion_flow_ready=false`；当前门槛 100 条，还缺 95 条。
-- 这一步不是训练生成模型，而是建立训练数据合同和 readiness gate，防止用过小的 smoke 数据训练出不可泛化生成器。
+- `scripts/import_proposal_eval_generation_records.py` 会把已经完成 predictor/Harness 的 scored proposals 写回 generation record ledger，让 SFT/扩散/流匹配使用同一审计链。
+- 当前 5 个 generation ledgers 共 408 条输入，其中 67 条通过 Harness，去重后得到 64 条训练候选。
+- SFT JSONL 为 52 条 train、12 条 eval，`sft_ready=true`；当前门槛 20 条已通过，可以进入 SFT dry-run/训练作业。
+- diffusion/flow seed table 为 52 条 train、12 条 eval，`diffusion_flow_ready=false`；当前门槛 100 条，还缺 36 条。
+- 这一步仍不直接推荐 SFT/flow 输出；训练后生成的候选必须重新写入 ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 Generation strategy bandit policy 已补充：
 
 - `scripts/update_generation_strategy_policy.py` 把 strategy feedback、replacement/latent eval、LLM/RAG summary 和生成模型 readiness 汇总为 strategy-level contextual bandit。
 - 当前 arm 包括 `vae_latent_local_search`、`functional_group_replacement`、`llm_rag_principle_generation`、`llm_smiles_generation`、`sft_candidate_generator`、`diffusion_or_flow_matching`。
 - 输出的 `allocation_per_100` 是下一轮 proposal 预算建议，不是最终配方推荐；所有候选仍必须经过 predictor、Harness、PiEvo 和人工审核。
-- 当前 6 个策略中 3 个 eligible active，1 个 suppressed，2 个 data_collection_only；top strategy 为 `llm_rag_principle_generation`。
-- `llm_smiles_generation` 因缺 predictor/chemistry evidence 继续 suppressed；SFT 和 diffusion/flow 因 readiness gate 未通过，不获得训练/生成预算，只获得继续收集 validated records 的建议。
+- 当前 6 个策略中 4 个 eligible active，1 个 suppressed，1 个 data_collection_only；top strategy 为 `llm_rag_principle_generation`。
+- `sft_candidate_generator` 已因 64 条 SFT 样本通过 readiness gate 成为 active arm，并获得 25/100 proposal budget 建议；`diffusion_or_flow_matching` 仍因 seed rows 不足保持 data_collection_only。
+- `llm_smiles_generation` 因缺 predictor/chemistry evidence 继续 suppressed。
 - Workflow summary 已读取 `generation_strategy_bandit_summary.json`，让“RL/策略优化”进入总览链路。
 
 Human experiment review queue 已补充：
