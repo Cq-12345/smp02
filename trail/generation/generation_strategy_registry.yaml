@@ -166,8 +166,8 @@ strategies:
     harness_required: true
     best_use: draft candidates only; never trust without RDKit and reaction validation
   sft_candidate_generator:
-    maturity: dry_run_generator_implemented
-    generator: scripts/build_generative_training_sets.py + scripts/run_sft_candidate_generator_dry_run.py
+    maturity: trained_projection_smoke_implemented
+    generator: scripts/build_generative_training_sets.py + scripts/run_sft_candidate_generator_dry_run.py + scripts/train_sft_record_projection_generator.py
     harness_required: true
     best_use: SFT dry-run/training with auditable generation_record JSONL, followed by predictor/Harness/PiEvo validation
     training_corpus:
@@ -206,6 +206,27 @@ strategies:
         - artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json
         - artifacts/trail/generation/sft_candidate_dry_run/heldout_eval_retrieval.csv
         - reports/sft_candidate_generator_dry_run.md
+    trained_projection:
+      mode: supervised_neural_sft_projection
+      script: scripts/train_sft_record_projection_generator.py
+      records: 23
+      harness_pass: 23
+      best_distance_c: 0.0031802513673540034
+      mean_generation_reward: 0.9564690371891499
+      train_loss_initial: 0.8800587058067322
+      train_loss_final: 0.6180704832077026
+      eval_loss_final: 0.8099173903465271
+      projection_distance_mean: 3.5848927912504776
+      heldout_eval_rows: 19
+      heldout_exact_candidate_matches: 1
+      caveat: Trained structured feature projection, not external LLM fine-tuning and not direct free-form SMILES generation.
+      outputs:
+        - artifacts/trail/generation/sft_trained_projection_generator/sft_record_projection_model.pt
+        - artifacts/trail/generation/sft_trained_projection_generator/sft_projection_scaler.json
+        - artifacts/trail/generation/sft_trained_projection_generator/sft_projection_training_summary.json
+        - artifacts/trail/generation/sft_trained_projection_generator/nearest_sft_record_projection.csv
+        - artifacts/trail/generation/sft_trained_projection_generator/generation_record_ledger.csv
+        - reports/sft_trained_projection_generator.md
   diffusion_or_flow_matching:
     maturity: trained_projection_smoke_implemented
     generator: scripts/build_generative_training_sets.py + scripts/run_diffusion_flow_candidate_generator_dry_run.py + scripts/train_conditional_flow_matching_generator.py
