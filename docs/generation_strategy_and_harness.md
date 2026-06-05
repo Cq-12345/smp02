@@ -122,6 +122,24 @@ h = (m_1..m_n, r_1..r_n)
 - 这 200 条 scored proposals 已通过 `scripts/import_proposal_eval_generation_records.py` 写回 generation record ledger：200 条 record 全部基础字段通过，18 条 Harness pass，失败项保留 target/chemistry failure reason 用于策略回流。
 - 原始 replacement、feedback-guided replacement 以及 190/195/200/250 C 多目标 strict replacement scored proposals 也已写回 generation record ledgers；这些账本为 SFT 和 diffusion/flow 提供更多目标条件、更多失败原因和更多 Harness-passing 小分子种子。
 
+### 3.2.1 Sparse target replacement expansion
+
+Target-conditioned policy 把 250 C 标记为 sparse target 后，新增了目标条件化 source-pool expansion：
+
+- `scripts/run_sparse_target_replacement_expansion.py`
+- `artifacts/trail/generation/sparse_target_replacement_expansion/sparse_target_replacement_expansion_summary.json`
+- `artifacts/trail/generation/sparse_target_replacement_records/target_250/generation_record_ledger.csv`
+- `reports/sparse_target_replacement_expansion.md`
+
+当前 250 C 结果：
+
+- 从 `all_ratio_candidates.csv` 中按 250 C 重新选择 40 条 source candidates，而不是沿用 195 C 的 `selected_candidates.csv`。
+- 生成 320 条 strict replacement proposals，其中 318 条可重建并评分。
+- 42 条通过 Harness，best eval distance 为 0.034 C；这比原 target sweep 的 4 条 pass 明显改善。
+- 42 条 surrogate observations 进入 PiEvo，6 轮 selected 全部通过 target guard，best selected distance 为 0.099 C。
+- 通过项写回 generation record ledger；去重后为训练语料新增 41 条 250 C functional-group replacement examples。
+- 目标条件化 policy 重算后，`sparse_targets=[]`；这表示当前 sample-count gate 已解除，不表示 250 C 真实物理规律已被验证。
+
 ### 3.3 VAE latent 生成
 
 当前已落地一个保守版本：
@@ -299,8 +317,8 @@ Feedback-aware LLM/RAG agent 状态：
 
 当前 readiness：
 
-- 16 个 generation ledgers 共 1965 条输入，其中 303 条通过 Harness；去重和 reward 过滤后得到 227 条训练候选。
-- SFT JSONL 为 192 条 train、35 条 eval。
+- 17 个 generation ledgers 共 2283 条输入，其中 345 条通过 Harness；去重和 reward 过滤后得到 268 条训练候选。
+- SFT JSONL 为 226 条 train、42 条 eval。
 - `sft_ready=true`，当前最小门槛为 20 条样本，已超过；下一步可以做 SFT dry-run 或训练作业。
 - SFT 生成器即使训练完成，也只能生成 auditable generation record JSON；候选仍必须重新经过 predictor、Harness、PiEvo 和人工审核，不能直接推荐。
 
@@ -308,15 +326,15 @@ Feedback-aware LLM/RAG agent 状态：
 
 - `scripts/run_sft_candidate_generator_dry_run.py` 已用 train split 中的 validated prototypes 生成 25 条 `sft_candidate_generator` records。
 - 25 条 records 全部通过 generation record/Harness，最佳 target distance 为 0.003 C，mean generation reward 为 0.9922。
-- heldout eval 有 35 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 SFT 已学会分布外生成。
+- heldout eval 有 42 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 SFT 已学会分布外生成。
 - dry-run mode 明确为 `prototype_replay_not_weight_update`。后续真正训练 LLM/SFT 权重时，应把模型输出写入同一 ledger，并和该 dry-run 的 pass rate、target distance、重复率对比。
 
 当前 SFT trained projection smoke：
 
 - `scripts/train_sft_record_projection_generator.py` 已在 SFT generation record 的结构化特征空间训练轻量监督 MLP：输入是 target/prompt/source 条件特征，输出是 formulation global features、预测 Tg、reward 和来源策略特征。
-- 120 epoch 后，train loss 从 0.880 降到 0.621，eval loss 为 0.725。
+- 120 epoch 后，train loss 从 0.864 降到 0.628，eval loss 为 0.750。
 - 连续模型输出不会直接当成配方；它们投影到最近 validated train-split record，得到 23 条 `sft_candidate_generator` records，23 条全部通过 Harness。
-- 最佳 target distance 为 0.003 C，mean generation reward 为 0.9798，projection distance mean 为 3.643；heldout eval 有 35 条，其中 0 条和 projection 输出完全同候选。
+- 最佳 target distance 为 0.003 C，mean generation reward 为 0.9800，projection distance mean 为 3.554；heldout eval 有 42 条，其中 0 条和 projection 输出完全同候选。
 - 该模式明确为 `supervised_neural_sft_projection`，不是外部 LLM 微调完成，也不是自由 SMILES 生成。后续若改成真实 LLM/SFT fine-tune 输出，仍必须写入同一 ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 ### 3.7 扩散/流匹配
@@ -340,14 +358,14 @@ Seed table 记录：
 
 当前 readiness：
 
-- diffusion/flow seed rows 为 227，192 条 train、35 条 eval。
+- diffusion/flow seed rows 为 268，226 条 train、42 条 eval。
 - `diffusion_flow_ready=true`，当前最小门槛 100 条 seed rows 已通过。
 - dry-run 使用 train split 中的 validated seed prototypes 做 `conditional_seed_replay_not_weight_update`，生成 19 条 `diffusion_or_flow_matching` records。
 - 19 条 records 全部通过 generation record/Harness，最佳 target distance 为 0.003 C，mean generation reward 为 0.9934。
-- heldout eval 有 35 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 diffusion/flow 已学会连续配方流形或分布外生成。
+- heldout eval 有 42 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 diffusion/flow 已学会连续配方流形或分布外生成。
 - 训练型 smoke 使用 31 维 formulation global features 训练条件 flow-matching MLP：从 Gaussian noise 到配方特征的 velocity，以目标 Tg 为条件。
-- 训练 120 epoch 后，train loss 从 1.860 降到 1.282，eval loss 为 1.502；连续生成点投影到最近 validated seed row 后得到 23 条 records，23 条全部通过 Harness。
-- 训练型 projection 的最佳 target distance 为 0.003 C，mean generation reward 为 0.8645，projection distance mean 为 4.629；多目标 latent 语料加入后投影质量和 eval loss 都有所改善，但仍未超过 seed replay。
+- 训练 120 epoch 后，train loss 从 1.839 降到 1.177，eval loss 为 1.412；连续生成点投影到最近 validated seed row 后得到 23 条 records，23 条全部通过 Harness。
+- 训练型 projection 的最佳 target distance 为 0.005 C，mean generation reward 为 0.8918，projection distance mean 为 4.422；250 C sparse expansion 语料加入后 eval loss 和 projection distance 继续改善，但仍未超过 seed replay。
 - 这一步把扩散/流匹配从“空泛未来项”推进为可训练数据契约、可审计 dry-run 和轻量训练型 projection；训练后输出仍必须重新写入 generation ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 ## 4. Harness 约束
@@ -435,9 +453,9 @@ transfer_budget(T) = base_transfer_budget * exp(-abs(T - 195) / transfer_decay)
 
 - 每个目标 Tg 都单独分配 100 proposal budget，且所有目标预算和都为 100。
 - 190/195/200 C 的 target-specific top strategy 为 `vae_latent_local_search`。
-- 250 C 的 target-specific top strategy 变成 `functional_group_replacement`；原因是 250 C 下 VAE latent 只有 5 条 pass、best selected distance 为 0.511 C，而 replacement 虽然也只有 4 条 pass，但 best selected distance 为 0.099 C。
+- 250 C 的 target-specific top strategy 变成 `functional_group_replacement`；原因是 250 C 下 VAE latent 只有 5 条 pass、best selected distance 为 0.511 C，而 sparse target replacement expansion 已得到 42 条 pass、best eval distance 0.034 C、best selected distance 0.099 C。
 - 195 C 可迁移 budget 为 25/100；190/200 C 衰减到 23/100；250 C 衰减到 13/100。
-- 250 C 被标记为 sparse target，后续应扩展高 Tg source pool、目标条件化 retrieval 或新 principle，而不是把 195 C 的全局规律硬外推。
+- 250 C 曾被标记为 sparse target；本轮 source-pool expansion 后 `sparse_targets=[]`。后续仍应优先做真实/高保真 validation 和更多 high-Tg principle 探索，而不是把 surrogate pass 当作物理真值。
 
 ## 6. 近期优先级
 
@@ -448,5 +466,5 @@ transfer_budget(T) = base_transfer_budget * exp(-abs(T - 195) / transfer_decay)
 5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
 7. SFT dry-run、SFT trained projection、diffusion/flow dry-run 和轻量条件 flow-matching 训练 smoke 都已跑通；下一步应做真实 LLM/SFT fine-tune 输出对比、改进 flow 训练/投影质量，或加入有效 SMILES decoder。任何训练输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。
-8. Target-conditioned strategy policy 已接入；下一步应针对 250 C 稀疏目标扩大 source pool、做目标条件化 retrieval，或让 LLM/RAG 提出新的高 Tg principle，再进入同一 ledger/Harness/PiEvo 链路。
+8. 250 C sparse target source-pool expansion 已跑通；下一步应对这些 250 C 通过项做人工/高保真复核，并把同样的 sparse-target expansion 机制推广到未来新出现的稀疏目标。
 9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。

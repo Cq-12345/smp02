@@ -41,8 +41,6 @@
     "200.0": 23,
     "250.0": 13
   },
-  "sparse_targets": [
-    250.0
-  ],
-  "sparse_target_count": 1
+  "sparse_targets": [],
+  "sparse_target_count": 0
 }

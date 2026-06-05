@@ -31,6 +31,7 @@ strategy_policy:
     policy_type: target_tg_conditioned_budget_with_global_transfer_exploration
     target_specific_sources:
       - artifacts/trail/generation/feedback_guided_replacement_target_sweep/feedback_replacement_target_sweep_summary.json
+      - artifacts/trail/generation/sparse_target_replacement_expansion/sparse_target_replacement_expansion_summary.json
       - artifacts/trail/generation/vae_latent_local_search_target_sweep/vae_latent_local_search_target_sweep_summary.json
     transferable_sources:
       - artifacts/trail/generation_strategy_policy/generation_strategy_bandit_policy.csv
@@ -46,7 +47,7 @@ strategy_policy:
       "195.0": vae_latent_local_search
       "200.0": vae_latent_local_search
       "250.0": functional_group_replacement
-    sparse_targets: [250.0]
+    sparse_targets: []
   guardrails:
     - llm_smiles_generation remains suppressed until predictor and chemistry evidence are present
     - sft_candidate_generator is active only after SFT readiness passes and still stays behind predictor/Harness/PiEvo gates
@@ -93,10 +94,14 @@ strategies:
         - artifacts/pievo_faithful_feedback_replacement_195_smoke/pievo_faithful_summary.json
         - artifacts/trail/generation/feedback_guided_replacement_pievo_compare/pievo_feedback_ledger_comparison.json
         - artifacts/trail/generation/feedback_guided_replacement_target_sweep/feedback_replacement_target_sweep_summary.json
+        - artifacts/trail/generation/sparse_target_replacement_expansion/sparse_target_replacement_expansion_summary.json
+        - artifacts/trail/generation/sparse_target_replacement_records/target_250/generation_record_ledger.csv
         - artifacts/pievo_faithful_feedback_replacement_target_sweep/target_195/pievo_faithful_summary.json
+        - artifacts/pievo_faithful_sparse_target_replacement_expansion/target_250/pievo_faithful_summary.json
         - reports/feedback_guided_replacement_comparison.md
         - reports/feedback_guided_replacement_pievo_comparison.md
         - reports/feedback_guided_replacement_target_sweep.md
+        - reports/sparse_target_replacement_expansion.md
         - reports/expanded_inventory_replacement_evaluation.md
         - reports/expanded_inventory_replacement_generation_records.md
       expanded_inventory_mode:
@@ -109,6 +114,19 @@ strategies:
           - replacement_template_intended_group
         literature_template_scored: 29
         literature_template_harness_pass: 3
+      sparse_target_expansion:
+        script: scripts/run_sparse_target_replacement_expansion.py
+        target_tg_c: 250.0
+        source_candidate_rows: 40
+        proposals: 320
+        rebuilt_formulas: 318
+        harness_pass: 42
+        best_distance_c: 0.034283
+        generation_record_harness_pass: 42
+        pievo_external_rows: 42
+        pievo_best_selected_distance_c: 0.0987732822528641
+        pievo_map_principle: reaction_cc7f1a60f1af
+        note: resolved the current target-conditioned sparse flag for 250 C by switching source pool from 195 C selected candidates to all-ratio candidates near 250 C
   vae_latent_local_search:
     maturity: decoder_free_inventory_search_implemented
     generator: trail/generation/vae_latent_local_search.py + scripts/evaluate_replacement_proposals.py + scripts/run_vae_latent_local_search_target_sweep.py
@@ -218,9 +236,9 @@ strategies:
     training_corpus:
       jsonl: artifacts/trail/generation/generative_training_sets/sft_generation_records.jsonl
       summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
-      examples: 227
-      train_examples: 192
-      eval_examples: 35
+      examples: 268
+      train_examples: 226
+      eval_examples: 42
       readiness_gate_pass: true
       min_examples: 20
       source_ledgers:
@@ -240,6 +258,7 @@ strategies:
         - artifacts/trail/generation/vae_latent_local_search_target_records/target_195/generation_record_ledger.csv
         - artifacts/trail/generation/vae_latent_local_search_target_records/target_200/generation_record_ledger.csv
         - artifacts/trail/generation/vae_latent_local_search_target_records/target_250/generation_record_ledger.csv
+        - artifacts/trail/generation/sparse_target_replacement_records/target_250/generation_record_ledger.csv
     dry_run:
       mode: prototype_replay_not_weight_update
       script: scripts/run_sft_candidate_generator_dry_run.py
@@ -247,7 +266,7 @@ strategies:
       harness_pass: 25
       best_distance_c: 0.0031802513673540034
       mean_generation_reward: 0.9921940687487707
-      heldout_eval_rows: 35
+      heldout_eval_rows: 42
       heldout_exact_candidate_matches: 0
       outputs:
         - artifacts/trail/generation/sft_candidate_dry_run/sft_candidate_records_input.csv
@@ -261,12 +280,12 @@ strategies:
       records: 23
       harness_pass: 23
       best_distance_c: 0.0031802513673540034
-      mean_generation_reward: 0.9797998605500596
-      train_loss_initial: 0.8799125949541727
-      train_loss_final: 0.6209816932678223
-      eval_loss_final: 0.7246468663215637
-      projection_distance_mean: 3.642749496128248
-      heldout_eval_rows: 35
+      mean_generation_reward: 0.9800251136418752
+      train_loss_initial: 0.8636801242828369
+      train_loss_final: 0.6275208443403244
+      eval_loss_final: 0.7500987648963928
+      projection_distance_mean: 3.553787272909413
+      heldout_eval_rows: 42
       heldout_exact_candidate_matches: 0
       caveat: Trained structured feature projection, not external LLM fine-tuning and not direct free-form SMILES generation.
       outputs:
@@ -284,9 +303,9 @@ strategies:
     training_seed_table:
       table: artifacts/trail/generation/generative_training_sets/diffusion_flow_seed_table.csv
       summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
-      seed_rows: 227
-      train_rows: 192
-      eval_rows: 35
+      seed_rows: 268
+      train_rows: 226
+      eval_rows: 42
       readiness_gate_pass: true
       min_examples: 100
       next_data_needed: 0
@@ -297,7 +316,7 @@ strategies:
       harness_pass: 19
       best_distance_c: 0.0031802513673540034
       mean_generation_reward: 0.9934334710121382
-      heldout_eval_rows: 35
+      heldout_eval_rows: 42
       heldout_exact_candidate_matches: 0
       outputs:
         - artifacts/trail/generation/diffusion_flow_candidate_dry_run/diffusion_flow_candidate_records_input.csv
@@ -310,16 +329,16 @@ strategies:
       script: scripts/train_conditional_flow_matching_generator.py
       feature_space: formulation_global_features_31d
       epochs: 120
-      train_seed_rows: 192
-      eval_seed_rows: 35
+      train_seed_rows: 226
+      eval_seed_rows: 42
       projected_records: 23
       harness_pass: 23
-      best_distance_c: 0.0031802513673540034
-      mean_generation_reward: 0.8644566894747596
-      train_loss_initial: 1.8595678408940632
-      train_loss_final: 1.2820241451263428
-      eval_loss_final: 1.501653790473938
-      projection_distance_mean: 4.6286066407742705
+      best_distance_c: 0.005365464445986845
+      mean_generation_reward: 0.8917715504049181
+      train_loss_initial: 1.8388483226299286
+      train_loss_final: 1.1765785813331604
+      eval_loss_final: 1.4116621017456055
+      projection_distance_mean: 4.422067984290745
       direct_smiles_generation_claim: false
       outputs:
         - artifacts/trail/generation/diffusion_flow_trained_generator/conditional_flow_matching_model.pt

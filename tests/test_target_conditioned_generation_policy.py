@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from scripts.update_target_conditioned_generation_policy import build_target_policy, run_target_conditioned_policy
+from scripts.update_target_conditioned_generation_policy import build_target_policy, merge_replacement_evidence, run_target_conditioned_policy
 
 
 def replacement_row(target: float, harness_pass: int, mean_reward: float, best_reward: float, selected_distance: float) -> dict:
@@ -165,6 +165,8 @@ def test_run_target_conditioned_policy_writes_outputs(tmp_path: Path) -> None:
     )
     global_policy = tmp_path / "global_policy.csv"
     global_policy_frame().to_csv(global_policy, index=False)
+    sparse = tmp_path / "sparse.json"
+    sparse.write_text("[]", encoding="utf-8")
     out_dir = tmp_path / "out"
     report = tmp_path / "report.md"
 
@@ -172,6 +174,7 @@ def test_run_target_conditioned_policy_writes_outputs(tmp_path: Path) -> None:
         Namespace(
             replacement_target_sweep_summary=str(replacement),
             vae_latent_target_sweep_summary=str(latent),
+            sparse_target_replacement_expansion_summary=str(sparse),
             global_policy=str(global_policy),
             total_budget=100,
             transferable_exploration_budget=25,
@@ -192,3 +195,19 @@ def test_run_target_conditioned_policy_writes_outputs(tmp_path: Path) -> None:
     assert (out_dir / "target_conditioned_generation_strategy_target_summary.csv").exists()
     assert (out_dir / "target_conditioned_generation_strategy_summary.json").exists()
     assert report.exists()
+
+
+def test_merge_replacement_evidence_prefers_sparse_expansion_for_same_target() -> None:
+    base = [replacement_row(250.0, harness_pass=4, mean_reward=0.71, best_reward=0.98, selected_distance=0.10)]
+    sparse = [
+        {
+            **replacement_row(250.0, harness_pass=42, mean_reward=0.63, best_reward=0.98, selected_distance=0.099),
+            "replacement_best_distance_c": 0.034,
+        }
+    ]
+
+    merged = merge_replacement_evidence(base, sparse)
+
+    assert len(merged) == 1
+    assert merged[0]["replacement_harness_pass"] == 42
+    assert merged[0]["target_evidence_source"] == "sparse_target_replacement_expansion"

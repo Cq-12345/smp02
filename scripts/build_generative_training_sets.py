@@ -26,6 +26,7 @@ DEFAULT_LEDGERS = [
     "artifacts/trail/generation/vae_latent_local_search_target_records/target_195/generation_record_ledger.csv",
     "artifacts/trail/generation/vae_latent_local_search_target_records/target_200/generation_record_ledger.csv",
     "artifacts/trail/generation/vae_latent_local_search_target_records/target_250/generation_record_ledger.csv",
+    "artifacts/trail/generation/sparse_target_replacement_records/target_250/generation_record_ledger.csv",
 ]
 
 

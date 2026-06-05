@@ -1,5 +1,6 @@
 eval_generation_id,eval_candidate_smiles,eval_candidate_ratios,nearest_generated_id,nearest_generated_distance_c,exact_candidate_match
 rule_template_24150f79c9cb,CC(C)(c1ccc(OCCOCC2CO2)cc1)c1ccc(OCCOCC2CO2)cc1|Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1,0.10000:0.90000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
+functional_group_replacement_7e5d60c20519,CN(C)Cc1cc(CN(C)C)c(O)c(CN(C)C)c1|COc1cc(COCC2CO2)cc(-c2cc(COCC3CO3)cc(OC)c2OCC2CO2)c1OCC1CO1,0.95000:0.05000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 rule_template_d3c79d830063,O=C=NC1CCC(CC2CCC(N=C=O)CC2)CC1|Nc1ccc(-c2nc3ccc(N)cc3[nH]2)cc1,0.45000:0.55000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 rule_template_53582e994fd1,COc1cc(/C=N/c2ccc(OCC3CO3)cc2)ccc1OCC1CO1|Nc1ccc(-c2ccc(N)cc2)cc1,0.65000:0.35000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 rule_template_423901b2e477,O=C(O)CC(O)(CC(=O)O)C(=O)O|O=C1OC(=O)c2cc(-c3ccc4c(c3)C(=O)OC4=O)ccc21,0.60000:0.40000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
@@ -15,15 +16,20 @@ vae_latent_local_search_88fc86bb2422,CC(C)(COCC1CO1)COCC1CO1|COc1cc(Nc2ccnc3cc(-
 vae_latent_local_search_95c50cf308d3,N#COc1ccc(S(=O)(=O)c2ccc(OC#N)cc2)cc1|Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1,0.20000:0.80000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_9b089207c99e,COc1cc(COCC2CO2)ccc1OCC1CO1|Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1,0.15000:0.85000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_cfa733197b96,C(=N/c1ccc(OCC2CO2)cc1)\c1ccc(OCC2CO2)cc1|Nc1ccc(-c2ccc(N)cc2)cc1,0.65000:0.35000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
+functional_group_replacement_e6de7444cfe7,C=CC(=O)OCC(CO)(COCC(COC(=O)C=C)(COC(=O)C=C)COC(=O)C=C)COC(=O)C=C|O=C1OC(=O)c2cc(Oc3ccc4c(c3)C(=O)OC4=O)ccc21,0.05000:0.95000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_2d23dcd47aa7,COc1cc(Nc2ccnc3cc(-c4ccncc4)ccc23)cc(OC)c1OC|O=C1OC(=O)c2cc(-c3ccc4c(c3)C(=O)OC4=O)ccc21,0.45000:0.55000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
+functional_group_replacement_225cf5228fa1,O=C1OC(=O)c2cc(Oc3ccc4c(c3)C(=O)OC4=O)ccc21|c1coc(CNCc2ccco2)c1,0.60000:0.40000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 functional_group_replacement_e3383997efc1,COc1ccc(OCC2CO2)c(CCCC(=O)OCCOC(=O)CCc2ccc(OCC3CO3)c(OC)c2)c1|Nc1ccc(Cc2ccc(N)cc2)cc1,0.20000:0.80000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_147a2280d342,CC(C)(c1ccc(OC#N)cc1)c1ccc(OC#N)cc1|N#Cc1c(N)nc(Sc2ccc(O)cc2)c(C#N)c1-c1ccc(Cl)cc1,0.20000:0.80000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
+functional_group_replacement_1bd4fc83c47e,COc1cc([C@H]2OC[C@H]3[C@@H]2CO[C@@H]3c2cc(OC)c(OCC3CO3)c(OC)c2)cc(OC)c1OCC1CO1|O=C1OC(=O)c2cc(Oc3ccc4c(c3)C(=O)OC4=O)ccc21,0.05000:0.95000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_83744cfbca56,Cc1ccc(N=C=O)cc1N=C=O|Nc1ccc(C(F)(F)F)c(-c2ccc(N)cc2C(F)(F)F)c1,0.35000:0.65000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_4a88ace749d0,COc1cc(Nc2ccnc3cc(-c4ccncc4)ccc23)cc(OC)c1OC|Cc1cc(-c2cc(C)c(OCC3CO3)c(C)c2)c(C)cc1OCC1CO1,0.65000:0.35000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_b975f0e4d8b7,C=CCc1ccc(OCC2CO2)c(-c2cc(CC=C)ccc2OCC2CO2)c1|CC1(C)CC(N)CC(C)(C)C1CN,0.70000:0.30000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_d3df94b75ecd,Cc1cc(-c2cc(C)c(OCC3CO3)c(C)c2)c(C)cc1OCC1CO1|O=C1CC(c2ccc(-c3ccccc3)cc2)c2c(ccc3ccccc23)N1,0.35000:0.65000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_b975f0e4d8b7,C=CCc1ccc(OCC2CO2)c(-c2cc(CC=C)ccc2OCC2CO2)c1|CC1(C)CC(N)CC(C)(C)C1CN,0.70000:0.30000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_4a88ace749d0,COc1cc(Nc2ccnc3cc(-c4ccncc4)ccc23)cc(OC)c1OC|Cc1cc(-c2cc(C)c(OCC3CO3)c(C)c2)c(C)cc1OCC1CO1,0.65000:0.35000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
+functional_group_replacement_14dbaca0ed7c,CN(C)Cc1cc(CN(C)C)c(O)c(CN(C)C)c1|COc1cc(CO)cc(-c2cc(CO)cc(OC)c2OCC2CO2)c1OCC1CO1,0.95000:0.05000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
+functional_group_replacement_bdaaf0537944,CC(C)(COCC1CO1)COCC1CO1|O=c1cc(-c2ccc3c(c2)CN(Cc2ccco2)CO3)c2c3c(c(O)cc2o1)CN(Cc1ccco1)CO3,0.10000:0.90000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_2d23dcd47aa7,COc1cc(Nc2ccnc3cc(-c4ccncc4)ccc23)cc(OC)c1OC|O=C1OC(=O)c2cc(-c3ccc4c(c3)C(=O)OC4=O)ccc21,0.45000:0.55000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_cfa733197b96,C(=N/c1ccc(OCC2CO2)cc1)\c1ccc(OCC2CO2)cc1|Nc1ccc(-c2ccc(N)cc2)cc1,0.65000:0.35000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_9b089207c99e,COc1cc(COCC2CO2)ccc1OCC1CO1|Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1,0.15000:0.85000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
@@ -33,4 +39,5 @@ vae_latent_local_search_0f2ca81b28a8,Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)c
 vae_latent_local_search_88fc86bb2422,CC(C)(COCC1CO1)COCC1CO1|COc1cc(Nc2ccnc3cc(-c4ccncc4)ccc23)cc(OC)c1OC,0.15000:0.85000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_d2bfaafc955c,COc1cc(CO)cc(-c2cc(CO)cc(OC)c2OCC2CO2)c1OCC1CO1|Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1,0.10000:0.90000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_4b31251007f8,C=C(C)C(=O)OC(C)(C)C|O=C1C=CC(=O)N(c2ccc(Cc3ccc(N4C(=O)C=CC4=O)cc3)cc2)C1=O,0.30000:0.70000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
+functional_group_replacement_e8571fd7b79f,COc1cc(CC2CO2)ccc1OP(=O)(Oc1ccc(CC2CO2)cc1OC)Oc1ccc(CC2CO2)cc1OC|O=C1OC(=O)c2cc(Cc3ccc4c(c3)C(=O)OC4=O)ccc21,0.20000:0.80000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False
 vae_latent_local_search_130f3c09169c,CC(C)(c1ccc(OCCOCC2CO2)cc1)c1ccc(OCCOCC2CO2)cc1|COc1cc(Nc2ccnc3cc(-c4ccncc4)ccc23)cc(OC)c1OC,0.10000:0.90000,diffusion_flow_dry_run_19c0346deafd,0.0031802513673540034,False

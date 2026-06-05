@@ -50,6 +50,9 @@ def summarize(
     target_conditioned_strategy_policy_summary: Path = Path(
         "artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_summary.json"
     ),
+    sparse_target_replacement_expansion_summary: Path = Path(
+        "artifacts/trail/generation/sparse_target_replacement_expansion/sparse_target_replacement_expansion_summary.json"
+    ),
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -75,6 +78,16 @@ def summarize(
     diffusion_flow_trained_generation = read_json(diffusion_flow_trained_generation_summary, {})
     sft_trained_candidate_generation = read_json(sft_trained_candidate_generation_summary, {})
     target_conditioned_strategy_policy = read_json(target_conditioned_strategy_policy_summary, {})
+    sparse_target_replacement_expansion = read_json(sparse_target_replacement_expansion_summary, [])
+    sparse_rows = sparse_target_replacement_expansion if isinstance(sparse_target_replacement_expansion, list) else []
+    sparse_best_eval = min(
+        [row.get("replacement_best_distance_c") for row in sparse_rows if row.get("replacement_best_distance_c") is not None],
+        default=None,
+    )
+    sparse_best_selected = min(
+        [row.get("best_selected_target_distance_c") for row in sparse_rows if row.get("best_selected_target_distance_c") is not None],
+        default=None,
+    )
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
@@ -147,6 +160,20 @@ def summarize(
         ),
         "target_conditioned_strategy_policy_sparse_targets": target_conditioned_strategy_policy.get("sparse_targets", []),
         "target_conditioned_strategy_policy_sparse_target_count": target_conditioned_strategy_policy.get("sparse_target_count", 0),
+        "sparse_target_replacement_expansion_targets": int(len(sparse_rows)),
+        "sparse_target_replacement_expansion_target_values": [row.get("target_tg_c") for row in sparse_rows],
+        "sparse_target_replacement_expansion_source_candidate_rows": int(sum(row.get("source_candidate_rows", 0) for row in sparse_rows)),
+        "sparse_target_replacement_expansion_proposals": int(sum(row.get("replacement_input_proposals", 0) for row in sparse_rows)),
+        "sparse_target_replacement_expansion_harness_pass": int(sum(row.get("replacement_harness_pass", 0) for row in sparse_rows)),
+        "sparse_target_replacement_expansion_generation_record_harness_pass": int(
+            sum(row.get("generation_record_harness_pass", 0) for row in sparse_rows)
+        ),
+        "sparse_target_replacement_expansion_best_eval_distance_c": sparse_best_eval,
+        "sparse_target_replacement_expansion_best_selected_distance_c": sparse_best_selected,
+        "sparse_target_replacement_expansion_all_selected_pass": bool(sparse_rows)
+        and all(bool(row.get("pievo_all_selected_pass", False)) for row in sparse_rows),
+        "sparse_target_replacement_expansion_all_selected_within_guard": bool(sparse_rows)
+        and all(bool(row.get("pievo_all_selected_within_guard", False)) for row in sparse_rows),
         "human_review_queue_rows": human_review.get("queue_rows", 0),
         "human_review_ready_for_active_ledger_rows": human_review.get("ready_for_active_ledger_rows", 0),
         "human_review_draft_ready_for_active_ledger_rows": human_review.get("draft_ready_for_active_ledger_rows", 0),
@@ -226,6 +253,10 @@ def main() -> None:
         "--target-conditioned-strategy-policy-summary",
         default="artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_summary.json",
     )
+    parser.add_argument(
+        "--sparse-target-replacement-expansion-summary",
+        default="artifacts/trail/generation/sparse_target_replacement_expansion/sparse_target_replacement_expansion_summary.json",
+    )
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
     result = summarize(
@@ -253,6 +284,7 @@ def main() -> None:
         Path(args.diffusion_flow_trained_generation_summary),
         Path(args.sft_trained_candidate_generation_summary),
         Path(args.target_conditioned_strategy_policy_summary),
+        Path(args.sparse_target_replacement_expansion_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

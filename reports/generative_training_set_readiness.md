@@ -12,16 +12,16 @@
 
 | item | value |
 | --- | ---: |
-| input_rows | 1965 |
-| harness_pass_rows | 303 |
-| training_candidate_rows | 227 |
-| sft_examples | 227 |
-| sft_train_examples | 192 |
-| sft_eval_examples | 35 |
+| input_rows | 2283 |
+| harness_pass_rows | 345 |
+| training_candidate_rows | 268 |
+| sft_examples | 268 |
+| sft_train_examples | 226 |
+| sft_eval_examples | 42 |
 | sft_ready | True |
-| diffusion_flow_seed_rows | 227 |
-| diffusion_flow_train_rows | 192 |
-| diffusion_flow_eval_rows | 35 |
+| diffusion_flow_seed_rows | 268 |
+| diffusion_flow_train_rows | 226 |
+| diffusion_flow_eval_rows | 42 |
 | diffusion_flow_ready | True |
 | next_data_needed_for_sft | 0 |
 | next_data_needed_for_diffusion_flow | 0 |
@@ -31,8 +31,8 @@
 | strategy | records |
 | --- | ---: |
 | vae_latent_local_search | 126 |
+| functional_group_replacement | 88 |
 | rule_template | 50 |
-| functional_group_replacement | 47 |
 | llm_rag_principle_generation | 4 |
 
 ## Interpretation

@@ -2,4 +2,4 @@ target_tg_c,total_budget,target_specific_budget,transfer_budget,allocation_sum,t
 190.0,100,77,23,100,51,51,vae_latent_local_search,vae_latent_local_search,maleimide_rigid_network,0.9394130628134758,False
 195.0,100,75,25,100,53,53,vae_latent_local_search,vae_latent_local_search,reaction_839cd29ef5d7,1.0,False
 200.0,100,77,23,100,52,52,vae_latent_local_search,vae_latent_local_search,sulfone_diamine_rigidity,0.9394130628134758,False
-250.0,100,87,13,100,9,9,functional_group_replacement,functional_group_replacement,heavy_halogen_practical_risk,0.5028315779709409,True
+250.0,100,87,13,100,47,47,functional_group_replacement,functional_group_replacement,reaction_cc7f1a60f1af,0.5028315779709409,False

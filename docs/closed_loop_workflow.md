@@ -243,6 +243,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --diffusion-flow-trained-generation-summary artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_summary.json \
   --sft-trained-candidate-generation-summary artifacts/trail/generation/sft_trained_projection_generator/generation_record_summary.json \
   --target-conditioned-strategy-policy-summary artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_summary.json \
+  --sparse-target-replacement-expansion-summary artifacts/trail/generation/sparse_target_replacement_expansion/sparse_target_replacement_expansion_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
 ```
 
@@ -350,9 +351,9 @@ Diffusion/flow candidate generator dry-run 已补充：
 Conditional flow-matching trained generator smoke 已补充：
 
 - `scripts/train_conditional_flow_matching_generator.py` 在 31 维 formulation global feature 空间训练条件 flow-matching MLP，并以目标 Tg 作为条件。
-- 当前 120 epoch smoke 中，train loss 从 1.860 降至 1.282，eval loss 为 1.502。
+- 当前 120 epoch smoke 中，train loss 从 1.839 降至 1.177，eval loss 为 1.412。
 - 连续生成 184 个特征样本后投影到最近 validated seed row，得到 23 条 `diffusion_or_flow_matching` records，23 条全部通过 Harness。
-- 最佳 target distance 为 0.003 C，mean generation reward 为 0.8645，projection distance mean 为 4.629。
+- 最佳 target distance 为 0.005 C，mean generation reward 为 0.8918，projection distance mean 为 4.422。
 - 这是训练型 projection，不是直接 SMILES diffusion；后续若取消 nearest-seed projection，必须新增有效 decoder、predictor 和 Harness 复评。
 - Workflow summary 已读取 trained flow summary，记录 rows、Harness pass、best distance、训练损失和 projection distance。
 
@@ -372,8 +373,10 @@ Target-conditioned generation strategy policy 已补充：
 - `scripts/update_target_conditioned_generation_policy.py` 读取 replacement target sweep、VAE latent target sweep 和全局 strategy bandit，把下一轮预算从单一 195 C 全局配置改成每个目标 Tg 单独分配。
 - 当前 190/195/200/250 C 每个目标预算和都为 100；190/195/200 C 的 target-specific top strategy 为 `vae_latent_local_search`，250 C 切换为 `functional_group_replacement`。
 - 全局 LLM/RAG、SFT projection、flow projection 只拿可迁移 exploration budget；该 budget 以 195 C 为参考衰减，250 C 只保留 13/100，避免把 195 C evidence 硬外推到高 Tg 区间。
-- 250 C 被标记为 sparse target；下一轮应优先扩展高 Tg source pool、目标条件化 latent retrieval 或新的 high-Tg principle，再经 predictor/Harness/PiEvo 复评。
-- Workflow summary 已读取 `target_conditioned_generation_strategy_summary.json`，记录每个目标的 top strategy、transfer budget 和 sparse target。
+- 250 C 曾被标记为 sparse target；`scripts/run_sparse_target_replacement_expansion.py` 已从全量 ratio candidates 中重新选择 40 条 250 C source candidates，生成 320 条 strict replacement proposals，其中 42 条通过 Harness，best eval distance 为 0.034 C。
+- 这 42 条 surrogate observations 进入 PiEvo 后，6 轮 selected 全部通过 target guard；best selected distance 为 0.099 C，MAP principle 为 `reaction_cc7f1a60f1af`。
+- sparse expansion 通过项已写回 `artifacts/trail/generation/sparse_target_replacement_records/target_250/generation_record_ledger.csv`，并纳入 SFT/diffusion-flow 训练语料；目标条件化 policy 重算后 `sparse_targets=[]`。
+- Workflow summary 已读取 `target_conditioned_generation_strategy_summary.json` 和 `sparse_target_replacement_expansion_summary.json`，记录每个目标的 top strategy、transfer budget、sparse target 和 250 C expansion 结果。
 
 Human experiment review queue 已补充：
 

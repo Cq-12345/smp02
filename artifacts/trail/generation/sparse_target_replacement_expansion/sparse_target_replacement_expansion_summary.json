@@ -1,0 +1,28 @@
+[
+  {
+    "target_tg_c": 250.0,
+    "source_candidate_rows": 40,
+    "replacement_input_proposals": 320,
+    "replacement_rebuilt_formulas": 318,
+    "replacement_harness_pass": 42,
+    "replacement_best_distance_c": 0.034283,
+    "replacement_within_1c": 8,
+    "replacement_within_5c": 42,
+    "replacement_observations": 42,
+    "pievo_output_dir": "artifacts/pievo_faithful_sparse_target_replacement_expansion/target_250",
+    "pievo_rounds": 6,
+    "pievo_history_rows": 48,
+    "pievo_external_rows": 42,
+    "pievo_external_mean_reward": 0.6333373713120272,
+    "pievo_posterior_entropy": 3.277193443090607,
+    "pievo_map_principle": "reaction_cc7f1a60f1af",
+    "pievo_map_principle_posterior": 0.18069898894312236,
+    "pievo_all_selected_within_guard": true,
+    "pievo_all_selected_pass": true,
+    "generation_record_rows": 318,
+    "generation_record_harness_pass": 42,
+    "best_selected_predicted_tg_mean_c": 249.90122671774716,
+    "best_selected_target_distance_c": 0.0987732822528641,
+    "best_selected_reward": 0.9804391882315944
+  }
+]

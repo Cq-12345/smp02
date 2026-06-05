@@ -106,7 +106,7 @@ def target_sweep_arm(strategy: str, target_tg_c: float, row: dict[str, Any]) -> 
         "strategy": strategy,
         "status": status,
         "evidence_scope": "target_sweep",
-        "evidence_source": config["source"],
+        "evidence_source": row.get("target_evidence_source", config["source"]),
         "attempts": attempts,
         "successes": successes,
         "failures": max(0, attempts - successes),
@@ -156,6 +156,32 @@ def target_arms_for_target(
     frame["target_exploration_bonus"] = bonuses
     frame["target_score"] = frame["target_score"] + frame["target_exploration_bonus"]
     return frame
+
+
+def replacement_evidence_score(row: dict[str, Any]) -> tuple[int, float, float]:
+    harness_pass = int(row.get("replacement_harness_pass", 0) or 0)
+    selected_distance = coalesce_float(row.get("best_selected_target_distance_c"), row.get("replacement_best_distance_c"))
+    eval_distance = coalesce_float(row.get("replacement_best_distance_c"))
+    return (
+        harness_pass,
+        -(float("inf") if selected_distance is None else selected_distance),
+        -(float("inf") if eval_distance is None else eval_distance),
+    )
+
+
+def merge_replacement_evidence(base_rows: Any, sparse_rows: Any) -> list[dict[str, Any]]:
+    merged: dict[float, dict[str, Any]] = {}
+    for target, row in rows_by_target(base_rows).items():
+        item = dict(row)
+        item["target_evidence_source"] = "feedback_guided_replacement_target_sweep"
+        merged[target] = item
+    for target, row in rows_by_target(sparse_rows).items():
+        item = dict(row)
+        item["target_evidence_source"] = "sparse_target_replacement_expansion"
+        current = merged.get(target)
+        if current is None or replacement_evidence_score(item) > replacement_evidence_score(current):
+            merged[target] = item
+    return [merged[target] for target in sorted(merged)]
 
 
 def transfer_arms_for_target(
@@ -471,10 +497,10 @@ def write_report(policy: pd.DataFrame, target_summary: pd.DataFrame, summary: di
             "",
             "## 解释",
             "",
-            "- `target_sweep` 证据来自该目标 Tg 下实际跑过的 replacement/VAE latent sweep 和 PiEvo selected reward。",
+            "- `target_sweep` 证据来自该目标 Tg 下实际跑过的 replacement/VAE latent sweep、sparse-target expansion 和 PiEvo selected reward；同一目标下会优先采用更强的 replacement evidence。",
             "- `global_transfer` 证据来自全局 strategy bandit；它只拿可迁移 exploration budget，且离 195 C 参考目标越远预算越小。",
             "- `allocation_per_100` 是下一轮 proposal 预算，不是最终配方推荐；所有候选仍必须写入 ledger，并重新经过 predictor、Harness、PiEvo 和人工审核。",
-            "- 250 C 被标记为 sparse target 时，含义是目标条件化成功样本少，应优先扩大该温区候选池或引入新 principle，而不是把 195 C 规律硬外推。",
+            "- `sparse_targets` 非空时，含义是目标条件化成功样本少，应优先扩大对应温区候选池或引入新 principle，而不是把 195 C 规律硬外推；当前若为空，只表示 sample-count gate 暂时通过，不表示物理真值已验证。",
         ]
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -482,8 +508,12 @@ def write_report(policy: pd.DataFrame, target_summary: pd.DataFrame, summary: di
 
 
 def run_target_conditioned_policy(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
-    policy, target_summary, summary = build_target_policy(
+    replacement_rows = merge_replacement_evidence(
         read_json(Path(args.replacement_target_sweep_summary)),
+        read_json(Path(args.sparse_target_replacement_expansion_summary)),
+    )
+    policy, target_summary, summary = build_target_policy(
+        replacement_rows,
         read_json(Path(args.vae_latent_target_sweep_summary)),
         read_csv(Path(args.global_policy)),
         total_budget=int(args.total_budget),
@@ -515,6 +545,10 @@ def main() -> None:
     parser.add_argument(
         "--vae-latent-target-sweep-summary",
         default="artifacts/trail/generation/vae_latent_local_search_target_sweep/vae_latent_local_search_target_sweep_summary.json",
+    )
+    parser.add_argument(
+        "--sparse-target-replacement-expansion-summary",
+        default="artifacts/trail/generation/sparse_target_replacement_expansion/sparse_target_replacement_expansion_summary.json",
     )
     parser.add_argument(
         "--global-policy",

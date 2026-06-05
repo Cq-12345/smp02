@@ -144,9 +144,28 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
                     "200.0": 23,
                     "250.0": 13,
                 },
-                "sparse_targets": [250.0],
-                "sparse_target_count": 1,
+                "sparse_targets": [],
+                "sparse_target_count": 0,
             }
+        ),
+        encoding="utf-8",
+    )
+    sparse_target_replacement = tmp_path / "sparse_target_replacement.json"
+    sparse_target_replacement.write_text(
+        json.dumps(
+            [
+                {
+                    "target_tg_c": 250.0,
+                    "source_candidate_rows": 40,
+                    "replacement_input_proposals": 320,
+                    "replacement_harness_pass": 42,
+                    "replacement_best_distance_c": 0.034,
+                    "generation_record_harness_pass": 42,
+                    "best_selected_target_distance_c": 0.099,
+                    "pievo_all_selected_pass": True,
+                    "pievo_all_selected_within_guard": True,
+                }
+            ]
         ),
         encoding="utf-8",
     )
@@ -280,6 +299,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         diffusion_flow_trained_generation,
         sft_trained_generation,
         target_conditioned_policy,
+        sparse_target_replacement,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -325,7 +345,14 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["target_conditioned_strategy_policy_top_strategy_by_target"]["250.0"] == "functional_group_replacement"
     assert result["target_conditioned_strategy_policy_top_target_specific_strategy_by_target"]["190.0"] == "vae_latent_local_search"
     assert result["target_conditioned_strategy_policy_transfer_budget_by_target"]["250.0"] == 13
-    assert result["target_conditioned_strategy_policy_sparse_target_count"] == 1
+    assert result["target_conditioned_strategy_policy_sparse_target_count"] == 0
+    assert result["sparse_target_replacement_expansion_targets"] == 1
+    assert result["sparse_target_replacement_expansion_target_values"] == [250.0]
+    assert result["sparse_target_replacement_expansion_harness_pass"] == 42
+    assert result["sparse_target_replacement_expansion_generation_record_harness_pass"] == 42
+    assert result["sparse_target_replacement_expansion_best_eval_distance_c"] == 0.034
+    assert result["sparse_target_replacement_expansion_best_selected_distance_c"] == 0.099
+    assert result["sparse_target_replacement_expansion_all_selected_pass"] is True
     assert result["human_review_queue_rows"] == 30
     assert result["human_review_ready_for_active_ledger_rows"] == 0
     assert result["human_review_draft_ready_for_active_ledger_rows"] == 0
