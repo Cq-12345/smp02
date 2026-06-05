@@ -17,7 +17,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/gnn/train_gnn.
 - `artifacts/trail/gnn_aligned_smoke/metrics.csv`
 - `artifacts/trail/gnn_aligned_smoke/train_predictions.csv`
 - `artifacts/trail/gnn_aligned_smoke/test_predictions.csv`
-- `artifacts/trail/gnn_aligned_smoke/gnn_tg_regressor.pt`
+- 新版训练脚本按架构保存模型，例如 `gnn_gcn_tg_regressor.pt`、`gnn_mpnn_tg_regressor.pt`。
 
 ## 2. 指标
 
@@ -50,7 +50,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/gnn/train_gnn.
 
 ## 4. 下一步
 
-- 加入边特征和 bond type。
-- 加入 global formulation features，如组分数、官能团统计、reaction principle。
-- 尝试 GIN/GAT/MPNN，而不是简单 GCN。
+- GIN/GAT/MPNN 已完成 5 epoch smoke，见 `reports/gnn_architecture_smoke_leaderboard.md`。
+- MPNN 在 smoke 中最好，MAPEK test 为 11.0512%，MAE test 为 47.1922 C，但仍弱于 VAE-WVCM-GPR/NuSVR。
+- 下一步加入 global formulation features，如组分数、官能团统计、reaction principle 和 process condition template。
 - 与 VAE-WVCM ensemble：GNN disagreement 可作为 PiEvo 的 epistemic/OOD 信号。

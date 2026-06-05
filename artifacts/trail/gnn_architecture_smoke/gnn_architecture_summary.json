@@ -1,0 +1,11 @@
+{
+  "architectures": [
+    "gcn",
+    "gin",
+    "gat",
+    "mpnn"
+  ],
+  "epochs": 5,
+  "batch_size": 32,
+  "best_architecture": "mpnn"
+}

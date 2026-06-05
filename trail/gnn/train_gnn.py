@@ -14,7 +14,7 @@ from torch import nn
 from torch.nn import functional as F
 from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
-from torch_geometric.nn import GCNConv, global_mean_pool
+from torch_geometric.nn import GATConv, GCNConv, GINConv, NNConv, global_mean_pool
 
 from smp02.data import load_smp_records
 
@@ -71,9 +71,22 @@ def atom_features(atom: Chem.Atom, ratio: float) -> list[float]:
     ]
 
 
+def bond_features(bond: Chem.Bond) -> list[float]:
+    bond_type = bond.GetBondType()
+    return [
+        float(bond_type == Chem.BondType.SINGLE),
+        float(bond_type == Chem.BondType.DOUBLE),
+        float(bond_type == Chem.BondType.TRIPLE),
+        float(bond_type == Chem.BondType.AROMATIC),
+        float(bond.GetIsConjugated()),
+        float(bond.IsInRing()),
+    ]
+
+
 def record_to_graph(record) -> Data | None:
     xs = []
     edges = []
+    edge_attrs = []
     offset = 0
     for smi, ratio in zip(record.smiles, record.ratios, strict=False):
         mol = Chem.MolFromSmiles(smi)
@@ -84,27 +97,55 @@ def record_to_graph(record) -> Data | None:
         for bond in mol.GetBonds():
             a = offset + bond.GetBeginAtomIdx()
             b = offset + bond.GetEndAtomIdx()
+            attrs = bond_features(bond)
             edges.append([a, b])
             edges.append([b, a])
+            edge_attrs.append(attrs)
+            edge_attrs.append(attrs)
         offset += mol.GetNumAtoms()
     if not xs:
         return None
     edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous() if edges else torch.empty((2, 0), dtype=torch.long)
-    return Data(x=torch.tensor(xs, dtype=torch.float32), edge_index=edge_index, y=torch.tensor([record.tg], dtype=torch.float32))
+    edge_attr = torch.tensor(edge_attrs, dtype=torch.float32) if edge_attrs else torch.empty((0, 6), dtype=torch.float32)
+    return Data(x=torch.tensor(xs, dtype=torch.float32), edge_index=edge_index, edge_attr=edge_attr, y=torch.tensor([record.tg], dtype=torch.float32))
 
 
 class GNNRegressor(nn.Module):
-    def __init__(self, in_channels: int = 5, hidden: int = 64) -> None:
+    def __init__(self, in_channels: int = 5, hidden: int = 64, edge_channels: int = 6, architecture: str = "gcn") -> None:
         super().__init__()
-        self.conv1 = GCNConv(in_channels, hidden)
-        self.conv2 = GCNConv(hidden, hidden)
+        self.architecture = architecture.lower()
+        if self.architecture == "gcn":
+            self.conv1 = GCNConv(in_channels, hidden)
+            self.conv2 = GCNConv(hidden, hidden)
+        elif self.architecture == "gin":
+            self.conv1 = GINConv(nn.Sequential(nn.Linear(in_channels, hidden), nn.ReLU(), nn.Linear(hidden, hidden)))
+            self.conv2 = GINConv(nn.Sequential(nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, hidden)))
+        elif self.architecture == "gat":
+            heads = 4
+            self.conv1 = GATConv(in_channels, hidden // heads, heads=heads, concat=True)
+            self.conv2 = GATConv(hidden, hidden // heads, heads=heads, concat=True)
+        elif self.architecture == "mpnn":
+            self.edge_mlp1 = nn.Sequential(nn.Linear(edge_channels, hidden), nn.ReLU(), nn.Linear(hidden, in_channels * hidden))
+            self.edge_mlp2 = nn.Sequential(nn.Linear(edge_channels, hidden), nn.ReLU(), nn.Linear(hidden, hidden * hidden))
+            self.conv1 = NNConv(in_channels, hidden, self.edge_mlp1, aggr="mean")
+            self.conv2 = NNConv(hidden, hidden, self.edge_mlp2, aggr="mean")
+        else:
+            raise ValueError(f"Unknown GNN architecture: {architecture}")
         self.head = nn.Sequential(nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, 1))
 
     def forward(self, data: Data) -> torch.Tensor:
-        x = F.relu(self.conv1(data.x, data.edge_index))
-        x = F.relu(self.conv2(x, data.edge_index))
+        if self.architecture == "mpnn":
+            x = F.relu(self.conv1(data.x, data.edge_index, data.edge_attr))
+            x = F.relu(self.conv2(x, data.edge_index, data.edge_attr))
+        else:
+            x = F.relu(self.conv1(data.x, data.edge_index))
+            x = F.relu(self.conv2(x, data.edge_index))
         pooled = global_mean_pool(x, data.batch)
         return self.head(pooled).view(-1)
+
+
+def cpu_state_dict(model: nn.Module) -> dict[str, torch.Tensor]:
+    return {key: value.detach().cpu() for key, value in model.state_dict().items()}
 
 
 def main() -> None:
@@ -112,6 +153,8 @@ def main() -> None:
     parser.add_argument("--data", default="data/SMP_Dataset.xlsx")
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument("--architecture", choices=["gcn", "gin", "gat", "mpnn"], default="gcn")
+    parser.add_argument("--hidden", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=1e-3)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--test-size", type=float, default=0.15)
@@ -126,7 +169,7 @@ def main() -> None:
     train_loader = DataLoader(train_graphs, batch_size=args.batch_size, shuffle=True)
     test_loader = DataLoader(test_graphs, batch_size=args.batch_size)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = GNNRegressor().to(device)
+    model = GNNRegressor(hidden=args.hidden, architecture=args.architecture).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     loss_history = []
     for _ in range(args.epochs):
@@ -156,12 +199,14 @@ def main() -> None:
     y_test, p_test = predict(test_loader)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    torch.save(model.state_dict(), out / "gnn_tg_regressor.pt")
+    torch.save(cpu_state_dict(model), out / f"gnn_{args.architecture}_tg_regressor.pt")
     metrics = regression_metrics(y_train, p_train, y_test, p_test)
     metrics.update(
         {
-            "ML method": "SmallMoleculeGraphGCN",
+            "ML method": f"SmallMoleculeGraph{args.architecture.upper()}",
             "model_family": "gnn",
+            "architecture": args.architecture,
+            "hidden": int(args.hidden),
             "epochs": int(args.epochs),
             "batch_size": int(args.batch_size),
             "test_size": float(args.test_size),

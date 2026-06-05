@@ -1,0 +1,2 @@
+MAPEK training dataset (%),MAPEK test dataset (%),MAE training dataset (C),MAE test dataset (C),RMSE training dataset (C),RMSE test dataset (C),PCP training dataset (%),PCP test dataset (%),R2 training,R2 test,ML method,model_family,architecture,hidden,epochs,batch_size,test_size,seed,n_graphs,n_train,n_test,final_train_loss
+26.03887413687509,27.0801266363429,112.37369734613519,122.57367684122394,137.67142715124754,155.048603498873,0.0,0.0,-1.8813409622185033,-1.597209072512483,SmallMoleculeGraphGCN,gnn,gcn,64,5,32,0.15,42,448,380,68,19578.381673177082
