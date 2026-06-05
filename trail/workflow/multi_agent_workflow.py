@@ -58,6 +58,7 @@ def summarize(
     validation_execution_schedule_summary: Path = Path("artifacts/trail/human_review/validation_execution_schedule_summary.json"),
     process_completion_packet_summary: Path = Path("artifacts/trail/human_review/process_completion_packet_summary.json"),
     process_design_suggestion_summary: Path = Path("artifacts/trail/human_review/process_design_suggestion_summary.json"),
+    process_approval_summary: Path = Path("artifacts/trail/human_review/process_completion_approval_summary.json"),
     validation_result_intake_summary: Path = Path("artifacts/trail/human_review/validation_result_intake_summary.json"),
     active_observation_summary: Path = Path("artifacts/trail/human_review/active_high_authority_observation_summary.json"),
     active_evidence_pievo_bridge_summary: Path = Path(
@@ -86,6 +87,7 @@ def summarize(
     validation_execution = read_json(validation_execution_schedule_summary, {})
     process_completion_packet = read_json(process_completion_packet_summary, {})
     process_design_suggestion = read_json(process_design_suggestion_summary, {})
+    process_approval = read_json(process_approval_summary, {})
     validation_result_intake = read_json(validation_result_intake_summary, {})
     active_observations = read_json(active_observation_summary, {})
     active_evidence_pievo_bridge = read_json(active_evidence_pievo_bridge_summary, {})
@@ -281,6 +283,15 @@ def summarize(
         "process_design_suggestion_template_counts": process_design_suggestion.get("process_template_counts", {}),
         "process_design_suggestion_suggested_field_frequency": process_design_suggestion.get("suggested_field_frequency", {}),
         "process_design_suggestion_evidence_level": process_design_suggestion.get("evidence_level", ""),
+        "process_approval_template_rows": process_approval.get("approval_template_rows", 0),
+        "process_approval_submitted_rows": process_approval.get("submitted_approval_rows", 0),
+        "process_approval_accepted_rows": process_approval.get("accepted_process_approval_rows", 0),
+        "process_approval_rejected_rows": process_approval.get("rejected_process_approval_rows", 0),
+        "process_approval_ready_process_record_rows": process_approval.get("ready_process_record_rows", 0),
+        "process_approval_unblocked_observation_request_rows": process_approval.get("unblocked_observation_request_rows", 0),
+        "process_approval_unblocked_target_counts": process_approval.get("unblocked_target_counts", {}),
+        "process_approval_unblocked_source_counts": process_approval.get("unblocked_source_counts", {}),
+        "process_approval_gate_status": process_approval.get("approval_gate_status", ""),
         "validation_result_template_rows": validation_result_intake.get("template_rows", 0),
         "validation_result_rows": validation_result_intake.get("result_rows", 0),
         "validation_result_accepted_rows": validation_result_intake.get("accepted_result_rows", 0),
@@ -388,6 +399,10 @@ def main() -> None:
         default="artifacts/trail/human_review/process_design_suggestion_summary.json",
     )
     parser.add_argument(
+        "--process-approval-summary",
+        default="artifacts/trail/human_review/process_completion_approval_summary.json",
+    )
+    parser.add_argument(
         "--validation-result-intake-summary",
         default="artifacts/trail/human_review/validation_result_intake_summary.json",
     )
@@ -446,6 +461,7 @@ def main() -> None:
         Path(args.validation_execution_schedule_summary),
         Path(args.process_completion_packet_summary),
         Path(args.process_design_suggestion_summary),
+        Path(args.process_approval_summary),
         Path(args.validation_result_intake_summary),
         Path(args.active_observation_summary),
         Path(args.active_evidence_pievo_bridge_summary),

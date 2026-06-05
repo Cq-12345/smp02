@@ -291,6 +291,23 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    process_approval = tmp_path / "process_approval.json"
+    process_approval.write_text(
+        json.dumps(
+            {
+                "approval_template_rows": 12,
+                "submitted_approval_rows": 0,
+                "accepted_process_approval_rows": 0,
+                "rejected_process_approval_rows": 0,
+                "ready_process_record_rows": 0,
+                "unblocked_observation_request_rows": 0,
+                "unblocked_target_counts": {},
+                "unblocked_source_counts": {},
+                "approval_gate_status": "awaiting_human_process_approval",
+            }
+        ),
+        encoding="utf-8",
+    )
     validation_result_intake = tmp_path / "validation_result_intake.json"
     validation_result_intake.write_text(
         json.dumps(
@@ -458,6 +475,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         validation_execution,
         process_completion_packet,
         process_design_suggestion,
+        process_approval,
         validation_result_intake,
         active_observations,
         active_evidence_pievo_bridge,
@@ -574,6 +592,13 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["process_design_suggestion_template_counts"]["epoxy_amine_thermal_cure"] == 5
     assert result["process_design_suggestion_suggested_field_frequency"]["catalyst_loading"] == 4
     assert result["process_design_suggestion_evidence_level"] == "knowledge_template_suggestion_not_observation"
+    assert result["process_approval_template_rows"] == 12
+    assert result["process_approval_submitted_rows"] == 0
+    assert result["process_approval_accepted_rows"] == 0
+    assert result["process_approval_rejected_rows"] == 0
+    assert result["process_approval_ready_process_record_rows"] == 0
+    assert result["process_approval_unblocked_observation_request_rows"] == 0
+    assert result["process_approval_gate_status"] == "awaiting_human_process_approval"
     assert result["validation_result_template_rows"] == 25
     assert result["validation_result_rows"] == 0
     assert result["validation_result_accepted_rows"] == 0

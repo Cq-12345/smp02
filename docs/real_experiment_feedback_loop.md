@@ -171,6 +171,24 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_proces
 - `process_design_suggestion_summary.json`
 - `reports/process_design_suggestion_packet.md`
 
+Process approval intake：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_process_approval_intake.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/process_approval_intake.md
+```
+
+输出：
+
+- `process_completion_approval_template.csv`
+- `process_completion_approval_review.csv`
+- `process_completion_approved_process_records.csv`
+- `process_completion_approved_process_record_ledger.csv`
+- `process_completion_unblocked_validation_requests.csv`
+- `process_completion_approval_summary.json`
+- `reports/process_approval_intake.md`
+
 ## 5. 与 PiEvo 的连接
 
 当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
@@ -279,6 +297,13 @@ Smoke 结果：
 - 建议覆盖 5 条环氧-胺热固化、4 条环氧-酸酐催化固化、2 条酸酐-胺酰亚胺化、1 条马来酰亚胺加成/共聚。
 - 12 条 suggested process records 都通过基础格式检查，且模板字段均可由建议补全；但它们仍只是 `knowledge_template_suggestion_not_observation`，全部保持 `review_status=needs_human_review`，`ready_for_active_ledger_rows=0`。
 - 这一步的作用是让人工补工艺不再从空白字段开始；它不能替代真实实验、文献复现或高保真模拟，也不能单独解锁 PiEvo high-authority posterior。
+
+当前 process approval intake：
+
+- `scripts/import_process_approval_intake.py` 会把 `process_design_suggestion_packet.csv` 转成 12 行人工审批模板，要求 `approval_decision`、`process_ready`、`reviewer_approved` 和 `reviewer_id` 同时满足。
+- 审批后的 process record 还会重新进入 `import_process_records`，必须 `ready_for_active_ledger=true`，才允许解锁同一 `linked_observation_id` 的 high-fidelity 或 real request。
+- 当前没有人工提交的 `process_completion_approval_completed.csv`，因此 `submitted_approval_rows=0`、`accepted_process_approval_rows=0`、`unblocked_observation_request_rows=0`。
+- 这一步只解锁后续 validation result intake，不产生 Tg observation；高保真/真实/文献结果仍必须单独填写 `observed_tg_c`、method、operator，并通过 result intake 和 active evidence gate。
 
 当前 validation result intake：
 

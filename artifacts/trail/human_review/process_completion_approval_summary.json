@@ -1,0 +1,20 @@
+{
+  "suggestion_rows": 12,
+  "approval_template_rows": 12,
+  "submitted_approval_rows": 0,
+  "accepted_process_approval_rows": 0,
+  "rejected_process_approval_rows": 0,
+  "ready_process_record_rows": 0,
+  "unblocked_observation_request_rows": 0,
+  "unblocked_target_counts": {},
+  "unblocked_source_counts": {},
+  "rejection_reason_counts": {},
+  "approval_gate_status": "awaiting_human_process_approval",
+  "template_path": "artifacts/trail/human_review/process_completion_approval_template.csv",
+  "review_path": "artifacts/trail/human_review/process_completion_approval_review.csv",
+  "approved_process_records_path": "artifacts/trail/human_review/process_completion_approved_process_records.csv",
+  "approved_process_record_ledger_path": "artifacts/trail/human_review/process_completion_approved_process_record_ledger.csv",
+  "unblocked_requests_path": "artifacts/trail/human_review/process_completion_unblocked_validation_requests.csv",
+  "summary_path": "artifacts/trail/human_review/process_completion_approval_summary.json",
+  "report_path": "reports/process_approval_intake.md"
+}
