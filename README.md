@@ -11,7 +11,7 @@
 5. 按 `selection_metric` 自动选择当前效果最好的 Tg predictor，后续 discovery 默认使用全局最佳模型。
 6. 对单体做官能团 SMARTS 分类，按热固性反应兼容规则生成合理候选配方。
 7. 枚举 5%-95% 摩尔比，用最佳模型预测 Tg，筛选 190-200°C 候选。
-7. 运行“界定搜索空间 -> 生成假设 -> 预测评估 -> 优化原则/假设”的 in-silico 闭环迭代。
+8. 运行“界定搜索空间 -> 生成假设 -> 预测评估 -> 优化原则/假设”的 in-silico 闭环迭代。
 
 ## 环境
 
@@ -41,7 +41,7 @@ Smoke 配置只训练极小样本和少量 epoch，用于检查整条链路：
 ./scripts/run_reproduce.sh
 ```
 
-默认完整运行会使用 `CUDA_VISIBLE_DEVICES=0,1` 和 VAE batch size 1024。当前机器 GPU0 上已有其他进程占用大量显存，因此这个配置保守利用剩余显存，同时让两张 GPU 都参与 VAE 训练。若 GPU0 被其他任务占满，可临时指定：
+默认完整运行会使用 `CUDA_VISIBLE_DEVICES=0,1`、VAE batch size 2048、DataLoader workers 24、predictor CNN batch size 64，并在 CUDA 下启用 PyTorch 固定形状卷积优化。当前机器 GPU0 上已有其他进程占用大量显存；如果 GPU0 被其他任务占满，可临时指定：
 
 ```bash
 CUDA_VISIBLE_DEVICES=1 ./scripts/run_reproduce.sh
@@ -59,6 +59,7 @@ PYTHONPATH=src conda run --no-capture-output -n mhc_pyg314 python -m smp02.cli c
 
 ## 关键文档
 
+- `reports/reproduce_summary.md`: 本次完整运行的 VAE、model zoo、discovery、closed-loop 汇总，以及 top-50 leaderboard/candidates CSV。
 - `docs/paper_reproduction_notes.md`: 论文和补充材料中的模型、超参数、评价指标、扩展 model zoo 和复现决策。
 - `docs/functional_group_classification_and_matching.md`: 官能团分类与合理匹配规则，回答 README 原任务中特别指出的问题。
 - `docs/closed_loop_workflow.md`: 自主迭代闭环的实现方式。

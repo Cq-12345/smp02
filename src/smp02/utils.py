@@ -44,10 +44,11 @@ def set_seed(seed: int) -> None:
 
 def resolve_device(requested: str = "cuda") -> torch.device:
     if requested == "cuda" and torch.cuda.is_available():
+        torch.backends.cudnn.benchmark = True
+        torch.set_float32_matmul_precision("high")
         return torch.device("cuda")
     return torch.device("cpu")
 
 
 def cpu_count(default: int = 1) -> int:
     return os.cpu_count() or default
-

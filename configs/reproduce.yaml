@@ -12,7 +12,7 @@ smiles:
 
 vae:
   latent_sizes: [16, 32, 64, 128, 256, 512, 1024]
-  batch_size: 1024
+  batch_size: 2048
   pretrain_epochs: 20
   finetune_epochs: 20
   learning_rate: 0.0001
@@ -20,7 +20,7 @@ vae:
   kl_weight: 1.0
   validity_weight: 0.1
   chembl_limit: 550000
-  num_workers: 12
+  num_workers: 24
 
 predictors:
   test_size: 0.15
@@ -28,7 +28,7 @@ predictors:
   selection_metric: R2 test
   selection_higher_is_better: true
   cnn_epochs: 250
-  cnn_batch_size: 16
+  cnn_batch_size: 64
   cnn_learning_rate: 0.00001
   cnn_weight_decay: 0.001
   rf_estimators: 100
