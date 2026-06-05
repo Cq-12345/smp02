@@ -180,3 +180,10 @@ Smoke 结果：
 - 当前共有 55 个 request：30 个 `process_completion` 只用于补齐工艺记录，25 个 `high_fidelity_validation` 完成后才可能以 `source_type=high_fidelity_simulation` 写入 observation ledger。
 - 25 个 high-fidelity request 全部 `blocked_by_process_completion=true`，说明高保真复核也必须等工艺字段补齐和人工批准后才能成为高权重证据。
 - 当前 `real_dsc_request_rows=0`；这不是没有候选，而是说明还没有候选通过工艺完整性和人工质量门，不能直接排真实 DSC。
+
+当前 validation result intake：
+
+- `scripts/import_validation_request_results.py` 会把 request 完成结果回收为 observation input；准入条件是 request 可产生 observation、`source_type` 匹配、`observed_tg_c` 非空、`process_ready=true` 且 `reviewer_approved=true`。
+- 当前生成 25 条 high-fidelity result intake template，等待真实高保真结果填写。
+- 当前没有完成结果，因此 `accepted_result_rows=0`、`observation_ledger_pass_rows=0`；PiEvo posterior 仍没有新增高权重真实/高保真 evidence。
+- 这一步保证即使有人填写了高保真或 DSC 数值，也不能绕过工艺完整性和人工批准直接污染 observation ledger。

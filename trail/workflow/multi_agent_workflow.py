@@ -55,6 +55,7 @@ def summarize(
     ),
     human_review_validation_summary: Path = Path("artifacts/trail/human_review/pre_experiment_validation_plan_summary.json"),
     validation_request_summary: Path = Path("artifacts/trail/human_review/validation_request_summary.json"),
+    validation_result_intake_summary: Path = Path("artifacts/trail/human_review/validation_result_intake_summary.json"),
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -75,6 +76,7 @@ def summarize(
     human_review = read_json(human_review_queue_summary, {})
     human_validation = read_json(human_review_validation_summary, {})
     validation_requests = read_json(validation_request_summary, {})
+    validation_result_intake = read_json(validation_result_intake_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
     generative_training = read_json(generative_training_summary, {})
     sft_candidate_generation = read_json(sft_candidate_generation_summary, {})
@@ -206,6 +208,13 @@ def summarize(
         "validation_request_expected_observation_source_counts": validation_requests.get("expected_observation_source_counts", {}),
         "validation_request_target_counts": validation_requests.get("target_counts", {}),
         "validation_request_max_authority_weight_if_completed": validation_requests.get("max_authority_weight_if_completed", 0),
+        "validation_result_template_rows": validation_result_intake.get("template_rows", 0),
+        "validation_result_rows": validation_result_intake.get("result_rows", 0),
+        "validation_result_accepted_rows": validation_result_intake.get("accepted_result_rows", 0),
+        "validation_result_rejected_rows": validation_result_intake.get("rejected_result_rows", 0),
+        "validation_result_observation_ledger_pass_rows": validation_result_intake.get("observation_ledger_pass_rows", 0),
+        "validation_result_rejection_reason_counts": validation_result_intake.get("rejection_reason_counts", {}),
+        "validation_result_accepted_source_counts": validation_result_intake.get("accepted_source_counts", {}),
         "gnn_global_feature_architecture": gnn_global.get("architecture"),
         "gnn_global_feature_best_case": gnn_global.get("best_case"),
         "gnn_global_feature_baseline_mapek_test_pct": gnn_global.get("baseline_mapek_test_pct"),
@@ -277,6 +286,10 @@ def main() -> None:
         "--validation-request-summary",
         default="artifacts/trail/human_review/validation_request_summary.json",
     )
+    parser.add_argument(
+        "--validation-result-intake-summary",
+        default="artifacts/trail/human_review/validation_result_intake_summary.json",
+    )
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--sft-candidate-generation-summary", default="artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json")
@@ -321,6 +334,7 @@ def main() -> None:
         Path(args.sparse_target_replacement_expansion_summary),
         Path(args.human_review_validation_summary),
         Path(args.validation_request_summary),
+        Path(args.validation_result_intake_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

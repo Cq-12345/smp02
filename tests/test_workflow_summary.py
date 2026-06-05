@@ -230,6 +230,21 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    validation_result_intake = tmp_path / "validation_result_intake.json"
+    validation_result_intake.write_text(
+        json.dumps(
+            {
+                "template_rows": 25,
+                "result_rows": 0,
+                "accepted_result_rows": 0,
+                "rejected_result_rows": 0,
+                "observation_ledger_pass_rows": 0,
+                "rejection_reason_counts": {},
+                "accepted_source_counts": {},
+            }
+        ),
+        encoding="utf-8",
+    )
     gnn_global = tmp_path / "gnn_global.json"
     gnn_global.write_text(
         json.dumps(
@@ -347,6 +362,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         sparse_target_replacement,
         human_validation,
         validation_requests,
+        validation_result_intake,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -426,6 +442,11 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["validation_request_expected_observation_source_counts"]["high_fidelity_simulation"] == 25
     assert result["validation_request_target_counts"]["250.0"] == 26
     assert result["validation_request_max_authority_weight_if_completed"] == 3.0
+    assert result["validation_result_template_rows"] == 25
+    assert result["validation_result_rows"] == 0
+    assert result["validation_result_accepted_rows"] == 0
+    assert result["validation_result_rejected_rows"] == 0
+    assert result["validation_result_observation_ledger_pass_rows"] == 0
     assert result["gnn_global_feature_architecture"] == "mpnn"
     assert result["gnn_global_feature_best_case"] == "mpnn_global"
     assert result["gnn_global_feature_mapek_delta_pct"] == -0.5

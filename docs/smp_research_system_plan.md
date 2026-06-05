@@ -165,7 +165,8 @@ Agent 分工：
 - 30 条 draft process records 基础格式通过，但 `ready_for_active_ledger=0`，说明仍需人工补固化/催化/后固化/酰亚胺化等工艺字段。
 - `scripts/build_pre_experiment_validation_plan.py` 已把 30 条 review items 转成实验前验证计划：30 条都需要补工艺字段，25 条还需要高保真/扩展集成模型复核，0 条可在不补工艺的情况下直接进入 DSC。
 - `scripts/build_validation_request_packet.py` 已把验证计划转成 55 个可分派 request：30 个 `process_completion`、25 个 `high_fidelity_validation`、0 个 `real_dsc_planning`；25 个 high-fidelity request 都被 process completion gate 阻塞。
-- Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts`、`human_validation_*` 和 `validation_request_*`；这一步把“真实实验结果迭代优化”前的人工质量门禁落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
+- `scripts/import_validation_request_results.py` 已生成 25 条 high-fidelity result intake template；当前没有完成结果，`accepted_result_rows=0`、`observation_ledger_pass_rows=0`。
+- Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts`、`human_validation_*`、`validation_request_*` 和 `validation_result_*`；这一步把“真实实验结果迭代优化”前的人工质量门禁落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
 
 ## 6. PiEvo-faithful 要求
 

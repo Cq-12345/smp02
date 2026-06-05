@@ -228,6 +228,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_valida
   --out-dir artifacts/trail/human_review \
   --report reports/validation_request_packet.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_validation_request_results.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/validation_result_intake.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
@@ -246,6 +250,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --human-review-queue-summary artifacts/trail/human_review/human_experiment_review_queue_summary.json \
   --human-review-validation-summary artifacts/trail/human_review/pre_experiment_validation_plan_summary.json \
   --validation-request-summary artifacts/trail/human_review/validation_request_summary.json \
+  --validation-result-intake-summary artifacts/trail/human_review/validation_result_intake_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
   --sft-candidate-generation-summary artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json \
@@ -399,6 +404,7 @@ Human experiment review queue 已补充：
 - 最佳队列候选距 250 C 目标 0.034 C，但仍只是 surrogate evidence；必须由人工补齐工艺并显式批准，才能进入真实/高权重 observation ledger。
 - `scripts/build_pre_experiment_validation_plan.py` 已把队列转成实验前验证计划：30 条都需要补工艺字段，25 条还需要高保真/扩展集成模型复核，0 条可不补工艺直接进入 DSC。
 - `scripts/build_validation_request_packet.py` 已把验证计划转成 55 个可分派 request：30 个只补工艺记录，25 个完成后可作为 `high_fidelity_simulation` 候选 observation，但都被工艺补全 gate 阻塞；当前 0 个 real DSC request。
-- Workflow summary 已读取 `human_experiment_review_queue_summary.json`、`pre_experiment_validation_plan_summary.json` 和 `validation_request_summary.json`，并记录 `human_review_*`、`human_validation_*` 与 `validation_request_*` 字段，让人工闭环不再只是 schema 和说明文档。
+- `scripts/import_validation_request_results.py` 已生成 25 条 high-fidelity result intake template；当前没有完成结果，因此 0 条 accepted observation、0 条 observation ledger pass。
+- Workflow summary 已读取 `human_experiment_review_queue_summary.json`、`pre_experiment_validation_plan_summary.json`、`validation_request_summary.json` 和 `validation_result_intake_summary.json`，并记录 `human_review_*`、`human_validation_*`、`validation_request_*` 与 `validation_result_*` 字段，让人工闭环不再只是 schema 和说明文档。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

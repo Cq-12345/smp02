@@ -355,6 +355,13 @@
     "250.0": 26
   },
   "validation_request_max_authority_weight_if_completed": 3.0,
+  "validation_result_template_rows": 25,
+  "validation_result_rows": 0,
+  "validation_result_accepted_rows": 0,
+  "validation_result_rejected_rows": 0,
+  "validation_result_observation_ledger_pass_rows": 0,
+  "validation_result_rejection_reason_counts": {},
+  "validation_result_accepted_source_counts": {},
   "gnn_global_feature_architecture": "mpnn",
   "gnn_global_feature_best_case": "mpnn_baseline",
   "gnn_global_feature_baseline_mapek_test_pct": 11.051218783853365,

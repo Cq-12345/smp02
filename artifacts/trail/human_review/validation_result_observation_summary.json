@@ -1,0 +1,8 @@
+{
+  "input_rows": 0,
+  "ledger_pass_rows": 0,
+  "source_counts": {},
+  "mean_target_distance_c": null,
+  "mean_weighted_reward": null,
+  "reward_temperature_c": 5.0
+}

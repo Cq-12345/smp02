@@ -1,0 +1,18 @@
+{
+  "template_rows": 25,
+  "result_rows": 0,
+  "accepted_result_rows": 0,
+  "rejected_result_rows": 0,
+  "rejection_reason_counts": {},
+  "accepted_source_counts": {},
+  "process_ready_rows": 0,
+  "reviewer_approved_rows": 0,
+  "observation_ledger_pass_rows": 0,
+  "template_path": "artifacts/trail/human_review/validation_result_intake_template.csv",
+  "review_path": "artifacts/trail/human_review/validation_result_review.csv",
+  "observation_input_path": "artifacts/trail/human_review/validation_result_observation_input.csv",
+  "observation_ledger_path": "artifacts/trail/human_review/validation_result_observation_ledger.csv",
+  "observation_summary_path": "artifacts/trail/human_review/validation_result_observation_summary.json",
+  "summary_path": "artifacts/trail/human_review/validation_result_intake_summary.json",
+  "report_path": "reports/validation_result_intake.md"
+}
