@@ -20,7 +20,7 @@ strategy_policy:
     eligible_active_strategies: 5
     suppressed_strategies: 1
     data_collection_only_strategies: 0
-    total_attempts: 447
+    total_attempts: 451
     total_budget: 100
   guardrails:
     - llm_smiles_generation remains suppressed until predictor and chemistry evidence are present
@@ -207,8 +207,8 @@ strategies:
         - artifacts/trail/generation/sft_candidate_dry_run/heldout_eval_retrieval.csv
         - reports/sft_candidate_generator_dry_run.md
   diffusion_or_flow_matching:
-    maturity: dry_run_generator_implemented
-    generator: scripts/build_generative_training_sets.py + scripts/run_diffusion_flow_candidate_generator_dry_run.py
+    maturity: trained_projection_smoke_implemented
+    generator: scripts/build_generative_training_sets.py + scripts/run_diffusion_flow_candidate_generator_dry_run.py + scripts/train_conditional_flow_matching_generator.py
     harness_required: true
     best_use: train or dry-run conditional diffusion/flow only after all generated records are revalidated by predictor/Harness/PiEvo
     training_seed_table:
@@ -235,6 +235,29 @@ strategies:
         - artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json
         - artifacts/trail/generation/diffusion_flow_candidate_dry_run/heldout_eval_retrieval.csv
         - reports/diffusion_flow_candidate_generator_dry_run.md
+    trained_projection:
+      mode: conditional_flow_matching_trained_projection
+      script: scripts/train_conditional_flow_matching_generator.py
+      feature_space: formulation_global_features_31d
+      epochs: 120
+      train_seed_rows: 124
+      eval_seed_rows: 19
+      projected_records: 23
+      harness_pass: 23
+      best_distance_c: 0.005365464445986845
+      mean_generation_reward: 0.8339556497143
+      train_loss_initial: 1.8879691362380981
+      train_loss_final: 1.312873661518097
+      eval_loss_final: 1.801619529724121
+      projection_distance_mean: 5.0249114451201065
+      direct_smiles_generation_claim: false
+      outputs:
+        - artifacts/trail/generation/diffusion_flow_trained_generator/conditional_flow_matching_model.pt
+        - artifacts/trail/generation/diffusion_flow_trained_generator/flow_matching_scaler.json
+        - artifacts/trail/generation/diffusion_flow_trained_generator/flow_matching_training_summary.json
+        - artifacts/trail/generation/diffusion_flow_trained_generator/nearest_seed_projection.csv
+        - artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_ledger.csv
+        - reports/diffusion_flow_trained_generator.md
 record_schema:
   schema_path: trail/generation/generation_record_schema.yaml
   importer: trail/generation/import_generation_records.py

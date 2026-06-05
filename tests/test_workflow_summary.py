@@ -176,6 +176,21 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    diffusion_flow_trained_generation = tmp_path / "diffusion_flow_trained_generation.json"
+    diffusion_flow_trained_generation.write_text(
+        json.dumps(
+            {
+                "input_rows": 23,
+                "harness_pass_rows": 23,
+                "best_distance_c": 0.005,
+                "generator_mode": "conditional_flow_matching_trained_projection",
+                "train_loss_final": 1.2,
+                "eval_loss_final": 1.8,
+                "projection_distance_mean": 5.0,
+            }
+        ),
+        encoding="utf-8",
+    )
 
     result = summarize(
         candidates,
@@ -198,6 +213,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         generative_training,
         sft_candidate_generation,
         diffusion_flow_candidate_generation,
+        diffusion_flow_trained_generation,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -258,3 +274,10 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["diffusion_flow_candidate_generator_mode"] == "conditional_seed_replay_not_weight_update"
     assert result["diffusion_flow_candidate_generator_heldout_eval_rows"] == 19
     assert result["diffusion_flow_candidate_generator_heldout_exact_candidate_matches"] == 0
+    assert result["diffusion_flow_trained_generator_rows"] == 23
+    assert result["diffusion_flow_trained_generator_harness_pass"] == 23
+    assert result["diffusion_flow_trained_generator_best_distance_c"] == 0.005
+    assert result["diffusion_flow_trained_generator_mode"] == "conditional_flow_matching_trained_projection"
+    assert result["diffusion_flow_trained_generator_train_loss_final"] == 1.2
+    assert result["diffusion_flow_trained_generator_eval_loss_final"] == 1.8
+    assert result["diffusion_flow_trained_generator_projection_distance_mean"] == 5.0

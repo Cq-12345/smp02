@@ -9,7 +9,7 @@ import pandas as pd
 
 AGENTS = {
     "space_agent": "界定搜索空间：官能团、反应兼容性、摩尔比网格。",
-    "generator_agent": "生成候选假设：模板、VAE replacement、prompt/RAG、SFT dry-run、diffusion/flow dry-run，以及未来神经生成模型。",
+    "generator_agent": "生成候选假设：模板、VAE replacement、prompt/RAG、SFT dry-run、diffusion/flow dry-run、trained flow projection，以及未来直接神经生成模型。",
     "rag_generator_agent": "读取 RAG 上下文和 strict strategy feedback，生成 auditable generation records。",
     "predictor_agent": "评估假设：VAE-WVCM model zoo、GNN、ensemble disagreement、uncertainty/OOD。",
     "harness_agent": "硬约束过滤：RDKit、比例、目标窗口、官能团反应兼容性。",
@@ -44,6 +44,7 @@ def summarize(
     generative_training_summary: Path,
     sft_candidate_generation_summary: Path,
     diffusion_flow_candidate_generation_summary: Path = Path("artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json"),
+    diffusion_flow_trained_generation_summary: Path = Path("artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_summary.json"),
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -65,6 +66,7 @@ def summarize(
     generative_training = read_json(generative_training_summary, {})
     sft_candidate_generation = read_json(sft_candidate_generation_summary, {})
     diffusion_flow_candidate_generation = read_json(diffusion_flow_candidate_generation_summary, {})
+    diffusion_flow_trained_generation = read_json(diffusion_flow_trained_generation_summary, {})
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
@@ -146,6 +148,13 @@ def summarize(
         "diffusion_flow_candidate_generator_mode": diffusion_flow_candidate_generation.get("generator_mode", ""),
         "diffusion_flow_candidate_generator_heldout_eval_rows": diffusion_flow_candidate_generation.get("heldout_eval_rows", 0),
         "diffusion_flow_candidate_generator_heldout_exact_candidate_matches": diffusion_flow_candidate_generation.get("heldout_exact_candidate_matches", 0),
+        "diffusion_flow_trained_generator_rows": diffusion_flow_trained_generation.get("input_rows", 0),
+        "diffusion_flow_trained_generator_harness_pass": diffusion_flow_trained_generation.get("harness_pass_rows", 0),
+        "diffusion_flow_trained_generator_best_distance_c": diffusion_flow_trained_generation.get("best_distance_c"),
+        "diffusion_flow_trained_generator_mode": diffusion_flow_trained_generation.get("generator_mode", ""),
+        "diffusion_flow_trained_generator_train_loss_final": diffusion_flow_trained_generation.get("train_loss_final"),
+        "diffusion_flow_trained_generator_eval_loss_final": diffusion_flow_trained_generation.get("eval_loss_final"),
+        "diffusion_flow_trained_generator_projection_distance_mean": diffusion_flow_trained_generation.get("projection_distance_mean"),
         "generation_feedback": feedback,
     }
 
@@ -172,6 +181,7 @@ def main() -> None:
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--sft-candidate-generation-summary", default="artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json")
     parser.add_argument("--diffusion-flow-candidate-generation-summary", default="artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json")
+    parser.add_argument("--diffusion-flow-trained-generation-summary", default="artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_summary.json")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
     result = summarize(
@@ -195,6 +205,7 @@ def main() -> None:
         Path(args.generative_training_summary),
         Path(args.sft_candidate_generation_summary),
         Path(args.diffusion_flow_candidate_generation_summary),
+        Path(args.diffusion_flow_trained_generation_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

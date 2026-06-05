@@ -173,10 +173,24 @@ def arm_from_sft_generation_or_training(
 
 
 def arm_from_diffusion_flow_generation_or_training(
+    diffusion_flow_trained_summary: dict[str, Any],
     diffusion_flow_generation_summary: dict[str, Any],
     training_summary: dict[str, Any],
     feedback: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
+    if int(diffusion_flow_trained_summary.get("input_rows", 0) or 0) > 0:
+        arm = arm_from_generation_summary("diffusion_or_flow_matching", diffusion_flow_trained_summary, feedback)
+        arm["evidence_source"] = "diffusion_flow_trained_projection_generation_record_summary"
+        if not bool(training_summary.get("diffusion_flow_ready", False)):
+            arm["status"] = "data_collection_only"
+            arm["readiness_gate"] = False
+            arm["readiness_reason"] = "Diffusion/flow trained projection exists, but seed-table readiness gate is not currently satisfied."
+            arm["next_constraint"] = "collect more Harness-passing, prediction-backed generation records before training."
+            return arm
+        arm["readiness_gate"] = True
+        arm["readiness_reason"] = "Conditional flow-matching training generated auditable projected records; replace projection with direct valid generation only behind the same gates."
+        arm["next_constraint"] = "improve conditional flow training or add a valid SMILES decoder; always evaluate behind predictor/Harness/PiEvo gates."
+        return arm
     if int(diffusion_flow_generation_summary.get("input_rows", 0) or 0) <= 0:
         return arm_from_training_readiness("diffusion_or_flow_matching", training_summary)
     arm = arm_from_generation_summary("diffusion_or_flow_matching", diffusion_flow_generation_summary, feedback)
@@ -201,17 +215,19 @@ def collect_arms(
     training_summary: dict[str, Any],
     sft_generation_summary: dict[str, Any] | None = None,
     diffusion_flow_generation_summary: dict[str, Any] | None = None,
+    diffusion_flow_trained_summary: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     feedback = feedback_lookup(strategy_feedback)
     sft_generation_summary = sft_generation_summary or {}
     diffusion_flow_generation_summary = diffusion_flow_generation_summary or {}
+    diffusion_flow_trained_summary = diffusion_flow_trained_summary or {}
     arms = [
         arm_from_eval_summary("vae_latent_local_search", latent_local_search_eval, feedback),
         arm_from_eval_summary("functional_group_replacement", expanded_replacement, feedback),
         arm_from_generation_summary("llm_rag_principle_generation", expanded_generation, feedback),
         arm_from_feedback_only("llm_smiles_generation", feedback),
         arm_from_sft_generation_or_training(sft_generation_summary, training_summary, feedback),
-        arm_from_diffusion_flow_generation_or_training(diffusion_flow_generation_summary, training_summary, feedback),
+        arm_from_diffusion_flow_generation_or_training(diffusion_flow_trained_summary, diffusion_flow_generation_summary, training_summary, feedback),
     ]
     return pd.DataFrame(arms)
 
@@ -341,8 +357,8 @@ def write_report(policy: pd.DataFrame, summary: dict[str, Any], out_dir: Path, r
             "",
             "- `allocation_per_100` 是下一轮生成预算建议，不是最终推荐配方。",
             "- `sft_candidate_generator` 优先读取 SFT dry-run generation summary；若 dry-run 不存在，则回退到 SFT readiness gate。",
-            "- `diffusion_or_flow_matching` 优先读取 diffusion/flow dry-run generation summary；若 dry-run 不存在，则回退到 seed-table readiness gate。",
-            "- readiness 或 dry-run 通过只表示策略可分配下一轮 proposal budget；生成结果仍必须重新进入 ledger/Harness/PiEvo。",
+            "- `diffusion_or_flow_matching` 优先读取 trained projection summary，其次读取 diffusion/flow dry-run summary；若两者都不存在，则回退到 seed-table readiness gate。",
+            "- readiness、dry-run 或训练型投影通过只表示策略可分配下一轮 proposal budget；生成结果仍必须重新进入 ledger/Harness/PiEvo。",
             "- `llm_smiles_generation` 若仍缺 predictor 或 chemistry evidence，会被压到 gate review，而不是进入 PiEvo 或实验推荐。",
             "- 高 allocation 的策略仍必须把候选写入 generation/proposal ledger，再经过 predictor、Harness、PiEvo 和人工审核。",
         ]
@@ -360,6 +376,7 @@ def run_policy(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[str, Any]]:
         read_json(Path(args.generative_training_summary)),
         read_json(Path(getattr(args, "sft_generation_summary", "artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json"))),
         read_json(Path(getattr(args, "diffusion_flow_generation_summary", "artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json"))),
+        read_json(Path(getattr(args, "diffusion_flow_trained_generation_summary", "artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_summary.json"))),
     )
     policy, summary = score_policy(
         arms,
@@ -384,6 +401,7 @@ def main() -> None:
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--sft-generation-summary", default="artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json")
     parser.add_argument("--diffusion-flow-generation-summary", default="artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json")
+    parser.add_argument("--diffusion-flow-trained-generation-summary", default="artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_summary.json")
     parser.add_argument("--exploration-c", type=float, default=0.25)
     parser.add_argument("--softmax-temperature", type=float, default=0.25)
     parser.add_argument("--total-budget", type=int, default=100)

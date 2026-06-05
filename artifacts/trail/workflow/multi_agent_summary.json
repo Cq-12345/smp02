@@ -1,7 +1,7 @@
 {
   "agents": {
     "space_agent": "界定搜索空间：官能团、反应兼容性、摩尔比网格。",
-    "generator_agent": "生成候选假设：模板、VAE replacement、prompt/RAG、SFT dry-run、diffusion/flow dry-run，以及未来神经生成模型。",
+    "generator_agent": "生成候选假设：模板、VAE replacement、prompt/RAG、SFT dry-run、diffusion/flow dry-run、trained flow projection，以及未来直接神经生成模型。",
     "rag_generator_agent": "读取 RAG 上下文和 strict strategy feedback，生成 auditable generation records。",
     "predictor_agent": "评估假设：VAE-WVCM model zoo、GNN、ensemble disagreement、uncertainty/OOD。",
     "harness_agent": "硬约束过滤：RDKit、比例、目标窗口、官能团反应兼容性。",
@@ -287,6 +287,13 @@
   "diffusion_flow_candidate_generator_mode": "conditional_seed_replay_not_weight_update",
   "diffusion_flow_candidate_generator_heldout_eval_rows": 19,
   "diffusion_flow_candidate_generator_heldout_exact_candidate_matches": 0,
+  "diffusion_flow_trained_generator_rows": 23,
+  "diffusion_flow_trained_generator_harness_pass": 23,
+  "diffusion_flow_trained_generator_best_distance_c": 0.005365464445986845,
+  "diffusion_flow_trained_generator_mode": "conditional_flow_matching_trained_projection",
+  "diffusion_flow_trained_generator_train_loss_final": 1.312873661518097,
+  "diffusion_flow_trained_generator_eval_loss_final": 1.801619529724121,
+  "diffusion_flow_trained_generator_projection_distance_mean": 5.0249114451201065,
   "generation_feedback": {
     "generation_records": 4,
     "generation_harness_pass": 3,

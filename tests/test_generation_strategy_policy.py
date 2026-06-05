@@ -175,6 +175,43 @@ def test_bandit_policy_prefers_diffusion_flow_dry_run_summary_when_available() -
     assert by_strategy["diffusion_or_flow_matching"]["status"] == "active"
 
 
+def test_bandit_policy_prefers_trained_diffusion_flow_summary_over_dry_run() -> None:
+    arms = collect_arms(
+        pd.DataFrame(),
+        expanded_replacement={"input_proposals": 200, "harness_pass": 18, "best_distance_c": 0.2, "replacement_observations": 18},
+        latent_local_search_eval={"input_proposals": 200, "harness_pass": 42, "best_distance_c": 0.2, "replacement_observations": 42},
+        expanded_generation={"input_rows": 2, "harness_pass_rows": 2, "best_distance_c": 0.01, "mean_generation_reward": 0.95},
+        training_summary={
+            "sft_examples": 143,
+            "sft_ready": True,
+            "next_data_needed_for_sft": 0,
+            "sft_min_examples": 20,
+            "diffusion_flow_seed_rows": 143,
+            "diffusion_flow_ready": True,
+            "next_data_needed_for_diffusion_flow": 0,
+            "diffusion_flow_min_examples": 100,
+        },
+        diffusion_flow_generation_summary={
+            "input_rows": 19,
+            "harness_pass_rows": 19,
+            "best_distance_c": 0.003,
+            "mean_generation_reward": 0.99,
+        },
+        diffusion_flow_trained_summary={
+            "input_rows": 23,
+            "harness_pass_rows": 23,
+            "best_distance_c": 0.005,
+            "mean_generation_reward": 0.84,
+        },
+    )
+
+    by_strategy = {row["strategy"]: row for _, row in arms.iterrows()}
+    assert by_strategy["diffusion_or_flow_matching"]["evidence_source"] == "diffusion_flow_trained_projection_generation_record_summary"
+    assert by_strategy["diffusion_or_flow_matching"]["attempts"] == 23
+    assert by_strategy["diffusion_or_flow_matching"]["successes"] == 23
+    assert by_strategy["diffusion_or_flow_matching"]["status"] == "active"
+
+
 def test_run_policy_writes_outputs(tmp_path: Path) -> None:
     feedback = tmp_path / "strategy_feedback.csv"
     pd.DataFrame(
@@ -213,6 +250,10 @@ def test_run_policy_writes_outputs(tmp_path: Path) -> None:
     )
     sft_generation = tmp_path / "sft_generation.json"
     sft_generation.write_text(json.dumps({"input_rows": 0}), encoding="utf-8")
+    diffusion_flow_generation = tmp_path / "diffusion_flow_generation.json"
+    diffusion_flow_generation.write_text(json.dumps({"input_rows": 0}), encoding="utf-8")
+    diffusion_flow_trained = tmp_path / "diffusion_flow_trained.json"
+    diffusion_flow_trained.write_text(json.dumps({"input_rows": 0}), encoding="utf-8")
     out_dir = tmp_path / "out"
     report = tmp_path / "report.md"
 
@@ -224,6 +265,8 @@ def test_run_policy_writes_outputs(tmp_path: Path) -> None:
             expanded_generation_summary=str(generation),
             generative_training_summary=str(training),
             sft_generation_summary=str(sft_generation),
+            diffusion_flow_generation_summary=str(diffusion_flow_generation),
+            diffusion_flow_trained_generation_summary=str(diffusion_flow_trained),
             exploration_c=0.25,
             softmax_temperature=0.25,
             total_budget=100,
