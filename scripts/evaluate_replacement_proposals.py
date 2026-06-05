@@ -129,6 +129,14 @@ def build_replacement_formulas(
     metadata = []
     rejections = []
     seen = set()
+    optional_metadata_columns = {
+        "latent_distance": "replacement_latent_distance",
+        "latent_cosine_similarity": "replacement_latent_cosine_similarity",
+        "latent_rank": "replacement_latent_rank",
+        "latent_search_space_rows": "replacement_latent_search_space_rows",
+        "latent_compatible_rows": "replacement_latent_compatible_rows",
+        "matched_groups": "replacement_matched_groups",
+    }
     for proposal_index, proposal in proposals.iterrows():
         side = str(proposal["replace_side"])
         source_tg = float(proposal["source_candidate_tg"])
@@ -171,30 +179,32 @@ def build_replacement_formulas(
             continue
         seen.add(key)
         formulas.append(formula)
-        metadata.append(
-            {
-                "proposal_index": int(proposal_index),
-                "source_candidate_tg_c": source_tg,
-                "source_target_distance_c": abs(source_tg - float(target_tg_c)),
-                "replace_side": side,
-                "original_smiles": original,
-                "replacement_smiles": replacement,
-                "replacement_source": proposal.get("replacement_source", ""),
-                "replacement_label": proposal.get("replacement_label", ""),
-                "replacement_template_family": proposal.get("replacement_template_family", ""),
-                "replacement_template_intended_group": proposal.get("replacement_template_intended_group", ""),
-                "replacement_tanimoto": float(proposal["tanimoto"]),
-                "shared_groups": proposal["shared_groups"],
-                "counterpart_groups": proposal.get("counterpart_groups", ""),
-                "counterpart_compatibility_reason": proposal.get("counterpart_compatibility_reason", ""),
-                "feedback_constraint": proposal.get("feedback_constraint", ""),
-                "source_smiles_a": source["smiles_a"],
-                "source_smiles_b": source["smiles_b"],
-                "source_ratio_a": float(source["ratio_a"]),
-                "source_ratio_b": float(source["ratio_b"]),
-                "source_compatibility_reason": source["compatibility_reason"],
-            }
-        )
+        item = {
+            "proposal_index": int(proposal_index),
+            "source_candidate_tg_c": source_tg,
+            "source_target_distance_c": abs(source_tg - float(target_tg_c)),
+            "replace_side": side,
+            "original_smiles": original,
+            "replacement_smiles": replacement,
+            "replacement_source": proposal.get("replacement_source", ""),
+            "replacement_label": proposal.get("replacement_label", ""),
+            "replacement_template_family": proposal.get("replacement_template_family", ""),
+            "replacement_template_intended_group": proposal.get("replacement_template_intended_group", ""),
+            "replacement_tanimoto": float(proposal["tanimoto"]),
+            "shared_groups": proposal["shared_groups"],
+            "counterpart_groups": proposal.get("counterpart_groups", ""),
+            "counterpart_compatibility_reason": proposal.get("counterpart_compatibility_reason", ""),
+            "feedback_constraint": proposal.get("feedback_constraint", ""),
+            "source_smiles_a": source["smiles_a"],
+            "source_smiles_b": source["smiles_b"],
+            "source_ratio_a": float(source["ratio_a"]),
+            "source_ratio_b": float(source["ratio_b"]),
+            "source_compatibility_reason": source["compatibility_reason"],
+        }
+        for proposal_column, metadata_column in optional_metadata_columns.items():
+            if proposal_column in proposal.index:
+                item[metadata_column] = proposal.get(proposal_column, "")
+        metadata.append(item)
     rejection_df = pd.DataFrame(rejections)
     if rejection_df.empty:
         rejection_df = pd.DataFrame(
@@ -227,8 +237,8 @@ def write_report(scored: pd.DataFrame, rejections: pd.DataFrame, summary: dict[s
             "",
             "## Top Harness-Passing Replacements",
             "",
-            "| rank | predicted Tg (C) | distance (C) | sigma (C) | replacement side | tanimoto | chemistry |",
-            "| ---: | ---: | ---: | ---: | --- | ---: | --- |",
+            "| rank | predicted Tg (C) | distance (C) | sigma (C) | replacement side | latent dist | tanimoto | chemistry |",
+            "| ---: | ---: | ---: | ---: | --- | ---: | ---: | --- |",
         ]
     )
     passed = scored[scored["harness_pass"]].sort_values(["target_distance_c", "ood_penalty", "predicted_tg_sigma_c"]).head(20)
@@ -236,9 +246,11 @@ def write_report(scored: pd.DataFrame, rejections: pd.DataFrame, summary: dict[s
         source_text = ""
         if "replacement_source" in row and str(row.get("replacement_source", "")).strip():
             source_text = f" source={row['replacement_source']}"
+        latent_distance = row.get("replacement_latent_distance", "")
+        latent_text = "" if pd.isna(latent_distance) or str(latent_distance) == "" else f"{float(latent_distance):.4f}"
         lines.append(
             f"| {rank} | {float(row['predicted_tg_mean_c']):.2f} | {float(row['target_distance_c']):.2f} | "
-            f"{float(row['predicted_tg_sigma_c']):.2f} | {row['replace_side']} | {float(row['replacement_tanimoto']):.3f} | "
+            f"{float(row['predicted_tg_sigma_c']):.2f} | {row['replace_side']} | {latent_text} | {float(row['replacement_tanimoto']):.3f} | "
             f"{str(row['compatibility_reasons']).replace('|', '; ')}{source_text} |"
         )
     lines.extend(
@@ -289,6 +301,9 @@ def write_replacement_observation_ledger(scored: pd.DataFrame, out_dir: Path, ta
     ]
     rows = []
     for _, row in passed.sort_values(["target_distance_c", "ood_penalty", "predicted_tg_sigma_c"]).iterrows():
+        latent_note = ""
+        if "replacement_latent_distance" in row and pd.notna(row["replacement_latent_distance"]):
+            latent_note = f"; latent_distance={float(row['replacement_latent_distance']):.4f}"
         rows.append(
             {
                 "observation_id": f"replacement_surrogate_{int(row['formula_id']):04d}",
@@ -304,7 +319,7 @@ def write_replacement_observation_ledger(scored: pd.DataFrame, out_dir: Path, ta
                 "method": "vae_wvcm_gpr_surrogate",
                 "notes": (
                     f"VAE replacement proposal {int(row['proposal_index'])}; replace_side={row['replace_side']}; "
-                    f"tanimoto={float(row['replacement_tanimoto']):.3f}; replacement_source={row.get('replacement_source', '')}"
+                    f"tanimoto={float(row['replacement_tanimoto']):.3f}{latent_note}; replacement_source={row.get('replacement_source', '')}"
                 ),
             }
         )
@@ -408,6 +423,12 @@ def main() -> None:
         "predictor": best_model["ML method"],
         "latent_size": latent_size,
         "replacement_observations": 0 if scored.empty else int(scored["harness_pass"].sum()),
+        "latent_local_search_scored": 0
+        if scored.empty or "replacement_latent_distance" not in scored
+        else int(scored["replacement_latent_distance"].notna().sum()),
+        "latent_local_search_harness_pass": 0
+        if scored.empty or "replacement_latent_distance" not in scored or "harness_pass" not in scored
+        else int((scored["replacement_latent_distance"].notna() & scored["harness_pass"].fillna(False).astype(bool)).sum()),
     }
     save_json(
         summary

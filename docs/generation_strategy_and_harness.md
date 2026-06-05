@@ -113,16 +113,58 @@ h = (m_1..m_n, r_1..r_n)
 
 ### 3.3 VAE latent 生成
 
-当前策略：
+当前已落地一个保守版本：
 
-- 先不盲目 decode 大量 latent。
-- 优先使用 VAE latent 做相似性、OOD、局部扰动和候选排序。
+- `trail/generation/vae_latent_local_search.py`
+- 在 expanded inventory 内对高 reward 配方的单体做 VAE latent-neighborhood retrieval。
+- 使用当前 VAE encoder 的 `mu` 向量计算单体级 latent Euclidean distance。
+- 默认仍要求共享至少一个源侧官能团，并在 `--require-counterpart-compatibility` 下保持与未替换 co-monomer 的可映射反应对。
+- 输出保留 `latent_distance / latent_cosine_similarity / latent_rank / tanimoto / matched_groups`，方便比较 VAE 表示相近与 Morgan fingerprint 相近是否导向不同候选。
+
+运行入口：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/generation/vae_latent_local_search.py \
+  --candidates artifacts/reproduce/discovery/selected_candidates.csv \
+  --component-inventory artifacts/trail/candidates_expanded/component_inventory.csv \
+  --top-k 20 \
+  --per-side 5 \
+  --require-counterpart-compatibility \
+  --out artifacts/trail/generation/vae_latent_local_search/latent_local_search_proposals.csv \
+  --report reports/vae_latent_local_search.md \
+  --device cpu
+
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/evaluate_replacement_proposals.py \
+  --proposals artifacts/trail/generation/vae_latent_local_search/latent_local_search_proposals.csv \
+  --out-dir artifacts/trail/generation/vae_latent_local_search_eval \
+  --report reports/vae_latent_local_search_evaluation.md \
+  --target-tg-c 195 \
+  --target-window-c 5 \
+  --device cpu
+
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python -m smp02.pievo_faithful \
+  --config configs/pievo_faithful_vae_latent_local_search_195_smoke.yaml
+```
+
+当前 smoke 结果：
+
+- 200 条 latent local search proposals。
+- 200 条全部可重建并评分，0 条重建拒绝。
+- 42 条通过 Harness，最佳 target distance 为 0.200 C。
+- `literature_template` proposals 为 39 条，其中 7 条通过 Harness。
+- 42 条通过项进入 surrogate observation ledger 后，PiEvo-faithful 接收 42 条外部 observations、拒绝 0 条。
+- 4 轮 PiEvo selected 全部通过 target guard，最佳 selected distance 为 0.059 C，MAP principle 为 `reaction_839cd29ef5d7`。
 
 后续可做：
 
-- 从高 reward 候选的 latent 附近采样。
+- 再考虑从高 reward 候选的 latent 附近采样并 decode。
 - 加入 decoder validity/harness pass rate 作为训练或筛选指标。
 - 对不同目标 Tg 学习条件化 latent proposal。
+
+边界：
+
+- 当前不是 VAE decoder 直接生成新 SMILES；它是 decoder-free inventory local search。
+- latent 邻居必须继续经过 predictor/Harness/PiEvo，不能直接当成推荐配方。
 
 ### 3.4 LLM/RAG 生成
 
@@ -303,3 +345,4 @@ PYTHONPATH=src python trail/harness/constraints.py \
 5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
 7. 持续运行 `scripts/build_generative_training_sets.py`，等 SFT 样本达到 20 条、diffusion/flow seed rows 达到 100 条且有 eval split 后，再考虑训练对应生成模型。
+8. 对 VAE latent local search 做多目标 sweep，并比较 latent-distance ranking、Tanimoto ranking 和 PiEvo posterior 的差异；当前 195 C smoke 已证明链路可运行，但还不能说明 latent metric 已是最优生成策略。

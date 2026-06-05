@@ -69,6 +69,28 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         json.dumps({"input_rows": 2, "harness_pass_rows": 2, "literature_template_context_rows": 1}),
         encoding="utf-8",
     )
+    latent_local_search = tmp_path / "latent_local_search.json"
+    latent_local_search.write_text(
+        json.dumps({"proposals": 200, "literature_template_proposals": 39}),
+        encoding="utf-8",
+    )
+    latent_local_search_eval = tmp_path / "latent_local_search_eval.json"
+    latent_local_search_eval.write_text(
+        json.dumps(
+            {
+                "harness_pass": 42,
+                "best_distance_c": 0.20046,
+                "literature_template_harness_pass": 7,
+                "replacement_observations": 42,
+            }
+        ),
+        encoding="utf-8",
+    )
+    latent_local_search_pievo = tmp_path / "latent_local_search_pievo.json"
+    latent_local_search_pievo.write_text(
+        json.dumps({"best_selected_target_distance_c": 0.059, "external_observation_summary": {"accepted_rows": 42}}),
+        encoding="utf-8",
+    )
     gnn_global = tmp_path / "gnn_global.json"
     gnn_global.write_text(
         json.dumps(
@@ -110,6 +132,9 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ensemble_guard_pievo,
         expanded_replacement,
         expanded_generation,
+        latent_local_search,
+        latent_local_search_eval,
+        latent_local_search_pievo,
         gnn_global,
         generative_training,
     )
@@ -131,6 +156,14 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["expanded_inventory_llm_rag_rows"] == 2
     assert result["expanded_inventory_llm_rag_harness_pass"] == 2
     assert result["expanded_inventory_llm_rag_literature_template_context_rows"] == 1
+    assert result["vae_latent_local_search_proposals"] == 200
+    assert result["vae_latent_local_search_literature_template_proposals"] == 39
+    assert result["vae_latent_local_search_harness_pass"] == 42
+    assert result["vae_latent_local_search_best_distance_c"] == 0.20046
+    assert result["vae_latent_local_search_literature_template_harness_pass"] == 7
+    assert result["vae_latent_local_search_observations"] == 42
+    assert result["vae_latent_local_search_pievo_external_rows"] == 42
+    assert result["vae_latent_local_search_pievo_best_distance_c"] == 0.059
     assert result["gnn_global_feature_architecture"] == "mpnn"
     assert result["gnn_global_feature_best_case"] == "mpnn_global"
     assert result["gnn_global_feature_mapek_delta_pct"] == -0.5

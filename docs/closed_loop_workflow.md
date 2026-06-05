@@ -79,6 +79,27 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/evaluate_rep
   --target-window-c 5 \
   --device cpu
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/generation/vae_latent_local_search.py \
+  --candidates artifacts/reproduce/discovery/selected_candidates.csv \
+  --component-inventory artifacts/trail/candidates_expanded/component_inventory.csv \
+  --top-k 20 \
+  --per-side 5 \
+  --require-counterpart-compatibility \
+  --out artifacts/trail/generation/vae_latent_local_search/latent_local_search_proposals.csv \
+  --report reports/vae_latent_local_search.md \
+  --device cpu
+
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/evaluate_replacement_proposals.py \
+  --proposals artifacts/trail/generation/vae_latent_local_search/latent_local_search_proposals.csv \
+  --out-dir artifacts/trail/generation/vae_latent_local_search_eval \
+  --report reports/vae_latent_local_search_evaluation.md \
+  --target-tg-c 195 \
+  --target-window-c 5 \
+  --device cpu
+
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python -m smp02.pievo_faithful \
+  --config configs/pievo_faithful_vae_latent_local_search_195_smoke.yaml
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/analyze_generation_feedback.py \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
   --replacement-rejections artifacts/trail/generation/feedback_guided_replacement_eval/replacement_proposal_rejections.csv \
@@ -142,6 +163,9 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --ensemble-guard-pievo-summary artifacts/pievo_faithful_ensemble_guard_195_smoke/pievo_faithful_summary.json \
   --expanded-replacement-summary artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json \
   --expanded-generation-summary artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json \
+  --vae-latent-local-search-summary artifacts/trail/generation/vae_latent_local_search/latent_local_search_summary.json \
+  --vae-latent-local-search-eval-summary artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json \
+  --vae-latent-local-search-pievo-summary artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
@@ -183,6 +207,15 @@ Expanded inventory replacement 已补充：
 - 本轮 expanded replacement 生成 200 条 strict proposals，200 条全部可重建并评分，18 条通过 Harness。
 - `literature_template` 候选被评分 29 条，其中 3 条通过 Harness；最佳 template 候选预测 Tg 为 194.48 C，距 195 C 目标 0.52 C。
 - Workflow summary 已读取 expanded replacement 和 expanded LLM/RAG summary，因此 expanded inventory 不再只是候选池审计结果，而是进入了生成与总览链路。
+
+VAE latent local search 已补充：
+
+- `trail/generation/vae_latent_local_search.py` 使用当前 VAE(512) encoder 的 latent 距离，在 expanded inventory 内检索高 reward 配方的局部替换单体。
+- 当前是 decoder-free inventory search，不声称 VAE decoder 已经直接生成新 SMILES；每条 proposal 仍必须经过 predictor、Harness 和 PiEvo。
+- 195 C smoke 生成 200 条 proposals，200 条可重建并评分，42 条通过 Harness，最佳 target distance 为 0.200 C。
+- `literature_template` proposals 为 39 条，其中 7 条通过 Harness。
+- 42 条通过项进入 PiEvo external observation ledger 后，4 轮 selected 全部通过 target guard，最佳 selected distance 为 0.059 C，MAP principle 为 `reaction_839cd29ef5d7`。
+- Workflow summary 已读取 latent local search summary、evaluation summary 和 PiEvo summary。
 
 Predictor ensemble disagreement 已补充：
 

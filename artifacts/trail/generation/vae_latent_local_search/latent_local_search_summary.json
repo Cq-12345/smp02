@@ -1,0 +1,15 @@
+{
+  "input_candidate_rows": 500,
+  "source_candidate_rows": 20,
+  "replacement_pool_rows": 710,
+  "encoded_unique_smiles": 710,
+  "proposals": 200,
+  "latent_size": 512,
+  "per_side": 5,
+  "require_counterpart_compatibility": true,
+  "require_shared_groups": true,
+  "literature_template_proposals": 39,
+  "mean_latent_distance": 0.062434,
+  "min_latent_distance": 0.005643,
+  "mean_tanimoto": 0.244208
+}

@@ -48,10 +48,43 @@ strategies:
         literature_template_scored: 29
         literature_template_harness_pass: 3
   vae_latent_local_search:
-    maturity: planned
-    generator: future
+    maturity: decoder_free_inventory_search_implemented
+    generator: trail/generation/vae_latent_local_search.py + scripts/evaluate_replacement_proposals.py
     harness_required: true
-    best_use: local decode around high-reward latent neighborhoods
+    best_use: retrieve VAE-latent-nearest replacement monomers around high-reward formulations without claiming decoder novelty
+    mode:
+      cli_flag: --require-counterpart-compatibility
+      search_space: artifacts/trail/candidates_expanded/component_inventory.csv
+      latent_encoder: artifacts/reproduce/vae/finetuned_latent_512.pt
+      distance: euclidean_distance_between_single-monomer_VAE_mu_vectors
+      constraint: replacement must share at least one source-side functional group and preserve a mapped complementary reactive pair with the unchanged co-monomer
+      decoder_claim: false
+      audit_fields:
+        - latent_distance
+        - latent_cosine_similarity
+        - latent_rank
+        - latent_search_space_rows
+        - latent_compatible_rows
+        - matched_groups
+        - tanimoto
+      outputs:
+        - artifacts/trail/generation/vae_latent_local_search/latent_local_search_proposals.csv
+        - artifacts/trail/generation/vae_latent_local_search/latent_local_search_summary.json
+        - artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json
+        - artifacts/trail/generation/vae_latent_local_search_eval/replacement_observation_ledger.csv
+        - artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json
+        - reports/vae_latent_local_search.md
+        - reports/vae_latent_local_search_evaluation.md
+        - reports/vae_latent_local_search_pievo_feedback.md
+      smoke_result:
+        proposals: 200
+        rebuilt_formulas: 200
+        harness_pass: 42
+        literature_template_proposals: 39
+        literature_template_harness_pass: 7
+        best_distance_c: 0.20046
+        pievo_external_observations: 42
+        pievo_best_selected_distance_c: 0.059032
   llm_rag_principle_generation:
     maturity: feedback_aware_agent_implemented
     generator: scripts/build_prompt_generation_records.py + scripts/run_feedback_aware_llm_rag_agent.py

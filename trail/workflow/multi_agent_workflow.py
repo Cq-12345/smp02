@@ -35,6 +35,9 @@ def summarize(
     ensemble_guard_pievo_summary: Path,
     expanded_replacement_summary: Path,
     expanded_generation_summary: Path,
+    vae_latent_local_search_summary: Path,
+    vae_latent_local_search_eval_summary: Path,
+    vae_latent_local_search_pievo_summary: Path,
     gnn_global_feature_summary: Path,
     generative_training_summary: Path,
 ) -> dict:
@@ -49,6 +52,9 @@ def summarize(
     ensemble_guard_pievo = read_json(ensemble_guard_pievo_summary, {})
     expanded_replacement = read_json(expanded_replacement_summary, {})
     expanded_generation = read_json(expanded_generation_summary, {})
+    latent_local_search = read_json(vae_latent_local_search_summary, {})
+    latent_local_search_eval = read_json(vae_latent_local_search_eval_summary, {})
+    latent_local_search_pievo = read_json(vae_latent_local_search_pievo_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
     generative_training = read_json(generative_training_summary, {})
     return {
@@ -89,6 +95,14 @@ def summarize(
         "expanded_inventory_llm_rag_rows": expanded_generation.get("input_rows", 0),
         "expanded_inventory_llm_rag_harness_pass": expanded_generation.get("harness_pass_rows", 0),
         "expanded_inventory_llm_rag_literature_template_context_rows": expanded_generation.get("literature_template_context_rows", 0),
+        "vae_latent_local_search_proposals": latent_local_search.get("proposals", 0),
+        "vae_latent_local_search_literature_template_proposals": latent_local_search.get("literature_template_proposals", 0),
+        "vae_latent_local_search_harness_pass": latent_local_search_eval.get("harness_pass", 0),
+        "vae_latent_local_search_best_distance_c": latent_local_search_eval.get("best_distance_c"),
+        "vae_latent_local_search_literature_template_harness_pass": latent_local_search_eval.get("literature_template_harness_pass", 0),
+        "vae_latent_local_search_observations": latent_local_search_eval.get("replacement_observations", 0),
+        "vae_latent_local_search_pievo_external_rows": latent_local_search_pievo.get("external_observation_summary", {}).get("accepted_rows", 0),
+        "vae_latent_local_search_pievo_best_distance_c": latent_local_search_pievo.get("best_selected_target_distance_c"),
         "gnn_global_feature_architecture": gnn_global.get("architecture"),
         "gnn_global_feature_best_case": gnn_global.get("best_case"),
         "gnn_global_feature_baseline_mapek_test_pct": gnn_global.get("baseline_mapek_test_pct"),
@@ -118,6 +132,9 @@ def main() -> None:
     parser.add_argument("--ensemble-guard-pievo-summary", default="artifacts/pievo_faithful_ensemble_guard_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--expanded-replacement-summary", default="artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json")
     parser.add_argument("--expanded-generation-summary", default="artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json")
+    parser.add_argument("--vae-latent-local-search-summary", default="artifacts/trail/generation/vae_latent_local_search/latent_local_search_summary.json")
+    parser.add_argument("--vae-latent-local-search-eval-summary", default="artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json")
+    parser.add_argument("--vae-latent-local-search-pievo-summary", default="artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
@@ -134,6 +151,9 @@ def main() -> None:
         Path(args.ensemble_guard_pievo_summary),
         Path(args.expanded_replacement_summary),
         Path(args.expanded_generation_summary),
+        Path(args.vae_latent_local_search_summary),
+        Path(args.vae_latent_local_search_eval_summary),
+        Path(args.vae_latent_local_search_pievo_summary),
         Path(args.gnn_global_feature_summary),
         Path(args.generative_training_summary),
     )

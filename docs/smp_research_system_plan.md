@@ -100,12 +100,19 @@
 - 规则模板生成：保留已知热固性结构 motif。
 - 替换生成：按官能团和 Morgan fingerprint 相似度替换单体。
 - Expanded replacement：从 expanded inventory 选择替换分子，保留 source/template provenance，并用 strict counterpart compatibility 过滤。
-- VAE latent 邻域搜索：未来可在 latent space 中扰动，再 decode。
+- VAE latent 邻域搜索：`trail/generation/vae_latent_local_search.py` 已在 expanded inventory 内按 VAE latent 距离检索局部替换单体；当前是 decoder-free inventory search，不声称直接 decoder 生成新 SMILES。
 - LLM/RAG 生成：未来可用知识库检索约束 prompt，生成 SMILES 或候选规则。
 - SFT / diffusion / flow 数据契约：`scripts/build_generative_training_sets.py` 已把通过 Harness 的 generation records 转成 SFT JSONL 和 diffusion/flow seed table，并用 readiness gate 阻止小样本过早训练。
 - Harness 控制：所有生成结果必须通过 RDKit、charset、元素、官能团、反应兼容、ratio simplex 等约束。
 
 生成不是最终决策；生成只产生候选 `h`，评估和选择由 predictor、PiEvo posterior、IDS 共同完成。
+
+VAE latent local search 当前 195 C smoke：
+
+- 200 条 latent proposals，200 条可重建并评分。
+- 42 条通过 Harness，最佳 target distance 为 0.200 C。
+- `literature_template` 有 39 条 proposals、7 条通过 Harness。
+- 42 条通过项进入 PiEvo-faithful external observation ledger 后，4 轮 selected 全部通过 target guard，最佳 selected distance 为 0.059 C。
 
 ## 5. 闭环 autonomous workflow
 
@@ -128,7 +135,7 @@ Agent 分工：
 
 - `trail/workflow/multi_agent_workflow.py` 是摘要级 workflow。
 - `src/smp02/pievo_faithful.py` 是更接近 PiEvo 数学的闭环实现。
-- workflow summary 已读取 expanded replacement 和 expanded LLM/RAG summary，用来确认 expanded inventory 是否真正进入生成链路，而不只是停留在 source audit。
+- workflow summary 已读取 expanded replacement、VAE latent local search 和 expanded LLM/RAG summary，用来确认 expanded inventory 是否真正进入生成链路，而不只是停留在 source audit。
 
 ## 6. PiEvo-faithful 要求
 
