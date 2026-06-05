@@ -302,9 +302,20 @@
   "human_review_queue_rows": 30,
   "human_review_ready_for_active_ledger_rows": 0,
   "human_review_draft_ready_for_active_ledger_rows": 0,
-  "human_review_best_target_distance_c": 0.0590323055353962,
-  "human_review_process_design_for_dsc_rows": 13,
-  "human_review_high_fidelity_before_dsc_rows": 11,
+  "human_review_best_target_distance_c": 0.0342827100285205,
+  "human_review_process_design_for_dsc_rows": 20,
+  "human_review_high_fidelity_before_dsc_rows": 10,
+  "human_review_target_counts": {
+    "195.0": 17,
+    "250.0": 13
+  },
+  "human_review_candidate_origin_counts": {
+    "sparse_target_replacement_250": 13,
+    "vae_latent_local_search": 11,
+    "pievo_latent_local_search_selected": 3,
+    "pievo_ensemble_guard_selected": 2,
+    "expanded_inventory_replacement": 1
+  },
   "gnn_global_feature_architecture": "mpnn",
   "gnn_global_feature_best_case": "mpnn_baseline",
   "gnn_global_feature_baseline_mapek_test_pct": 11.051218783853365,

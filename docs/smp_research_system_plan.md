@@ -158,9 +158,12 @@ Agent 分工：
 当前 human review queue 状态：
 
 - `scripts/build_human_experiment_review_queue.py` 已把 surrogate/PiEvo/Harness 候选转成人工实验复核队列。
-- 输入 58 条候选，去重 43 条，输出 30 条 review items。
+- 默认 candidate table 现在支持 `path::origin::target_tg_c`，因此没有 `target_tg_c` 列的 250 C sparse expansion 结果不会被误当成 195 C 候选。
+- 输入 88 条候选，去重 73 条，输出 30 条 review items。
+- 队列目标分布为 195 C 17 条、250 C 13 条；250 C 的 13 条全部来自 `sparse_target_replacement_250`，最佳 target distance 为 0.034 C。
+- 20 条为 `process_design_for_dsc`，10 条为 `high_fidelity_before_dsc`。
 - 30 条 draft process records 基础格式通过，但 `ready_for_active_ledger=0`，说明仍需人工补固化/催化/后固化/酰亚胺化等工艺字段。
-- 这一步把“真实实验结果迭代优化”前的人工质量门禁落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
+- Workflow summary 已读取 `human_review_target_counts` 和 `human_review_candidate_origin_counts`；这一步把“真实实验结果迭代优化”前的人工质量门禁落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
 
 ## 6. PiEvo-faithful 要求
 

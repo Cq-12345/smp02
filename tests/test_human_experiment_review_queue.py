@@ -4,7 +4,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from scripts.build_human_experiment_review_queue import build_review_queue, infer_reaction_principle, process_template_for_principle, read_knowledge
+from scripts.build_human_experiment_review_queue import (
+    build_review_queue,
+    infer_reaction_principle,
+    parse_candidate_table_specs,
+    process_template_for_principle,
+    read_knowledge,
+)
 from trail.experiments.import_process_records import import_process_records
 
 
@@ -57,3 +63,34 @@ def test_human_review_queue_keeps_surrogate_drafts_out_of_active_ledger(tmp_path
     assert process_summary["process_record_pass_rows"] == 1
     assert process_summary["ready_for_active_ledger_rows"] == 0
     assert bool(ledger.iloc[0]["ready_for_active_ledger"]) is False
+
+
+def test_human_review_queue_respects_target_override_for_sparse_target(tmp_path: Path) -> None:
+    candidates = tmp_path / "sparse_250.csv"
+    pd.DataFrame(
+        [
+            {
+                "harness_pass": True,
+                "formula_id": 1,
+                "smiles": "CC(O)CO|O=C1OC(=O)c2ccccc21",
+                "ratios": "0.60000:0.40000",
+                "predicted_tg_mean_c": 249.97,
+                "predicted_tg_sigma_c": 77.0,
+                "target_distance_c": 0.03,
+                "compatibility_reasons": "酸酐-羟基酯化。",
+            }
+        ]
+    ).to_csv(candidates, index=False)
+
+    specs = parse_candidate_table_specs([f"{candidates}::sparse_target_250::250"])
+    queue, _, summary = build_review_queue(
+        specs,
+        Path("trail/knowledge/smp_prior_knowledge.yaml"),
+        per_table_limit=10,
+        top_k=5,
+    )
+
+    assert queue.iloc[0]["target_tg_c"] == 250.0
+    assert queue.iloc[0]["candidate_origin"] == "sparse_target_250"
+    assert summary["target_counts"] == {"250.0": 1}
+    assert summary["candidate_origin_counts"] == {"sparse_target_250": 1}

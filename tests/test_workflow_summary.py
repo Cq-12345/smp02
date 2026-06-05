@@ -181,6 +181,8 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
                     "process_design_for_dsc": 13,
                     "high_fidelity_before_dsc": 11,
                 },
+                "target_counts": {"195.0": 17, "250.0": 13},
+                "candidate_origin_counts": {"sparse_target_replacement_250": 13, "vae_latent_local_search": 11},
             }
         ),
         encoding="utf-8",
@@ -359,6 +361,8 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["human_review_best_target_distance_c"] == 0.059
     assert result["human_review_process_design_for_dsc_rows"] == 13
     assert result["human_review_high_fidelity_before_dsc_rows"] == 11
+    assert result["human_review_target_counts"]["250.0"] == 13
+    assert result["human_review_candidate_origin_counts"]["sparse_target_replacement_250"] == 13
     assert result["gnn_global_feature_architecture"] == "mpnn"
     assert result["gnn_global_feature_best_case"] == "mpnn_global"
     assert result["gnn_global_feature_mapek_delta_pct"] == -0.5

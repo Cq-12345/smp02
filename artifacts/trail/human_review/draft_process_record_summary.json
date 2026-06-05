@@ -10,12 +10,12 @@
     "needs_human_review": 30
   },
   "process_template_counts": {
-    "epoxy_amine_thermal_cure": 10,
-    "cyanate_ester_triazine_cure": 6,
+    "epoxy_anhydride_catalyzed_cure": 9,
+    "epoxy_amine_thermal_cure": 9,
+    "cyanate_ester_triazine_cure": 4,
     "anhydride_amine_imidization": 4,
-    "maleimide_addition_or_copolymerization": 4,
-    "epoxy_anhydride_catalyzed_cure": 3,
-    "isocyanate_urethane_urea": 3
+    "maleimide_addition_or_copolymerization": 3,
+    "isocyanate_urethane_urea": 1
   },
-  "mean_target_distance_c": 1.4210625575319114
+  "mean_target_distance_c": 0.8784547373233617
 }

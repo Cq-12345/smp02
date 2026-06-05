@@ -123,7 +123,7 @@ def target_reward(distance_c: float | None, reward_temperature_c: float) -> floa
     return float(math.exp(-abs(distance_c) / reward_temperature_c))
 
 
-def normalize_candidate_table(path: Path, origin: str, limit: int | None = None) -> pd.DataFrame:
+def normalize_candidate_table(path: Path, origin: str, limit: int | None = None, target_override_c: float | None = None) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
     df = pd.read_csv(path)
@@ -144,7 +144,7 @@ def normalize_candidate_table(path: Path, origin: str, limit: int | None = None)
         if not smiles or not ratios:
             continue
         observed = numeric(row, ["observed_tg_c", "predicted_tg_mean_c", "predicted_tg"], default=None)
-        target = numeric(row, ["target_tg_c"], default=195.0)
+        target = float(target_override_c) if target_override_c is not None else numeric(row, ["target_tg_c"], default=195.0)
         distance = numeric(row, ["target_distance_c"], default=None)
         if distance is None and observed is not None and target is not None:
             distance = abs(observed - target)
@@ -204,7 +204,7 @@ def review_tier(priority: str) -> int:
 
 
 def build_review_queue(
-    candidate_tables: list[tuple[Path, str]],
+    candidate_tables: list[tuple[Path, str] | tuple[Path, str, float | None]],
     knowledge_path: Path,
     per_table_limit: int | None = 20,
     top_k: int = 30,
@@ -212,7 +212,15 @@ def build_review_queue(
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     knowledge = read_knowledge(knowledge_path)
     templates = process_templates(knowledge_path)
-    frames = [normalize_candidate_table(path, origin, per_table_limit) for path, origin in candidate_tables]
+    frames = [
+        normalize_candidate_table(
+            item[0],
+            item[1],
+            per_table_limit,
+            target_override_c=item[2] if len(item) >= 3 else None,
+        )
+        for item in candidate_tables
+    ]
     candidates = pd.concat([frame for frame in frames if not frame.empty], ignore_index=True) if any(not f.empty for f in frames) else pd.DataFrame()
     if candidates.empty:
         empty = pd.DataFrame()
@@ -296,6 +304,8 @@ def build_review_queue(
         "ready_for_active_ledger_rows": int(queue["ready_for_active_ledger"].sum()),
         "process_templates": queue["process_template"].value_counts().to_dict(),
         "review_priorities": queue["review_priority"].value_counts().to_dict(),
+        "target_counts": {f"{float(key):.1f}": int(value) for key, value in queue["target_tg_c"].value_counts().sort_index().items()},
+        "candidate_origin_counts": queue["candidate_origin"].value_counts().to_dict(),
         "mean_target_distance_c": float(queue["target_distance_c"].mean()) if len(queue) else None,
         "best_target_distance_c": float(queue["target_distance_c"].min()) if len(queue) else None,
     }
@@ -325,6 +335,24 @@ def write_report(queue: pd.DataFrame, process_summary: dict[str, Any], summary: 
         if isinstance(value, dict):
             continue
         lines.append(f"| {key} | {value} |")
+    for title, counts in [
+        ("Target Tg Distribution", summary.get("target_counts", {})),
+        ("Candidate Origin Distribution", summary.get("candidate_origin_counts", {})),
+        ("Review Priority Distribution", summary.get("review_priorities", {})),
+    ]:
+        if not counts:
+            continue
+        lines.extend(
+            [
+                "",
+                f"## {title}",
+                "",
+                "| item | rows |",
+                "| --- | ---: |",
+            ]
+        )
+        for key, value in counts.items():
+            lines.append(f"| {key} | {value} |")
     lines.extend(
         [
             "",
@@ -343,15 +371,15 @@ def write_report(queue: pd.DataFrame, process_summary: dict[str, Any], summary: 
             "",
             "## Top Review Items",
             "",
-            "| rank | Tg (C) | distance (C) | sigma (C) | template | missing process fields | priority | action |",
-            "| ---: | ---: | ---: | ---: | --- | --- | --- | --- |",
+            "| rank | target Tg (C) | observed Tg (C) | distance (C) | sigma (C) | origin | template | missing process fields | priority | action |",
+            "| ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- | --- |",
         ]
     )
     for _, row in queue.head(15).iterrows():
         sigma = "" if pd.isna(row["predicted_tg_sigma_c"]) else f"{float(row['predicted_tg_sigma_c']):.2f}"
         lines.append(
-            f"| {int(row['review_rank'])} | {float(row['observed_tg_c']):.2f} | {float(row['target_distance_c']):.3f} | "
-            f"{sigma} | {row['process_template']} | {row['missing_process_fields']} | "
+            f"| {int(row['review_rank'])} | {float(row['target_tg_c']):.1f} | {float(row['observed_tg_c']):.2f} | "
+            f"{float(row['target_distance_c']):.3f} | {sigma} | {row['candidate_origin']} | {row['process_template']} | {row['missing_process_fields']} | "
             f"{row['review_priority']} | {row['recommended_action']} |"
         )
     lines.extend(
@@ -368,15 +396,19 @@ def write_report(queue: pd.DataFrame, process_summary: dict[str, Any], summary: 
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def parse_candidate_table_specs(values: list[str]) -> list[tuple[Path, str]]:
+def parse_candidate_table_specs(values: list[str]) -> list[tuple[Path, str, float | None]]:
     specs = []
     for value in values:
-        if "::" in value:
-            path, origin = value.split("::", 1)
+        parts = value.split("::")
+        if len(parts) >= 2:
+            path, origin = parts[0], parts[1]
         else:
             path = value
             origin = Path(value).stem
-        specs.append((Path(path), origin))
+        target_override = None
+        if len(parts) >= 3 and str(parts[2]).strip():
+            target_override = float(parts[2])
+        specs.append((Path(path), origin, target_override))
     return specs
 
 
@@ -429,8 +461,9 @@ def main() -> None:
             "artifacts/pievo_faithful_vae_latent_local_search_195_smoke/selected_formulations.csv::pievo_latent_local_search_selected",
             "artifacts/pievo_faithful_ensemble_guard_195_smoke/selected_formulations.csv::pievo_ensemble_guard_selected",
             "artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_proposals_scored.csv::expanded_inventory_replacement",
+            "artifacts/trail/generation/sparse_target_replacement_expansion/target_250/replacement_eval/replacement_proposals_scored.csv::sparse_target_replacement_250::250",
         ],
-        help="Candidate CSV path, optionally suffixed with ::origin. Can be provided multiple times.",
+        help="Candidate CSV path, optionally suffixed with ::origin or ::origin::target_tg_c. Can be provided multiple times.",
     )
     parser.add_argument("--knowledge", default="trail/knowledge/smp_prior_knowledge.yaml")
     parser.add_argument("--process-schema", default="trail/experiments/process_record_schema.yaml")

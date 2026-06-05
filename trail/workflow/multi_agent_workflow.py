@@ -180,6 +180,8 @@ def summarize(
         "human_review_best_target_distance_c": human_review.get("best_target_distance_c"),
         "human_review_process_design_for_dsc_rows": human_review.get("review_priorities", {}).get("process_design_for_dsc", 0),
         "human_review_high_fidelity_before_dsc_rows": human_review.get("review_priorities", {}).get("high_fidelity_before_dsc", 0),
+        "human_review_target_counts": human_review.get("target_counts", {}),
+        "human_review_candidate_origin_counts": human_review.get("candidate_origin_counts", {}),
         "gnn_global_feature_architecture": gnn_global.get("architecture"),
         "gnn_global_feature_best_case": gnn_global.get("best_case"),
         "gnn_global_feature_baseline_mapek_test_pct": gnn_global.get("baseline_mapek_test_pct"),

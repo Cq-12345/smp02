@@ -381,10 +381,12 @@ Target-conditioned generation strategy policy 已补充：
 Human experiment review queue 已补充：
 
 - `scripts/build_human_experiment_review_queue.py` 会读取当前通过 Harness/PiEvo 的 surrogate 候选，推断 reaction principle、process template 和缺失工艺字段。
-- 当前队列输入 58 条候选，去重后 43 条，输出 30 条人工复核候选。
+- 默认 candidate table spec 支持 `path::origin::target_tg_c`，让没有 `target_tg_c` 列的目标专属 scored table 也能保留真实目标温度。
+- 当前队列输入 88 条候选，去重后 73 条，输出 30 条人工复核候选。
+- 目标分布为 195 C 17 条、250 C 13 条；250 C 候选全部来自 `sparse_target_replacement_250`，最佳 target distance 为 0.034 C。
 - draft process records 30 条基础格式都通过，但 `ready_for_active_ledger=0`，因为仍缺固化温度、后固化、催化剂、NCO 指数、酰亚胺化条件等字段。
-- 队列中 13 条是 `process_design_for_dsc`，11 条建议先做 `high_fidelity_before_dsc`。
-- 最佳队列候选距 195 C 目标 0.059 C，但仍只是 surrogate evidence；必须由人工补齐工艺并显式批准，才能进入真实/高权重 observation ledger。
-- Workflow summary 已读取 `human_experiment_review_queue_summary.json`，让人工闭环不再只是 schema 和说明文档。
+- 队列中 20 条是 `process_design_for_dsc`，10 条建议先做 `high_fidelity_before_dsc`。
+- 最佳队列候选距 250 C 目标 0.034 C，但仍只是 surrogate evidence；必须由人工补齐工艺并显式批准，才能进入真实/高权重 observation ledger。
+- Workflow summary 已读取 `human_experiment_review_queue_summary.json`，并记录 `human_review_target_counts` 与 `human_review_candidate_origin_counts`，让人工闭环不再只是 schema 和说明文档。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。
