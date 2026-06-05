@@ -232,6 +232,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_valid
   --out-dir artifacts/trail/human_review \
   --report reports/validation_result_intake.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_active_observation_ledger.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/active_high_authority_observation_ledger.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
@@ -251,6 +255,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --human-review-validation-summary artifacts/trail/human_review/pre_experiment_validation_plan_summary.json \
   --validation-request-summary artifacts/trail/human_review/validation_request_summary.json \
   --validation-result-intake-summary artifacts/trail/human_review/validation_result_intake_summary.json \
+  --active-observation-summary artifacts/trail/human_review/active_high_authority_observation_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
   --sft-candidate-generation-summary artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json \
@@ -268,6 +273,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
 - `feedback_agent`：把 generation ledger 和 Harness rejection 转成下一轮生成器约束。
 - `rag_generator_agent`：读取 RAG refs 和 strict strategy feedback，产出 generation records，而不是直接推荐。
 - `human_review_agent`：补工艺条件、决定是否进入真实/高保真 observation ledger。
+- `active_evidence_agent`：只把通过 validation result intake 和 observation ledger gate 的高权重观测暴露给 posterior/策略更新。
 
 当前 replacement 反馈闭环的观测结果：
 
@@ -405,6 +411,7 @@ Human experiment review queue 已补充：
 - `scripts/build_pre_experiment_validation_plan.py` 已把队列转成实验前验证计划：30 条都需要补工艺字段，25 条还需要高保真/扩展集成模型复核，0 条可不补工艺直接进入 DSC。
 - `scripts/build_validation_request_packet.py` 已把验证计划转成 55 个可分派 request：30 个只补工艺记录，25 个完成后可作为 `high_fidelity_simulation` 候选 observation，但都被工艺补全 gate 阻塞；当前 0 个 real DSC request。
 - `scripts/import_validation_request_results.py` 已生成 25 条 high-fidelity result intake template；当前没有完成结果，因此 0 条 accepted observation、0 条 observation ledger pass。
-- Workflow summary 已读取 `human_experiment_review_queue_summary.json`、`pre_experiment_validation_plan_summary.json`、`validation_request_summary.json` 和 `validation_result_intake_summary.json`，并记录 `human_review_*`、`human_validation_*`、`validation_request_*` 与 `validation_result_*` 字段，让人工闭环不再只是 schema 和说明文档。
+- `scripts/build_active_observation_ledger.py` 已把 result intake 后的 observation ledger 再过滤成 active high-authority evidence ledger；当前 0 条 active rows，因为尚无完成且获批的高保真/真实/文献观测。
+- Workflow summary 已读取 `human_experiment_review_queue_summary.json`、`pre_experiment_validation_plan_summary.json`、`validation_request_summary.json`、`validation_result_intake_summary.json` 和 `active_high_authority_observation_summary.json`，并记录 `human_review_*`、`human_validation_*`、`validation_request_*`、`validation_result_*` 与 `active_observation_*` 字段，让人工闭环不再只是 schema 和说明文档。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

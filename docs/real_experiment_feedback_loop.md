@@ -94,6 +94,20 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_human_
 - `draft_process_record_ledger.csv`
 - `human_experiment_review_queue_summary.json`
 
+高权重 active evidence ledger：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_active_observation_ledger.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/active_high_authority_observation_ledger.md
+```
+
+输出：
+
+- `active_high_authority_observation_ledger.csv`
+- `active_high_authority_observation_summary.json`
+- `reports/active_high_authority_observation_ledger.md`
+
 ## 5. 与 PiEvo 的连接
 
 当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
@@ -187,3 +201,10 @@ Smoke 结果：
 - 当前生成 25 条 high-fidelity result intake template，等待真实高保真结果填写。
 - 当前没有完成结果，因此 `accepted_result_rows=0`、`observation_ledger_pass_rows=0`；PiEvo posterior 仍没有新增高权重真实/高保真 evidence。
 - 这一步保证即使有人填写了高保真或 DSC 数值，也不能绕过工艺完整性和人工批准直接污染 observation ledger。
+
+当前 active high-authority observation ledger：
+
+- `scripts/build_active_observation_ledger.py` 只读取已经通过上一层 observation ledger 的结果，不读取 request template 或原始 result 草稿。
+- 默认只允许 `high_fidelity_simulation`、`real_dsc`、`literature` 三类来源成为 active evidence；`surrogate` 即使通过 Harness，也不能进入这一层。
+- 当前输入 ledger 为 `validation_result_observation_ledger.csv`，其中 0 条完成观测；因此 `active_rows=0`、`authority_weight_sum=0.0`。
+- 这层 ledger 才是后续 PiEvo posterior、strategy update 或真实实验总结应读取的高权重 evidence source。当前为空表示质量门没有被绕过，而不是说明候选生成链路失败。

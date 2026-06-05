@@ -1,0 +1,25 @@
+{
+  "input_ledgers": [
+    "artifacts/trail/human_review/validation_result_observation_ledger.csv"
+  ],
+  "missing_input_ledgers": [],
+  "allowed_active_source_types": [
+    "high_fidelity_simulation",
+    "real_dsc",
+    "literature"
+  ],
+  "input_rows": 0,
+  "source_counts": {},
+  "ledger_pass_rows": 0,
+  "allowed_source_rows": 0,
+  "active_rows": 0,
+  "active_source_counts": {},
+  "validation_result_active_rows": 0,
+  "authority_weight_sum": 0.0,
+  "max_authority_weight": null,
+  "mean_target_distance_c": null,
+  "mean_weighted_reward": null,
+  "out_path": "artifacts/trail/human_review/active_high_authority_observation_ledger.csv",
+  "summary_path": "artifacts/trail/human_review/active_high_authority_observation_summary.json",
+  "report_path": "reports/active_high_authority_observation_ledger.md"
+}

@@ -245,6 +245,22 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    active_observations = tmp_path / "active_observations.json"
+    active_observations.write_text(
+        json.dumps(
+            {
+                "input_rows": 2,
+                "active_rows": 1,
+                "validation_result_active_rows": 1,
+                "active_source_counts": {"high_fidelity_simulation": 1},
+                "authority_weight_sum": 3.0,
+                "max_authority_weight": 3.0,
+                "mean_target_distance_c": 1.2,
+                "mean_weighted_reward": 2.1,
+            }
+        ),
+        encoding="utf-8",
+    )
     gnn_global = tmp_path / "gnn_global.json"
     gnn_global.write_text(
         json.dumps(
@@ -363,6 +379,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         human_validation,
         validation_requests,
         validation_result_intake,
+        active_observations,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -447,6 +464,14 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["validation_result_accepted_rows"] == 0
     assert result["validation_result_rejected_rows"] == 0
     assert result["validation_result_observation_ledger_pass_rows"] == 0
+    assert result["active_observation_input_rows"] == 2
+    assert result["active_observation_rows"] == 1
+    assert result["active_observation_validation_result_rows"] == 1
+    assert result["active_observation_source_counts"]["high_fidelity_simulation"] == 1
+    assert result["active_observation_authority_weight_sum"] == 3.0
+    assert result["active_observation_max_authority_weight"] == 3.0
+    assert result["active_observation_mean_target_distance_c"] == 1.2
+    assert result["active_observation_mean_weighted_reward"] == 2.1
     assert result["gnn_global_feature_architecture"] == "mpnn"
     assert result["gnn_global_feature_best_case"] == "mpnn_global"
     assert result["gnn_global_feature_mapek_delta_pct"] == -0.5
