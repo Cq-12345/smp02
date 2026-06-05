@@ -85,7 +85,7 @@ strategies:
         literature_template_harness_pass: 3
   vae_latent_local_search:
     maturity: decoder_free_inventory_search_implemented
-    generator: trail/generation/vae_latent_local_search.py + scripts/evaluate_replacement_proposals.py
+    generator: trail/generation/vae_latent_local_search.py + scripts/evaluate_replacement_proposals.py + scripts/run_vae_latent_local_search_target_sweep.py
     harness_required: true
     best_use: retrieve VAE-latent-nearest replacement monomers around high-reward formulations without claiming decoder novelty
     mode:
@@ -110,10 +110,14 @@ strategies:
         - artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv
         - artifacts/trail/generation/vae_latent_local_search_eval/replacement_observation_ledger.csv
         - artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json
+        - artifacts/trail/generation/vae_latent_local_search_target_sweep/vae_latent_local_search_target_sweep_summary.json
+        - artifacts/trail/generation/vae_latent_local_search_target_sweep/vae_latent_local_search_target_sweep_aggregate.json
+        - artifacts/pievo_faithful_vae_latent_local_search_target_sweep
         - reports/vae_latent_local_search.md
         - reports/vae_latent_local_search_evaluation.md
         - reports/vae_latent_local_search_generation_records.md
         - reports/vae_latent_local_search_pievo_feedback.md
+        - reports/vae_latent_local_search_target_sweep.md
       smoke_result:
         proposals: 200
         rebuilt_formulas: 200
@@ -123,6 +127,21 @@ strategies:
         best_distance_c: 0.20046
         pievo_external_observations: 42
         pievo_best_selected_distance_c: 0.059032
+      target_sweep:
+        targets: [190.0, 195.0, 200.0, 250.0]
+        total_input_proposals: 800
+        total_harness_pass: 126
+        total_observations: 126
+        all_pievo_selected_pass: true
+        all_pievo_selected_within_guard: true
+        best_target_tg_c: 190.0
+        best_selected_target_distance_c: 0.0023821476506213
+        best_target_map_principle: maleimide_rigid_network
+        target_records:
+          - artifacts/trail/generation/vae_latent_local_search_target_records/target_190/generation_record_ledger.csv
+          - artifacts/trail/generation/vae_latent_local_search_target_records/target_195/generation_record_ledger.csv
+          - artifacts/trail/generation/vae_latent_local_search_target_records/target_200/generation_record_ledger.csv
+          - artifacts/trail/generation/vae_latent_local_search_target_records/target_250/generation_record_ledger.csv
   llm_rag_principle_generation:
     maturity: feedback_aware_agent_implemented
     generator: scripts/build_prompt_generation_records.py + scripts/run_feedback_aware_llm_rag_agent.py
@@ -173,9 +192,9 @@ strategies:
     training_corpus:
       jsonl: artifacts/trail/generation/generative_training_sets/sft_generation_records.jsonl
       summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
-      examples: 143
-      train_examples: 124
-      eval_examples: 19
+      examples: 227
+      train_examples: 192
+      eval_examples: 35
       readiness_gate_pass: true
       min_examples: 20
       source_ledgers:
@@ -191,6 +210,10 @@ strategies:
         - artifacts/trail/generation/feedback_guided_replacement_target_records/target_195/generation_record_ledger.csv
         - artifacts/trail/generation/feedback_guided_replacement_target_records/target_200/generation_record_ledger.csv
         - artifacts/trail/generation/feedback_guided_replacement_target_records/target_250/generation_record_ledger.csv
+        - artifacts/trail/generation/vae_latent_local_search_target_records/target_190/generation_record_ledger.csv
+        - artifacts/trail/generation/vae_latent_local_search_target_records/target_195/generation_record_ledger.csv
+        - artifacts/trail/generation/vae_latent_local_search_target_records/target_200/generation_record_ledger.csv
+        - artifacts/trail/generation/vae_latent_local_search_target_records/target_250/generation_record_ledger.csv
     dry_run:
       mode: prototype_replay_not_weight_update
       script: scripts/run_sft_candidate_generator_dry_run.py
@@ -198,7 +221,7 @@ strategies:
       harness_pass: 25
       best_distance_c: 0.0031802513673540034
       mean_generation_reward: 0.9921940687487707
-      heldout_eval_rows: 19
+      heldout_eval_rows: 35
       heldout_exact_candidate_matches: 0
       outputs:
         - artifacts/trail/generation/sft_candidate_dry_run/sft_candidate_records_input.csv
@@ -212,13 +235,13 @@ strategies:
       records: 23
       harness_pass: 23
       best_distance_c: 0.0031802513673540034
-      mean_generation_reward: 0.9564690371891499
-      train_loss_initial: 0.8800587058067322
-      train_loss_final: 0.6180704832077026
-      eval_loss_final: 0.8099173903465271
-      projection_distance_mean: 3.5848927912504776
-      heldout_eval_rows: 19
-      heldout_exact_candidate_matches: 1
+      mean_generation_reward: 0.9797998605500596
+      train_loss_initial: 0.8799125949541727
+      train_loss_final: 0.6209816932678223
+      eval_loss_final: 0.7246468663215637
+      projection_distance_mean: 3.642749496128248
+      heldout_eval_rows: 35
+      heldout_exact_candidate_matches: 0
       caveat: Trained structured feature projection, not external LLM fine-tuning and not direct free-form SMILES generation.
       outputs:
         - artifacts/trail/generation/sft_trained_projection_generator/sft_record_projection_model.pt
@@ -235,9 +258,9 @@ strategies:
     training_seed_table:
       table: artifacts/trail/generation/generative_training_sets/diffusion_flow_seed_table.csv
       summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
-      seed_rows: 143
-      train_rows: 124
-      eval_rows: 19
+      seed_rows: 227
+      train_rows: 192
+      eval_rows: 35
       readiness_gate_pass: true
       min_examples: 100
       next_data_needed: 0
@@ -248,7 +271,7 @@ strategies:
       harness_pass: 19
       best_distance_c: 0.0031802513673540034
       mean_generation_reward: 0.9934334710121382
-      heldout_eval_rows: 19
+      heldout_eval_rows: 35
       heldout_exact_candidate_matches: 0
       outputs:
         - artifacts/trail/generation/diffusion_flow_candidate_dry_run/diffusion_flow_candidate_records_input.csv
@@ -261,16 +284,16 @@ strategies:
       script: scripts/train_conditional_flow_matching_generator.py
       feature_space: formulation_global_features_31d
       epochs: 120
-      train_seed_rows: 124
-      eval_seed_rows: 19
+      train_seed_rows: 192
+      eval_seed_rows: 35
       projected_records: 23
       harness_pass: 23
-      best_distance_c: 0.005365464445986845
-      mean_generation_reward: 0.8339556497143
-      train_loss_initial: 1.8879691362380981
-      train_loss_final: 1.312873661518097
-      eval_loss_final: 1.801619529724121
-      projection_distance_mean: 5.0249114451201065
+      best_distance_c: 0.0031802513673540034
+      mean_generation_reward: 0.8644566894747596
+      train_loss_initial: 1.8595678408940632
+      train_loss_final: 1.2820241451263428
+      eval_loss_final: 1.501653790473938
+      projection_distance_mean: 4.6286066407742705
       direct_smiles_generation_claim: false
       outputs:
         - artifacts/trail/generation/diffusion_flow_trained_generator/conditional_flow_matching_model.pt

@@ -1,0 +1,21 @@
+{
+  "targets": 4,
+  "target_values": [
+    190.0,
+    195.0,
+    200.0,
+    250.0
+  ],
+  "output_root": "artifacts/trail/generation/vae_latent_local_search_target_sweep",
+  "pievo_output_root": "artifacts/pievo_faithful_vae_latent_local_search_target_sweep",
+  "total_latent_input_proposals": 800,
+  "total_latent_harness_pass": 126,
+  "total_latent_observations": 126,
+  "total_pievo_external_rows": 126,
+  "all_pievo_selected_pass": true,
+  "all_pievo_selected_within_guard": true,
+  "best_target_tg_c": 190.0,
+  "best_selected_predicted_tg_mean_c": 189.99761785234935,
+  "best_selected_target_distance_c": 0.0023821476506213,
+  "best_target_map_principle": "maleimide_rigid_network"
+}

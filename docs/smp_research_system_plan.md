@@ -95,7 +95,7 @@
 
 ## 4. 生成模型策略
 
-当前生成层先不做复杂扩散/流匹配训练，先形成多策略候选生成：
+当前生成层先不做直接 SMILES diffusion/flow 生成，先形成多策略候选生成和训练型投影 smoke：
 
 - 规则模板生成：保留已知热固性结构 motif。
 - 替换生成：按官能团和 Morgan fingerprint 相似度替换单体。
@@ -114,11 +114,12 @@ VAE latent local search 当前 195 C smoke：
 - 42 条通过 Harness，最佳 target distance 为 0.200 C。
 - `literature_template` 有 39 条 proposals、7 条通过 Harness。
 - 42 条通过项进入 PiEvo-faithful external observation ledger 后，4 轮 selected 全部通过 target guard，最佳 selected distance 为 0.059 C。
-- scored latent proposals、replacement target-sweep records 和 rule-template baseline records 已写回 generation record ledgers，把 SFT/diffusion/flow 训练候选扩展到 143 条。
+- `scripts/run_vae_latent_local_search_target_sweep.py` 已把 VAE latent local search 扩展到 190/195/200/250 C 四个目标：800 条 target-wise evaluations 中 126 条通过 Harness，四个目标 PiEvo selected 全部通过 target guard；250 C 只有 5 条 latent pass，说明高温目标需要更有针对性的 source pool 或条件化 latent retrieval。
+- scored latent proposals、replacement target-sweep records、VAE latent target-sweep records 和 rule-template baseline records 已写回 generation record ledgers，把 SFT/diffusion/flow 训练候选扩展到 227 条。
 - `scripts/run_sft_candidate_generator_dry_run.py` 已用 SFT train split validated prototypes 生成 25 条 `sft_candidate_generator` records，25 条全部通过 Harness，mean generation reward 为 0.9922；这是链路验证，不是神经权重微调完成。
-- `scripts/train_sft_record_projection_generator.py` 已在 SFT generation record 结构化特征空间训练轻量监督 MLP：120 epoch 后 train loss 0.618、eval loss 0.810；连续模型输出投影到 validated train row 后生成 23 条 records，23 条全部通过 Harness，mean generation reward 为 0.9565。这是有权重更新的 SFT-style projection，不是外部 LLM 微调或自由 SMILES 生成。
+- `scripts/train_sft_record_projection_generator.py` 已在 SFT generation record 结构化特征空间训练轻量监督 MLP：120 epoch 后 train loss 0.621、eval loss 0.725；连续模型输出投影到 validated train row 后生成 23 条 records，23 条全部通过 Harness，mean generation reward 为 0.9798。这是有权重更新的 SFT-style projection，不是外部 LLM 微调或自由 SMILES 生成。
 - `scripts/run_diffusion_flow_candidate_generator_dry_run.py` 已用 diffusion/flow seed table train split validated prototypes 生成 19 条 `diffusion_or_flow_matching` records，19 条全部通过 Harness，mean generation reward 为 0.9934；这是条件 seed replay 链路验证，不是神经扩散或 flow-matching 权重训练完成。
-- `scripts/train_conditional_flow_matching_generator.py` 已在 31 维 formulation global feature 空间训练条件 flow-matching MLP：120 epoch 后 train loss 1.313、eval loss 1.802；连续样本投影到 validated seed row 后生成 23 条 records，23 条全部通过 Harness，mean generation reward 为 0.8340。
+- `scripts/train_conditional_flow_matching_generator.py` 已在 31 维 formulation global feature 空间训练条件 flow-matching MLP：120 epoch 后 train loss 1.282、eval loss 1.502；连续样本投影到 validated seed row 后生成 23 条 records，23 条全部通过 Harness，mean generation reward 为 0.8645。
 
 ## 5. 闭环 autonomous workflow
 
@@ -149,7 +150,7 @@ Agent 分工：
 - 5 个策略 eligible active；1 个 suppressed；0 个 data_collection_only。
 - top strategy 为 `llm_rag_principle_generation`。
 - `sft_candidate_generator` 已因 23 条 trained projection records 进入 active arm，获得 23/100 proposal budget 建议；当前 policy 优先读取 trained SFT summary，而不是 dry-run replay。
-- `diffusion_or_flow_matching` 已因 23 条 trained projection records 进入 active arm，获得 18/100 proposal budget 建议；这只证明训练型投影链路可用，生成输出仍需重新通过 predictor/Harness/PiEvo。
+- `diffusion_or_flow_matching` 已因 23 条 trained projection records 进入 active arm，获得 19/100 proposal budget 建议；这只证明训练型投影链路可用，生成输出仍需重新通过 predictor/Harness/PiEvo。
 - `llm_smiles_generation` 在缺 predictor/chemistry evidence 时不进入下一轮预算。
 
 当前 human review queue 状态：
@@ -180,10 +181,9 @@ Agent 分工：
 
 第一优先级：
 
-- 跑通 `configs/pievo_faithful_smoke.yaml`。
-- 检查 `principle_posterior.json` 是否能随 history 改变。
-- 检查 `candidate_diagnostics.csv` 是否包含 regret、information gain、IDS ratio。
-- 将 agent_discovery 的候选池与 PiEvo-faithful 的选择结果对比。
+- 将已经跑通的 PiEvo-faithful、target guard、ensemble guard 和多目标 sweeps 合并成更长轮次、更大候选批次的复核实验。
+- 对不同生成策略的 target-wise 表现做统一比较：rule-template、strict replacement、VAE latent local search、SFT projection、flow projection。
+- 检查每个目标下 `principle_posterior.json`、MAP principle 和 IDS 选择路径是否稳定，避免只根据短 smoke 过早相信某个规律。
 
 第二优先级：
 

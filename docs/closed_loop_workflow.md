@@ -116,6 +116,14 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_propo
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python -m smp02.pievo_faithful \
   --config configs/pievo_faithful_vae_latent_local_search_195_smoke.yaml
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_vae_latent_local_search_target_sweep.py \
+  --targets 190 195 200 250 \
+  --rounds 4 \
+  --candidate-batch-size 220 \
+  --output-root artifacts/trail/generation/vae_latent_local_search_target_sweep \
+  --pievo-output-root artifacts/pievo_faithful_vae_latent_local_search_target_sweep \
+  --report reports/vae_latent_local_search_target_sweep.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/analyze_generation_feedback.py \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
   --replacement-rejections artifacts/trail/generation/feedback_guided_replacement_eval/replacement_proposal_rejections.csv \
@@ -225,6 +233,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --vae-latent-local-search-summary artifacts/trail/generation/vae_latent_local_search/latent_local_search_summary.json \
   --vae-latent-local-search-eval-summary artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json \
   --vae-latent-local-search-pievo-summary artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json \
+  --vae-latent-local-search-target-sweep-summary artifacts/trail/generation/vae_latent_local_search_target_sweep/vae_latent_local_search_target_sweep_aggregate.json \
   --generation-strategy-policy-summary artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json \
   --human-review-queue-summary artifacts/trail/human_review/human_experiment_review_queue_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
@@ -281,6 +290,10 @@ VAE latent local search 已补充：
 - `literature_template` proposals 为 39 条，其中 7 条通过 Harness。
 - 42 条通过项进入 PiEvo external observation ledger 后，4 轮 selected 全部通过 target guard，最佳 selected distance 为 0.059 C，MAP principle 为 `reaction_839cd29ef5d7`。
 - Workflow summary 已读取 latent local search summary、evaluation summary 和 PiEvo summary。
+- `scripts/run_vae_latent_local_search_target_sweep.py` 已把同一批 latent proposals 扩展到 190/195/200/250 C 四个目标：800 条 target-wise evaluations 中 126 条通过 Harness，126 条进入 surrogate observation ledger。
+- 四个目标的 latent Harness pass 分别为 38、42、41、5；250 C 目标覆盖明显较弱，提示下一轮应按目标重新选择 source candidate pool 或做条件化 latent retrieval。
+- 四个目标 PiEvo selected 全部通过 target guard 和 validation；最佳 selected distance 分别为 0.002、0.059、0.043、0.511 C。
+- Workflow summary 已读取 `vae_latent_local_search_target_sweep_aggregate.json`，记录 targets、total Harness pass、total observations、best target 和 all selected pass。
 
 Predictor ensemble disagreement 已补充：
 
@@ -303,25 +316,25 @@ SFT / diffusion / flow readiness 已补充：
 - `scripts/build_generative_training_sets.py` 从 generation record ledgers 中筛选 `record_pass + harness_pass + prediction_available` 的记录，生成 SFT JSONL 和 diffusion/flow seed table。
 - `scripts/import_proposal_eval_generation_records.py` 会把已经完成 predictor/Harness 的 scored proposals 写回 generation record ledger，让 SFT/扩散/流匹配使用同一审计链。
 - `scripts/build_rule_template_generation_records.py` 会把当前 selected candidate space 的近目标规则/模板候选写成 `rule_template` generation records，作为 SFT/diffusion/flow 的规则基线种子。
-- 当前 12 个 generation ledgers 共 1165 条输入，其中 177 条通过 Harness，去重后得到 143 条训练候选。
-- SFT JSONL 为 124 条 train、19 条 eval，`sft_ready=true`；当前门槛 20 条已通过，SFT dry-run 和轻量监督 trained projection smoke 均已完成。
-- diffusion/flow seed table 为 124 条 train、19 条 eval，`diffusion_flow_ready=true`；当前门槛 100 条已通过，且 diffusion/flow dry-run 与轻量 flow-matching 训练 smoke 已完成。
+- 当前 16 个 generation ledgers 共 1965 条输入，其中 303 条通过 Harness，去重后得到 227 条训练候选。
+- SFT JSONL 为 192 条 train、35 条 eval，`sft_ready=true`；当前门槛 20 条已通过，SFT dry-run 和轻量监督 trained projection smoke 均已完成。
+- diffusion/flow seed table 为 192 条 train、35 条 eval，`diffusion_flow_ready=true`；当前门槛 100 条已通过，且 diffusion/flow dry-run 与轻量 flow-matching 训练 smoke 已完成。
 - 这一步仍不直接推荐 SFT/flow 输出；训练后生成的候选必须重新写入 ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 SFT candidate generator dry-run 已补充：
 
 - `scripts/run_sft_candidate_generator_dry_run.py` 用 SFT train split 中的 validated prototypes 生成 `sft_candidate_generator` records。
 - 当前 dry-run 生成 25 条 records，25 条全部通过 generation record/Harness；最佳 target distance 为 0.003 C。
-- mean generation reward 为 0.9922；heldout eval 有 19 条，其中 0 条和 dry-run prototypes 完全同候选。
+- mean generation reward 为 0.9922；heldout eval 有 35 条，其中 0 条和 dry-run prototypes 完全同候选。
 - dry-run mode 是 `prototype_replay_not_weight_update`，即链路验证和策略激活，不冒充神经权重微调完成。
 - Workflow summary 已读取 SFT dry-run summary，记录 rows、Harness pass、best distance、heldout eval rows 和 exact candidate matches。
 
 SFT trained projection generator smoke 已补充：
 
 - `scripts/train_sft_record_projection_generator.py` 在 SFT generation record 的结构化特征空间训练轻量监督 MLP；输入是 target/prompt/source 条件特征，输出是 formulation global features、预测 Tg、reward 和来源策略特征。
-- 当前 120 epoch smoke 中，train loss 从 0.880 降至 0.618，eval loss 为 0.810。
+- 当前 120 epoch smoke 中，train loss 从 0.880 降至 0.621，eval loss 为 0.725。
 - 连续模型输出投影到最近 validated train-split record 后，得到 23 条 `sft_candidate_generator` records，23 条全部通过 Harness。
-- 最佳 target distance 为 0.003 C，mean generation reward 为 0.9565，projection distance mean 为 3.585。
+- 最佳 target distance 为 0.003 C，mean generation reward 为 0.9798，projection distance mean 为 3.643。
 - 这是有权重更新的 SFT-style projection，不是外部 LLM 微调，也不是自由 SMILES 生成；后续若接入真实 LLM/SFT 输出，仍必须走同一 ledger/Harness/PiEvo 门禁。
 - Workflow summary 已读取 trained SFT summary，记录 rows、Harness pass、best distance、训练损失、projection distance 和 heldout eval。
 
@@ -329,16 +342,16 @@ Diffusion/flow candidate generator dry-run 已补充：
 
 - `scripts/run_diffusion_flow_candidate_generator_dry_run.py` 用 diffusion/flow seed table train split 中的 validated seed prototypes 生成 `diffusion_or_flow_matching` records。
 - 当前 dry-run 生成 19 条 records，19 条全部通过 generation record/Harness；最佳 target distance 为 0.003 C，mean generation reward 为 0.9934。
-- heldout eval 有 19 条，其中 0 条和 dry-run prototypes 完全同候选。
+- heldout eval 有 35 条，其中 0 条和 dry-run prototypes 完全同候选。
 - dry-run mode 是 `conditional_seed_replay_not_weight_update`，即链路验证和策略激活，不冒充神经扩散或 flow-matching 权重训练完成。
 - Workflow summary 已读取 diffusion/flow dry-run summary，记录 rows、Harness pass、best distance、heldout eval rows 和 exact candidate matches。
 
 Conditional flow-matching trained generator smoke 已补充：
 
 - `scripts/train_conditional_flow_matching_generator.py` 在 31 维 formulation global feature 空间训练条件 flow-matching MLP，并以目标 Tg 作为条件。
-- 当前 120 epoch smoke 中，train loss 从 1.888 降至 1.313，eval loss 为 1.802。
+- 当前 120 epoch smoke 中，train loss 从 1.860 降至 1.282，eval loss 为 1.502。
 - 连续生成 184 个特征样本后投影到最近 validated seed row，得到 23 条 `diffusion_or_flow_matching` records，23 条全部通过 Harness。
-- 最佳 target distance 为 0.005 C，mean generation reward 为 0.8340，projection distance mean 为 5.025。
+- 最佳 target distance 为 0.003 C，mean generation reward 为 0.8645，projection distance mean 为 4.629。
 - 这是训练型 projection，不是直接 SMILES diffusion；后续若取消 nearest-seed projection，必须新增有效 decoder、predictor 和 Harness 复评。
 - Workflow summary 已读取 trained flow summary，记录 rows、Harness pass、best distance、训练损失和 projection distance。
 
@@ -349,7 +362,7 @@ Generation strategy bandit policy 已补充：
 - 输出的 `allocation_per_100` 是下一轮 proposal 预算建议，不是最终配方推荐；所有候选仍必须经过 predictor、Harness、PiEvo 和人工审核。
 - 当前 6 个策略中 5 个 eligible active，1 个 suppressed，0 个 data_collection_only；top strategy 为 `llm_rag_principle_generation`。
 - `sft_candidate_generator` 已因 23 条 trained projection records 全部通过 Harness 成为 active arm；当前 policy 优先读取 trained SFT summary，SFT 获得 23/100 proposal budget 建议。
-- `diffusion_or_flow_matching` 已因 23 条 trained projection records 全部通过 Harness 成为 active arm，获得 18/100 proposal budget 建议；当前仍只是训练型 projection 链路已开放，不代表已有直接 SMILES 扩散/流模型推荐。
+- `diffusion_or_flow_matching` 已因 23 条 trained projection records 全部通过 Harness 成为 active arm，获得 19/100 proposal budget 建议；当前仍只是训练型 projection 链路已开放，不代表已有直接 SMILES 扩散/流模型推荐。
 - `llm_smiles_generation` 因缺 predictor/chemistry evidence 继续 suppressed。
 - Workflow summary 已读取 `generation_strategy_bandit_summary.json`，让“RL/策略优化”进入总览链路。
 

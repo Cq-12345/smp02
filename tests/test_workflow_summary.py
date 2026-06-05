@@ -91,6 +91,22 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         json.dumps({"best_selected_target_distance_c": 0.059, "external_observation_summary": {"accepted_rows": 42}}),
         encoding="utf-8",
     )
+    latent_target_sweep = tmp_path / "latent_target_sweep.json"
+    latent_target_sweep.write_text(
+        json.dumps(
+            {
+                "targets": 4,
+                "total_latent_harness_pass": 126,
+                "total_latent_observations": 126,
+                "all_pievo_selected_pass": True,
+                "all_pievo_selected_within_guard": True,
+                "best_target_tg_c": 190.0,
+                "best_selected_target_distance_c": 0.002,
+                "best_target_map_principle": "maleimide_rigid_network",
+            }
+        ),
+        encoding="utf-8",
+    )
     strategy_policy = tmp_path / "strategy_policy.json"
     strategy_policy.write_text(
         json.dumps(
@@ -224,6 +240,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         latent_local_search,
         latent_local_search_eval,
         latent_local_search_pievo,
+        latent_target_sweep,
         strategy_policy,
         human_review,
         gnn_global,
@@ -259,6 +276,14 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["vae_latent_local_search_observations"] == 42
     assert result["vae_latent_local_search_pievo_external_rows"] == 42
     assert result["vae_latent_local_search_pievo_best_distance_c"] == 0.059
+    assert result["vae_latent_local_search_target_sweep_targets"] == 4
+    assert result["vae_latent_local_search_target_sweep_total_harness_pass"] == 126
+    assert result["vae_latent_local_search_target_sweep_total_observations"] == 126
+    assert result["vae_latent_local_search_target_sweep_all_selected_pass"] is True
+    assert result["vae_latent_local_search_target_sweep_all_selected_within_guard"] is True
+    assert result["vae_latent_local_search_target_sweep_best_target_tg_c"] == 190.0
+    assert result["vae_latent_local_search_target_sweep_best_selected_distance_c"] == 0.002
+    assert result["vae_latent_local_search_target_sweep_best_target_map_principle"] == "maleimide_rigid_network"
     assert result["generation_strategy_policy_top_strategy"] == "llm_rag_principle_generation"
     assert result["generation_strategy_policy_eligible_active_strategies"] == 3
     assert result["generation_strategy_policy_suppressed_strategies"] == 1

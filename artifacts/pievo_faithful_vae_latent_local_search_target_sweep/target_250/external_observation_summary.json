@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "ledger_path": "artifacts/trail/generation/vae_latent_local_search_target_sweep/target_250/latent_eval/replacement_observation_ledger.csv",
+  "input_rows": 5,
+  "candidate_rows_after_filter": 5,
+  "accepted_rows": 5,
+  "rejected_rows": 0,
+  "rejected": [],
+  "source_counts": {
+    "surrogate": 5
+  },
+  "total_authority_weight": 5.0,
+  "mean_reward": 0.5829396795619448
+}

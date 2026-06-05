@@ -38,6 +38,7 @@ def summarize(
     vae_latent_local_search_summary: Path,
     vae_latent_local_search_eval_summary: Path,
     vae_latent_local_search_pievo_summary: Path,
+    vae_latent_local_search_target_sweep_summary: Path,
     generation_strategy_policy_summary: Path,
     human_review_queue_summary: Path,
     gnn_global_feature_summary: Path,
@@ -61,6 +62,7 @@ def summarize(
     latent_local_search = read_json(vae_latent_local_search_summary, {})
     latent_local_search_eval = read_json(vae_latent_local_search_eval_summary, {})
     latent_local_search_pievo = read_json(vae_latent_local_search_pievo_summary, {})
+    latent_local_search_target_sweep = read_json(vae_latent_local_search_target_sweep_summary, {})
     strategy_policy = read_json(generation_strategy_policy_summary, {})
     human_review = read_json(human_review_queue_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
@@ -115,6 +117,14 @@ def summarize(
         "vae_latent_local_search_observations": latent_local_search_eval.get("replacement_observations", 0),
         "vae_latent_local_search_pievo_external_rows": latent_local_search_pievo.get("external_observation_summary", {}).get("accepted_rows", 0),
         "vae_latent_local_search_pievo_best_distance_c": latent_local_search_pievo.get("best_selected_target_distance_c"),
+        "vae_latent_local_search_target_sweep_targets": latent_local_search_target_sweep.get("targets", 0),
+        "vae_latent_local_search_target_sweep_total_harness_pass": latent_local_search_target_sweep.get("total_latent_harness_pass", 0),
+        "vae_latent_local_search_target_sweep_total_observations": latent_local_search_target_sweep.get("total_latent_observations", 0),
+        "vae_latent_local_search_target_sweep_all_selected_pass": latent_local_search_target_sweep.get("all_pievo_selected_pass"),
+        "vae_latent_local_search_target_sweep_all_selected_within_guard": latent_local_search_target_sweep.get("all_pievo_selected_within_guard"),
+        "vae_latent_local_search_target_sweep_best_target_tg_c": latent_local_search_target_sweep.get("best_target_tg_c"),
+        "vae_latent_local_search_target_sweep_best_selected_distance_c": latent_local_search_target_sweep.get("best_selected_target_distance_c"),
+        "vae_latent_local_search_target_sweep_best_target_map_principle": latent_local_search_target_sweep.get("best_target_map_principle"),
         "generation_strategy_policy_top_strategy": strategy_policy.get("top_strategy"),
         "generation_strategy_policy_eligible_active_strategies": strategy_policy.get("eligible_active_strategies", 0),
         "generation_strategy_policy_suppressed_strategies": strategy_policy.get("suppressed_strategies", 0),
@@ -186,6 +196,7 @@ def main() -> None:
     parser.add_argument("--vae-latent-local-search-summary", default="artifacts/trail/generation/vae_latent_local_search/latent_local_search_summary.json")
     parser.add_argument("--vae-latent-local-search-eval-summary", default="artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json")
     parser.add_argument("--vae-latent-local-search-pievo-summary", default="artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json")
+    parser.add_argument("--vae-latent-local-search-target-sweep-summary", default="artifacts/trail/generation/vae_latent_local_search_target_sweep/vae_latent_local_search_target_sweep_aggregate.json")
     parser.add_argument("--generation-strategy-policy-summary", default="artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json")
     parser.add_argument("--human-review-queue-summary", default="artifacts/trail/human_review/human_experiment_review_queue_summary.json")
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
@@ -211,6 +222,7 @@ def main() -> None:
         Path(args.vae_latent_local_search_summary),
         Path(args.vae_latent_local_search_eval_summary),
         Path(args.vae_latent_local_search_pievo_summary),
+        Path(args.vae_latent_local_search_target_sweep_summary),
         Path(args.generation_strategy_policy_summary),
         Path(args.human_review_queue_summary),
         Path(args.gnn_global_feature_summary),

@@ -26,11 +26,11 @@
 | reward_temperature_c | 5.0 |
 | generator_mode | prototype_replay_not_weight_update |
 | sft_jsonl | artifacts/trail/generation/generative_training_sets/sft_generation_records.jsonl |
-| train_examples | 124 |
-| eval_examples | 19 |
+| train_examples | 192 |
+| eval_examples | 35 |
 | generated_records | 25 |
 | heldout_exact_candidate_matches | 0 |
-| heldout_eval_rows | 19 |
+| heldout_eval_rows | 35 |
 | input_records_path | artifacts/trail/generation/sft_candidate_dry_run/sft_candidate_records_input.csv |
 | generation_record_ledger_path | artifacts/trail/generation/sft_candidate_dry_run/generation_record_ledger.csv |
 | heldout_eval_retrieval_path | artifacts/trail/generation/sft_candidate_dry_run/heldout_eval_retrieval.csv |

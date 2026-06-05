@@ -26,12 +26,12 @@
 | reward_temperature_c | 5.0 |
 | generator_mode | conditional_seed_replay_not_weight_update |
 | seed_table | artifacts/trail/generation/generative_training_sets/diffusion_flow_seed_table.csv |
-| train_seed_rows | 124 |
-| eval_seed_rows | 19 |
+| train_seed_rows | 192 |
+| eval_seed_rows | 35 |
 | generated_records | 19 |
 | target_condition_tolerance_c | 10.0 |
 | heldout_exact_candidate_matches | 0 |
-| heldout_eval_rows | 19 |
+| heldout_eval_rows | 35 |
 | input_records_path | artifacts/trail/generation/diffusion_flow_candidate_dry_run/diffusion_flow_candidate_records_input.csv |
 | generation_record_ledger_path | artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_ledger.csv |
 | heldout_eval_retrieval_path | artifacts/trail/generation/diffusion_flow_candidate_dry_run/heldout_eval_retrieval.csv |

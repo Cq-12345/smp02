@@ -24,9 +24,9 @@
 
 | strategy | status | attempts | successes | beta pass mean | utility | UCB bonus | score | allocation/100 | review | action |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| llm_rag_principle_generation | active | 2 | 2 | 0.750 | 0.840 | 0.357 | 1.297 | 52 | high | allocate 52/100 next-round proposal budget; keep predictor/Harness/PiEvo gates active. |
-| sft_candidate_generator | active | 23 | 23 | 0.960 | 0.958 | 0.126 | 1.085 | 23 | high | allocate 23/100 next-round proposal budget; keep predictor/Harness/PiEvo gates active. |
-| diffusion_or_flow_matching | active | 23 | 23 | 0.960 | 0.903 | 0.126 | 1.029 | 18 | high | allocate 18/100 next-round proposal budget; keep predictor/Harness/PiEvo gates active. |
+| llm_rag_principle_generation | active | 2 | 2 | 0.750 | 0.840 | 0.357 | 1.297 | 51 | high | allocate 51/100 next-round proposal budget; keep predictor/Harness/PiEvo gates active. |
+| sft_candidate_generator | active | 23 | 23 | 0.960 | 0.969 | 0.126 | 1.095 | 23 | high | allocate 23/100 next-round proposal budget; keep predictor/Harness/PiEvo gates active. |
+| diffusion_or_flow_matching | active | 23 | 23 | 0.960 | 0.917 | 0.126 | 1.043 | 19 | high | allocate 19/100 next-round proposal budget; keep predictor/Harness/PiEvo gates active. |
 | functional_group_replacement | active | 200 | 18 | 0.094 | 0.484 | 0.044 | 0.628 | 4 | high | allocate 4/100 next-round proposal budget; keep predictor/Harness/PiEvo gates active. |
 | vae_latent_local_search | active | 200 | 42 | 0.213 | 0.549 | 0.044 | 0.593 | 3 | high | allocate 3/100 next-round proposal budget; keep predictor/Harness/PiEvo gates active. |
 | llm_smiles_generation | suppressed | 1 | 0 | 0.333 | 0.333 | 0.437 | -0.380 | 0 | gate_review | predictor_feedback: run VAE-WVCM/GNN predictor before recommendation. |

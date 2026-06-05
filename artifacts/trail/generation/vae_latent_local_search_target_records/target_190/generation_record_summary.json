@@ -1,0 +1,21 @@
+{
+  "input_rows": 200,
+  "record_pass_rows": 200,
+  "ready_for_prediction_rows": 0,
+  "harness_pass_rows": 38,
+  "harness_fail_rows": 162,
+  "strategy_counts": {
+    "vae_latent_local_search": 200
+  },
+  "stage_counts": {
+    "predicted": 162,
+    "harnessed": 38
+  },
+  "best_distance_c": 0.16655943404330742,
+  "mean_generation_reward": 0.18413035425059654,
+  "reward_temperature_c": 5.0,
+  "strategy": "vae_latent_local_search",
+  "source_context": "vae_latent_local_search_target_sweep_190",
+  "input_records_path": "artifacts/trail/generation/vae_latent_local_search_target_records/target_190/proposal_generation_records_input.csv",
+  "generation_record_ledger_path": "artifacts/trail/generation/vae_latent_local_search_target_records/target_190/generation_record_ledger.csv"
+}

@@ -167,11 +167,14 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python -m smp02.pievo_faith
 - 4 轮 PiEvo selected 全部通过 target guard，最佳 selected distance 为 0.059 C，MAP principle 为 `reaction_839cd29ef5d7`。
 - 这 200 条 scored proposals 已通过 `scripts/import_proposal_eval_generation_records.py` 写回 generation record ledger：200 条 record 全部基础字段通过，42 条 Harness pass。该账本现在是 SFT/diffusion/flow 训练语料的主要来源之一。
 
-后续可做：
+多目标 VAE latent local search target sweep 已补充：
 
-- 再考虑从高 reward 候选的 latent 附近采样并 decode。
-- 加入 decoder validity/harness pass rate 作为训练或筛选指标。
-- 对不同目标 Tg 学习条件化 latent proposal。
+- `scripts/run_vae_latent_local_search_target_sweep.py` 已对 190/195/200/250 C 四个目标运行同一批 latent proposals 的 target-wise evaluation、observation ledger 和 PiEvo-faithful。
+- 四个目标共 800 条 target-wise latent proposal evaluations，126 条通过 Harness 并进入 surrogate observation ledger。
+- 各目标 Harness pass 数分别为 38、42、41、5；250 C 的通过数明显少，说明同一批 195 C 附近的 latent-neighborhood proposals 对高温目标覆盖不足。
+- 四个目标 PiEvo selected 全部通过 target guard 和 validation；最佳 selected distance 分别为 0.002、0.059、0.043、0.511 C。
+- MAP principle 随目标变化：190 C 为 `maleimide_rigid_network`，195 C 为 `reaction_839cd29ef5d7`，200 C 为 `sulfone_diamine_rigidity`，250 C 为 `reaction_a5dd26ae10ad`。
+- 这 4 个 target-wise scored ledgers 已写回 generation record ledgers，并纳入 SFT/diffusion/flow 训练语料。latent metric 仍只是候选排序信号，不等于物理规律。
 
 边界：
 
@@ -296,8 +299,8 @@ Feedback-aware LLM/RAG agent 状态：
 
 当前 readiness：
 
-- 12 个 generation ledgers 共 1165 条输入，其中 177 条通过 Harness；去重和 reward 过滤后得到 143 条训练候选。
-- SFT JSONL 为 124 条 train、19 条 eval。
+- 16 个 generation ledgers 共 1965 条输入，其中 303 条通过 Harness；去重和 reward 过滤后得到 227 条训练候选。
+- SFT JSONL 为 192 条 train、35 条 eval。
 - `sft_ready=true`，当前最小门槛为 20 条样本，已超过；下一步可以做 SFT dry-run 或训练作业。
 - SFT 生成器即使训练完成，也只能生成 auditable generation record JSON；候选仍必须重新经过 predictor、Harness、PiEvo 和人工审核，不能直接推荐。
 
@@ -305,15 +308,15 @@ Feedback-aware LLM/RAG agent 状态：
 
 - `scripts/run_sft_candidate_generator_dry_run.py` 已用 train split 中的 validated prototypes 生成 25 条 `sft_candidate_generator` records。
 - 25 条 records 全部通过 generation record/Harness，最佳 target distance 为 0.003 C，mean generation reward 为 0.9922。
-- heldout eval 有 19 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 SFT 已学会分布外生成。
+- heldout eval 有 35 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 SFT 已学会分布外生成。
 - dry-run mode 明确为 `prototype_replay_not_weight_update`。后续真正训练 LLM/SFT 权重时，应把模型输出写入同一 ledger，并和该 dry-run 的 pass rate、target distance、重复率对比。
 
 当前 SFT trained projection smoke：
 
 - `scripts/train_sft_record_projection_generator.py` 已在 SFT generation record 的结构化特征空间训练轻量监督 MLP：输入是 target/prompt/source 条件特征，输出是 formulation global features、预测 Tg、reward 和来源策略特征。
-- 120 epoch 后，train loss 从 0.880 降到 0.618，eval loss 为 0.810。
+- 120 epoch 后，train loss 从 0.880 降到 0.621，eval loss 为 0.725。
 - 连续模型输出不会直接当成配方；它们投影到最近 validated train-split record，得到 23 条 `sft_candidate_generator` records，23 条全部通过 Harness。
-- 最佳 target distance 为 0.003 C，mean generation reward 为 0.9565，projection distance mean 为 3.585；heldout eval 有 19 条，其中 1 条和 projection 输出完全同候选。
+- 最佳 target distance 为 0.003 C，mean generation reward 为 0.9798，projection distance mean 为 3.643；heldout eval 有 35 条，其中 0 条和 projection 输出完全同候选。
 - 该模式明确为 `supervised_neural_sft_projection`，不是外部 LLM 微调完成，也不是自由 SMILES 生成。后续若改成真实 LLM/SFT fine-tune 输出，仍必须写入同一 ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 ### 3.7 扩散/流匹配
@@ -337,14 +340,14 @@ Seed table 记录：
 
 当前 readiness：
 
-- diffusion/flow seed rows 为 143，124 条 train、19 条 eval。
+- diffusion/flow seed rows 为 227，192 条 train、35 条 eval。
 - `diffusion_flow_ready=true`，当前最小门槛 100 条 seed rows 已通过。
 - dry-run 使用 train split 中的 validated seed prototypes 做 `conditional_seed_replay_not_weight_update`，生成 19 条 `diffusion_or_flow_matching` records。
 - 19 条 records 全部通过 generation record/Harness，最佳 target distance 为 0.003 C，mean generation reward 为 0.9934。
-- heldout eval 有 19 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 diffusion/flow 已学会连续配方流形或分布外生成。
+- heldout eval 有 35 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 diffusion/flow 已学会连续配方流形或分布外生成。
 - 训练型 smoke 使用 31 维 formulation global features 训练条件 flow-matching MLP：从 Gaussian noise 到配方特征的 velocity，以目标 Tg 为条件。
-- 训练 120 epoch 后，train loss 从 1.888 降到 1.313，eval loss 为 1.802；连续生成点投影到最近 validated seed row 后得到 23 条 records，23 条全部通过 Harness。
-- 训练型 projection 的最佳 target distance 为 0.005 C，mean generation reward 为 0.8340，projection distance mean 为 5.025；这说明链路已能训练和采样，但投影质量仍需优化。
+- 训练 120 epoch 后，train loss 从 1.860 降到 1.282，eval loss 为 1.502；连续生成点投影到最近 validated seed row 后得到 23 条 records，23 条全部通过 Harness。
+- 训练型 projection 的最佳 target distance 为 0.003 C，mean generation reward 为 0.8645，projection distance mean 为 4.629；多目标 latent 语料加入后投影质量和 eval loss 都有所改善，但仍未超过 seed replay。
 - 这一步把扩散/流匹配从“空泛未来项”推进为可训练数据契约、可审计 dry-run 和轻量训练型 projection；训练后输出仍必须重新写入 generation ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 ## 4. Harness 约束
@@ -407,7 +410,7 @@ allocation = softmax(score / temperature)
 - 5 个策略为 eligible active。
 - `llm_smiles_generation` 仍 suppressed，因为它缺 predictor/chemistry evidence。
 - `sft_candidate_generator` 已因 23 条 trained projection generation records 成为 active arm，获得 23/100 下一轮 proposal budget 建议；当前 policy 优先读取 trained projection summary，而不是只看 dry-run replay。
-- `diffusion_or_flow_matching` 已因 23 条 trained projection generation records 成为 active arm，获得 18/100 下一轮 proposal budget 建议；这只表示训练型投影链路已可用，不表示已有可信直接 SMILES diffusion/flow 模型输出。
+- `diffusion_or_flow_matching` 已因 23 条 trained projection generation records 成为 active arm，获得 19/100 下一轮 proposal budget 建议；这只表示训练型投影链路已可用，不表示已有可信直接 SMILES diffusion/flow 模型输出。
 - 当前 top strategy 为 `llm_rag_principle_generation`，原因是 2/2 generation records 通过 Harness 且 UCB 鼓励继续探索低样本高回报策略。
 
 ## 6. 近期优先级
@@ -419,5 +422,5 @@ allocation = softmax(score / temperature)
 5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
 7. SFT dry-run、SFT trained projection、diffusion/flow dry-run 和轻量条件 flow-matching 训练 smoke 都已跑通；下一步应做真实 LLM/SFT fine-tune 输出对比、改进 flow 训练/投影质量，或加入有效 SMILES decoder。任何训练输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。
-8. 对 VAE latent local search 做多目标 sweep，并比较 latent-distance ranking、Tanimoto ranking 和 PiEvo posterior 的差异；当前 195 C smoke 已证明链路可运行，但还不能说明 latent metric 已是最优生成策略。
+8. VAE latent local search 多目标 sweep 已跑通；下一步应比较 target-wise latent search、Tanimoto replacement、rule-template 和 trained SFT/flow projection 的目标级预算，而不是只看 195 C 单点结果。
 9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。
