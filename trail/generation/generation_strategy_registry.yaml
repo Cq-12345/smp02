@@ -20,7 +20,7 @@ strategy_policy:
     eligible_active_strategies: 5
     suppressed_strategies: 1
     data_collection_only_strategies: 0
-    total_attempts: 571
+    total_attempts: 447
     total_budget: 100
   guardrails:
     - llm_smiles_generation remains suppressed until predictor and chemistry evidence are present
@@ -207,8 +207,8 @@ strategies:
         - artifacts/trail/generation/sft_candidate_dry_run/heldout_eval_retrieval.csv
         - reports/sft_candidate_generator_dry_run.md
   diffusion_or_flow_matching:
-    maturity: seed_table_ready_for_dry_run_or_training
-    generator: scripts/build_generative_training_sets.py
+    maturity: dry_run_generator_implemented
+    generator: scripts/build_generative_training_sets.py + scripts/run_diffusion_flow_candidate_generator_dry_run.py
     harness_required: true
     best_use: train or dry-run conditional diffusion/flow only after all generated records are revalidated by predictor/Harness/PiEvo
     training_seed_table:
@@ -220,6 +220,21 @@ strategies:
       readiness_gate_pass: true
       min_examples: 100
       next_data_needed: 0
+    dry_run:
+      mode: conditional_seed_replay_not_weight_update
+      script: scripts/run_diffusion_flow_candidate_generator_dry_run.py
+      records: 19
+      harness_pass: 19
+      best_distance_c: 0.0031802513673540034
+      mean_generation_reward: 0.9934334710121382
+      heldout_eval_rows: 19
+      heldout_exact_candidate_matches: 0
+      outputs:
+        - artifacts/trail/generation/diffusion_flow_candidate_dry_run/diffusion_flow_candidate_records_input.csv
+        - artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_ledger.csv
+        - artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json
+        - artifacts/trail/generation/diffusion_flow_candidate_dry_run/heldout_eval_retrieval.csv
+        - reports/diffusion_flow_candidate_generator_dry_run.md
 record_schema:
   schema_path: trail/generation/generation_record_schema.yaml
   importer: trail/generation/import_generation_records.py

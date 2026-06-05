@@ -162,6 +162,20 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    diffusion_flow_candidate_generation = tmp_path / "diffusion_flow_candidate_generation.json"
+    diffusion_flow_candidate_generation.write_text(
+        json.dumps(
+            {
+                "input_rows": 19,
+                "harness_pass_rows": 19,
+                "best_distance_c": 0.004,
+                "generator_mode": "conditional_seed_replay_not_weight_update",
+                "heldout_eval_rows": 19,
+                "heldout_exact_candidate_matches": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
 
     result = summarize(
         candidates,
@@ -183,6 +197,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         gnn_global,
         generative_training,
         sft_candidate_generation,
+        diffusion_flow_candidate_generation,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -237,3 +252,9 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["sft_candidate_generator_mode"] == "prototype_replay_not_weight_update"
     assert result["sft_candidate_generator_heldout_eval_rows"] == 12
     assert result["sft_candidate_generator_heldout_exact_candidate_matches"] == 3
+    assert result["diffusion_flow_candidate_generator_rows"] == 19
+    assert result["diffusion_flow_candidate_generator_harness_pass"] == 19
+    assert result["diffusion_flow_candidate_generator_best_distance_c"] == 0.004
+    assert result["diffusion_flow_candidate_generator_mode"] == "conditional_seed_replay_not_weight_update"
+    assert result["diffusion_flow_candidate_generator_heldout_eval_rows"] == 19
+    assert result["diffusion_flow_candidate_generator_heldout_exact_candidate_matches"] == 0

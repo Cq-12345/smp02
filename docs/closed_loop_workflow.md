@@ -182,6 +182,11 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_sft_cand
   --out-dir artifacts/trail/generation/sft_candidate_dry_run \
   --report reports/sft_candidate_generator_dry_run.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_diffusion_flow_candidate_generator_dry_run.py \
+  --max-records 19 \
+  --out-dir artifacts/trail/generation/diffusion_flow_candidate_dry_run \
+  --report reports/diffusion_flow_candidate_generator_dry_run.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/update_generation_strategy_policy.py \
   --out-dir artifacts/trail/generation_strategy_policy \
   --report reports/generation_strategy_bandit_policy.md
@@ -208,6 +213,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
   --sft-candidate-generation-summary artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json \
+  --diffusion-flow-candidate-generation-summary artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
 ```
 
@@ -280,7 +286,7 @@ SFT / diffusion / flow readiness 已补充：
 - `scripts/build_rule_template_generation_records.py` 会把当前 selected candidate space 的近目标规则/模板候选写成 `rule_template` generation records，作为 SFT/diffusion/flow 的规则基线种子。
 - 当前 12 个 generation ledgers 共 1165 条输入，其中 177 条通过 Harness，去重后得到 143 条训练候选。
 - SFT JSONL 为 124 条 train、19 条 eval，`sft_ready=true`；当前门槛 20 条已通过，可以进入 SFT dry-run/训练作业。
-- diffusion/flow seed table 为 124 条 train、19 条 eval，`diffusion_flow_ready=true`；当前门槛 100 条已通过，可以进入 diffusion/flow dry-run/训练作业。
+- diffusion/flow seed table 为 124 条 train、19 条 eval，`diffusion_flow_ready=true`；当前门槛 100 条已通过，且 diffusion/flow dry-run 已完成，下一步才是权重训练作业。
 - 这一步仍不直接推荐 SFT/flow 输出；训练后生成的候选必须重新写入 ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 SFT candidate generator dry-run 已补充：
@@ -291,14 +297,22 @@ SFT candidate generator dry-run 已补充：
 - dry-run mode 是 `prototype_replay_not_weight_update`，即链路验证和策略激活，不冒充神经权重微调完成。
 - Workflow summary 已读取 SFT dry-run summary，记录 rows、Harness pass、best distance、heldout eval rows 和 exact candidate matches。
 
+Diffusion/flow candidate generator dry-run 已补充：
+
+- `scripts/run_diffusion_flow_candidate_generator_dry_run.py` 用 diffusion/flow seed table train split 中的 validated seed prototypes 生成 `diffusion_or_flow_matching` records。
+- 当前 dry-run 生成 19 条 records，19 条全部通过 generation record/Harness；最佳 target distance 为 0.003 C，mean generation reward 为 0.9934。
+- heldout eval 有 19 条，其中 0 条和 dry-run prototypes 完全同候选。
+- dry-run mode 是 `conditional_seed_replay_not_weight_update`，即链路验证和策略激活，不冒充神经扩散或 flow-matching 权重训练完成。
+- Workflow summary 已读取 diffusion/flow dry-run summary，记录 rows、Harness pass、best distance、heldout eval rows 和 exact candidate matches。
+
 Generation strategy bandit policy 已补充：
 
 - `scripts/update_generation_strategy_policy.py` 把 strategy feedback、replacement/latent eval、LLM/RAG summary 和生成模型 readiness 汇总为 strategy-level contextual bandit。
 - 当前 arm 包括 `vae_latent_local_search`、`functional_group_replacement`、`llm_rag_principle_generation`、`llm_smiles_generation`、`sft_candidate_generator`、`diffusion_or_flow_matching`。
 - 输出的 `allocation_per_100` 是下一轮 proposal 预算建议，不是最终配方推荐；所有候选仍必须经过 predictor、Harness、PiEvo 和人工审核。
 - 当前 6 个策略中 5 个 eligible active，1 个 suppressed，0 个 data_collection_only；top strategy 为 `llm_rag_principle_generation`。
-- `sft_candidate_generator` 已因 143 条 SFT 样本和 25 条 dry-run records 成为 active arm；当前 policy 优先读取 SFT dry-run summary，SFT 获得 23/100 proposal budget 建议。
-- `diffusion_or_flow_matching` 已因 143 条 seed rows 通过 readiness gate 成为 active arm，获得 19/100 proposal budget 建议；当前仍只是训练/dry-run 入口已开放，不代表已有扩散/流模型推荐。
+- `sft_candidate_generator` 已因 143 条 SFT 样本和 25 条 dry-run records 成为 active arm；当前 policy 优先读取 SFT dry-run summary，SFT 获得 22/100 proposal budget 建议。
+- `diffusion_or_flow_matching` 已因 143 条 seed rows 通过 readiness gate 且 19 条 dry-run records 全部通过 Harness 成为 active arm，获得 23/100 proposal budget 建议；当前仍只是 dry-run 链路已开放，不代表已有神经扩散/流模型推荐。
 - `llm_smiles_generation` 因缺 predictor/chemistry evidence 继续 suppressed。
 - Workflow summary 已读取 `generation_strategy_bandit_summary.json`，让“RL/策略优化”进入总览链路。
 

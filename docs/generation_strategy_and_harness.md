@@ -307,10 +307,13 @@ Feedback-aware LLM/RAG agent 状态：
 
 ### 3.7 扩散/流匹配
 
-当前已落地 diffusion/flow seed table 契约，但不训练模型：
+当前已落地 diffusion/flow seed table 契约，并完成一个保守 dry-run；仍未训练神经扩散或 flow-matching 权重：
 
 - `artifacts/trail/generation/generative_training_sets/diffusion_flow_seed_table.csv`
+- `scripts/run_diffusion_flow_candidate_generator_dry_run.py`
+- `artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_ledger.csv`
 - `reports/generative_training_set_readiness.md`
+- `reports/diffusion_flow_candidate_generator_dry_run.md`
 
 Seed table 记录：
 
@@ -321,8 +324,11 @@ Seed table 记录：
 当前 readiness：
 
 - diffusion/flow seed rows 为 143，124 条 train、19 条 eval。
-- `diffusion_flow_ready=true`，当前最小门槛 100 条 seed rows 已通过；下一步可以启动 diffusion/flow dry-run 或训练作业。
-- 这一步把扩散/流匹配从“空泛未来项”推进为可训练数据契约；训练后输出仍必须重新写入 generation ledger，并经过 predictor、Harness、PiEvo 和人工审核。
+- `diffusion_flow_ready=true`，当前最小门槛 100 条 seed rows 已通过。
+- dry-run 使用 train split 中的 validated seed prototypes 做 `conditional_seed_replay_not_weight_update`，生成 19 条 `diffusion_or_flow_matching` records。
+- 19 条 records 全部通过 generation record/Harness，最佳 target distance 为 0.003 C，mean generation reward 为 0.9934。
+- heldout eval 有 19 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 diffusion/flow 已学会连续配方流形或分布外生成。
+- 这一步把扩散/流匹配从“空泛未来项”推进为可训练数据契约和可审计 dry-run；训练后输出仍必须重新写入 generation ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 ## 4. Harness 约束
 
@@ -383,8 +389,8 @@ allocation = softmax(score / temperature)
 - 6 个策略进入 policy：VAE latent local search、functional-group replacement、LLM/RAG principle generation、LLM SMILES draft、SFT candidate generator、diffusion/flow matching。
 - 5 个策略为 eligible active。
 - `llm_smiles_generation` 仍 suppressed，因为它缺 predictor/chemistry evidence。
-- `sft_candidate_generator` 已因 143 条 SFT 样本和 25 条 dry-run generation records 成为 active arm，获得 23/100 下一轮 proposal budget 建议。
-- `diffusion_or_flow_matching` 已因 143 条 seed rows 通过 readiness gate 成为 active arm，获得 19/100 下一轮 proposal budget 建议；这只表示可以做 dry-run/训练，不表示已有可信生成模型输出。
+- `sft_candidate_generator` 已因 143 条 SFT 样本和 25 条 dry-run generation records 成为 active arm，获得 22/100 下一轮 proposal budget 建议。
+- `diffusion_or_flow_matching` 已因 19 条 dry-run generation records 成为 active arm，获得 23/100 下一轮 proposal budget 建议；这只表示 dry-run 链路已可用，不表示已有可信神经 diffusion/flow 模型输出。
 - 当前 top strategy 为 `llm_rag_principle_generation`，原因是 2/2 generation records 通过 Harness 且 UCB 鼓励继续探索低样本高回报策略。
 
 ## 6. 近期优先级
@@ -395,6 +401,6 @@ allocation = softmax(score / temperature)
 4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 和 feedback-aware LLM/RAG 侧都已完成 observation ledger -> PiEvo posterior 的 smoke 闭环。
 5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
-7. SFT dry-run 已跑通，diffusion/flow seed table 也已通过 100 条门槛；下一步可分别替换为真实神经 SFT/LLM 权重训练和 diffusion/flow dry-run/训练，训练后输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。
+7. SFT dry-run 和 diffusion/flow dry-run 都已跑通；下一步可分别替换为真实神经 SFT/LLM 权重训练和 diffusion/flow 权重训练，训练后输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。
 8. 对 VAE latent local search 做多目标 sweep，并比较 latent-distance ranking、Tanimoto ranking 和 PiEvo posterior 的差异；当前 195 C smoke 已证明链路可运行，但还不能说明 latent metric 已是最优生成策略。
 9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。

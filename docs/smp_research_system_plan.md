@@ -102,7 +102,7 @@
 - Expanded replacement：从 expanded inventory 选择替换分子，保留 source/template provenance，并用 strict counterpart compatibility 过滤。
 - VAE latent 邻域搜索：`trail/generation/vae_latent_local_search.py` 已在 expanded inventory 内按 VAE latent 距离检索局部替换单体；当前是 decoder-free inventory search，不声称直接 decoder 生成新 SMILES。
 - LLM/RAG 生成：未来可用知识库检索约束 prompt，生成 SMILES 或候选规则。
-- SFT / diffusion / flow 数据契约：`scripts/import_proposal_eval_generation_records.py` 先把已评分 proposals 写回 generation record ledger，`scripts/build_rule_template_generation_records.py` 提供规则模板基线种子，`scripts/build_generative_training_sets.py` 再把通过 Harness 的 records 转成 SFT JSONL 和 diffusion/flow seed table；当前 SFT readiness 和 diffusion/flow seed-table readiness 均已通过，SFT dry-run generator 已产生 records。
+- SFT / diffusion / flow 数据契约：`scripts/import_proposal_eval_generation_records.py` 先把已评分 proposals 写回 generation record ledger，`scripts/build_rule_template_generation_records.py` 提供规则模板基线种子，`scripts/build_generative_training_sets.py` 再把通过 Harness 的 records 转成 SFT JSONL 和 diffusion/flow seed table；当前 SFT readiness 和 diffusion/flow seed-table readiness 均已通过，SFT dry-run 与 diffusion/flow dry-run generator 都已产生 records。
 - Strategy-level bandit policy：`scripts/update_generation_strategy_policy.py` 会把各生成策略的 Harness pass、target reward、失败回流和 readiness gate 汇总成下一轮 proposal 预算建议。
 - Harness 控制：所有生成结果必须通过 RDKit、charset、元素、官能团、反应兼容、ratio simplex 等约束。
 
@@ -116,6 +116,7 @@ VAE latent local search 当前 195 C smoke：
 - 42 条通过项进入 PiEvo-faithful external observation ledger 后，4 轮 selected 全部通过 target guard，最佳 selected distance 为 0.059 C。
 - scored latent proposals、replacement target-sweep records 和 rule-template baseline records 已写回 generation record ledgers，把 SFT/diffusion/flow 训练候选扩展到 143 条。
 - `scripts/run_sft_candidate_generator_dry_run.py` 已用 SFT train split validated prototypes 生成 25 条 `sft_candidate_generator` records，25 条全部通过 Harness，mean generation reward 为 0.9922；这是链路验证，不是神经权重微调完成。
+- `scripts/run_diffusion_flow_candidate_generator_dry_run.py` 已用 diffusion/flow seed table train split validated prototypes 生成 19 条 `diffusion_or_flow_matching` records，19 条全部通过 Harness，mean generation reward 为 0.9934；这是条件 seed replay 链路验证，不是神经扩散或 flow-matching 权重训练完成。
 
 ## 5. 闭环 autonomous workflow
 
@@ -145,8 +146,8 @@ Agent 分工：
 - 6 个策略被纳入 arm：VAE latent local search、functional-group replacement、LLM/RAG principle generation、LLM SMILES draft、SFT candidate generator、diffusion/flow matching。
 - 5 个策略 eligible active；1 个 suppressed；0 个 data_collection_only。
 - top strategy 为 `llm_rag_principle_generation`。
-- `sft_candidate_generator` 已因 143 条 SFT 样本和 25 条 dry-run records 进入 active arm，获得 23/100 proposal budget 建议。
-- `diffusion_or_flow_matching` 已因 143 条 seed rows 通过 readiness gate 进入 active arm，获得 19/100 proposal budget 建议；这只打开 dry-run/训练入口，生成输出仍需重新通过 predictor/Harness/PiEvo。
+- `sft_candidate_generator` 已因 143 条 SFT 样本和 25 条 dry-run records 进入 active arm，获得 22/100 proposal budget 建议。
+- `diffusion_or_flow_matching` 已因 143 条 seed rows 通过 readiness gate，并因 19 条 dry-run records 进入 active arm，获得 23/100 proposal budget 建议；这只证明 dry-run 链路可用，生成输出仍需重新通过 predictor/Harness/PiEvo。
 - `llm_smiles_generation` 在缺 predictor/chemistry evidence 时不进入下一轮预算。
 
 当前 human review queue 状态：
@@ -194,4 +195,4 @@ Agent 分工：
 - 对 dormant principle 做剪枝策略。
 - 对不同目标 Tg 批量运行，观察 posterior 是否随目标变化。
 - 对 GNN global features 做更长训练，并评估是否作为结构视角加入 predictor ensemble disagreement。
-- SFT dry-run 已跑通，diffusion/flow seed table 已通过 100 条门槛；下一步可做真实神经 SFT/LLM 权重训练，或启动 diffusion/flow dry-run/训练作业。训练输出必须写回 generation ledger，再经过 predictor、Harness、PiEvo 和人工审核。
+- SFT dry-run 与 diffusion/flow dry-run 已跑通；下一步可做真实神经 SFT/LLM 权重训练，或启动 diffusion/flow 权重训练作业。训练输出必须写回 generation ledger，再经过 predictor、Harness、PiEvo 和人工审核。
