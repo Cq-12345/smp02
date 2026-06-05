@@ -49,7 +49,14 @@ def prepare_smiles(cfg: dict) -> tuple[list[str], list[str], list[str]]:
     monomers = unique_monomers(records)
     smiles_cfg = cfg["smiles"]
     vae_cfg = cfg["vae"]
-    chembl = list(iter_chembl_smiles(cfg["chembl_path"], limit=int(vae_cfg["chembl_limit"]), max_length=int(smiles_cfg["max_length"])))
+    chembl = list(
+        iter_chembl_smiles(
+            cfg["chembl_path"],
+            limit=int(vae_cfg["chembl_limit"]),
+            max_length=int(smiles_cfg["max_length"]),
+            validate=False,
+        )
+    )
     augmented = augment_smiles(
         monomers,
         per_monomer=int(smiles_cfg["augment_per_monomer"]),
@@ -58,6 +65,11 @@ def prepare_smiles(cfg: dict) -> tuple[list[str], list[str], list[str]]:
     charset = build_charset(chembl + augmented + monomers, min_size=int(smiles_cfg["min_charset_size"]))
     chembl = filter_smiles_by_charset(chembl, charset, int(smiles_cfg["max_length"]))
     augmented = filter_smiles_by_charset(augmented, charset, int(smiles_cfg["max_length"]))
+    print(
+        f"Prepared SMILES: chembl={len(chembl)}, augmented_smp={len(augmented)}, "
+        f"charset={len(charset)}, max_length={smiles_cfg['max_length']}",
+        flush=True,
+    )
     return chembl, augmented, charset
 
 
@@ -179,4 +191,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -141,17 +141,20 @@ def unique_monomers(records: Iterable[SMPRecord]) -> list[str]:
     return ordered
 
 
-def iter_chembl_smiles(path: str | Path, limit: int | None = None, max_length: int = 204) -> Iterator[str]:
+def iter_chembl_smiles(path: str | Path, limit: int | None = None, max_length: int = 204, validate: bool = False) -> Iterator[str]:
     yielded = 0
     with Path(path).open("r", encoding="utf-8", errors="ignore", newline="") as fh:
         reader = csv.DictReader(fh, delimiter="\t")
         for row in reader:
-            raw = row.get("canonical_smiles", "")
+            raw = str(row.get("canonical_smiles", "")).strip()
             if not raw or len(raw) > max_length:
                 continue
-            smi = canonicalize_smiles(raw)
-            if smi is None or len(smi) > max_length:
-                continue
+            if validate:
+                smi = canonicalize_smiles(raw)
+                if smi is None or len(smi) > max_length:
+                    continue
+            else:
+                smi = raw
             yield smi
             yielded += 1
             if limit is not None and yielded >= limit:
@@ -184,4 +187,3 @@ def augment_smiles(smiles: Iterable[str], per_monomer: int, limit: int | None = 
 def filter_smiles_by_charset(smiles: Iterable[str], charset: list[str], max_length: int) -> list[str]:
     allowed = set(charset)
     return [s for s in smiles if len(s) <= max_length and all(ch in allowed for ch in s)]
-
