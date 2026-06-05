@@ -7,9 +7,10 @@
 1. 读取扩充 XLSX 数据集，解析每个 SMP 的单体 SMILES、摩尔比和 Tg。
 2. 用 ChEMBL SMILES 预训练 VAE，并用 SMP 单体随机 SMILES 增强数据 fine-tune decoder。
 3. 对 7 个 latent size `[16, 32, 64, 128, 256, 512, 1024]` 训练 VAE。
-4. 用 WVCM 将单体 latent vector 按摩尔比加权求和，训练 CNN、SVR、RF 预测 Tg。
-5. 对单体做官能团 SMARTS 分类，按热固性反应兼容规则生成合理候选配方。
-6. 枚举 5%-95% 摩尔比，用最佳 SVR 预测 Tg，筛选 190-200°C 候选。
+4. 用 WVCM 将单体 latent vector 按摩尔比加权求和，复现 CNN、SVR、RF，并扩展训练 MLP、GBR、KRR、LightGBM、XGBoost、CatBoost、NGBoost 等 model zoo。
+5. 按 `selection_metric` 自动选择当前效果最好的 Tg predictor，后续 discovery 默认使用全局最佳模型。
+6. 对单体做官能团 SMARTS 分类，按热固性反应兼容规则生成合理候选配方。
+7. 枚举 5%-95% 摩尔比，用最佳模型预测 Tg，筛选 190-200°C 候选。
 7. 运行“界定搜索空间 -> 生成假设 -> 预测评估 -> 优化原则/假设”的 in-silico 闭环迭代。
 
 ## 环境
@@ -34,10 +35,16 @@ Smoke 配置只训练极小样本和少量 epoch，用于检查整条链路：
 
 ## 完整复现
 
-完整配置对齐论文参数：ChEMBL 550,000 条、VAE 20 epoch pretrain + 20 epoch fine-tune、7 个 latent size、CNN/SVR/RF 对比。
+完整配置对齐论文参数：ChEMBL 550,000 条、VAE 20 epoch pretrain + 20 epoch fine-tune、7 个 latent size、论文 CNN/SVR/RF 对比，并额外训练几十个回归模型进行统一排行。
 
 ```bash
 ./scripts/run_reproduce.sh
+```
+
+默认完整运行会使用 `CUDA_VISIBLE_DEVICES=0,1` 和 VAE batch size 1024。当前机器 GPU0 上已有其他进程占用大量显存，因此这个配置保守利用剩余显存，同时让两张 GPU 都参与 VAE 训练。若 GPU0 被其他任务占满，可临时指定：
+
+```bash
+CUDA_VISIBLE_DEVICES=1 ./scripts/run_reproduce.sh
 ```
 
 或分步运行：
@@ -52,7 +59,7 @@ PYTHONPATH=src conda run --no-capture-output -n mhc_pyg314 python -m smp02.cli c
 
 ## 关键文档
 
-- `docs/paper_reproduction_notes.md`: 论文和补充材料中的模型、超参数、评价指标和复现决策。
+- `docs/paper_reproduction_notes.md`: 论文和补充材料中的模型、超参数、评价指标、扩展 model zoo 和复现决策。
 - `docs/functional_group_classification_and_matching.md`: 官能团分类与合理匹配规则，回答 README 原任务中特别指出的问题。
 - `docs/closed_loop_workflow.md`: 自主迭代闭环的实现方式。
 - `trail/`: 会议速记中的扩展尝试，包括知识库、知识图谱、本体、GNN、RAG、harness 和多智能体 workflow 原型。
@@ -60,4 +67,3 @@ PYTHONPATH=src conda run --no-capture-output -n mhc_pyg314 python -m smp02.cli c
 ## 原任务摘要
 
 原始要求：复现论文和补充材料中的特殊训练模型、尝试和对比实验；使用扩充版 XLSX；训练模型并寻找新配方；实现“界定搜索空间 -> 生成假设 -> 预测/评估 -> 优化”的闭环；补充官能团分类与匹配文档；扩展尝试代码放在 `trail/`。
-

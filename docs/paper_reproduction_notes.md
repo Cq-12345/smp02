@@ -70,6 +70,35 @@ RF：
 
 因此本仓库默认 discovery 使用 `latent_size=64` 和 SVR。
 
+## 扩展 predictor model zoo
+
+用户要求不局限于论文中的 CNN/SVR/RF。本仓库在复现论文三类模型后，额外训练并排行以下模型家族：
+
+- 线性/稳健/贝叶斯模型：LinearRegression、Ridge、Lasso、ElasticNet、BayesianRidge、ARDRegression、HuberRegressor、SGDRegressor。
+- 核方法和近邻：SVR 多核、NuSVR、LinearSVR、KernelRidge RBF/linear/poly、KNN。
+- 树和集成：DecisionTree、RandomForest、ExtraTrees、AdaBoost、Bagging、sklearn GradientBoosting、HistGradientBoosting。
+- 神经网络：多种 MLPRegressor。
+- 降维回归：PLSRegression。
+- 概率/不确定性模型：GaussianProcessRegressor、NGBoost。
+- 外部 GBDT：XGBoost、LightGBM、CatBoost。
+
+每个 latent size 的结果写入：
+
+- `artifacts/reproduce/predictors/latent_{latent}/predictor_metrics_latent_{latent}.csv`
+- `artifacts/reproduce/predictors/latent_{latent}/best_model_latent_{latent}.json`
+
+跨 latent size 的总排行写入：
+
+- `artifacts/reproduce/predictors/all_predictor_metrics.csv`
+- `artifacts/reproduce/predictors/best_model.json`
+
+默认选择指标来自 `configs/reproduce.yaml`：
+
+- `selection_metric: R2 test`
+- `selection_higher_is_better: true`
+
+后续候选配方 discovery 使用 `discovery.predictor: best`，会自动读取全局最佳模型和对应 latent size。
+
 ## 复现决策
 
 补充材料没有公开原始代码，也没有给出具体官能团映射表和所有训练随机种子。本实现做了以下可审计补全：
@@ -78,4 +107,3 @@ RF：
 - VAE encoder/decoder 层数与通道数对齐论文表格，使用 adaptive pooling 固定到 1456 维。
 - validity penalty 被记录进 loss 标量；由于 RDKit validity 是离散检查，它主要作为训练日志和不可微惩罚项。
 - 官能团规则由 `src/smp02/functional_groups.py` 的 SMARTS 和兼容性映射定义，并在 `docs/functional_group_classification_and_matching.md` 解释。
-
