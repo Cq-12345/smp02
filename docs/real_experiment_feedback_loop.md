@@ -139,6 +139,22 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_valida
 - `validation_execution_schedule_summary.json`
 - `reports/validation_execution_schedule.md`
 
+Process completion packet：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_process_completion_packet.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/process_completion_packet.md
+```
+
+输出：
+
+- `process_completion_packet.csv`
+- `process_completion_process_record_template.csv`
+- `process_completion_process_record_ledger.csv`
+- `process_completion_packet_summary.json`
+- `reports/process_completion_packet.md`
+
 ## 5. 与 PiEvo 的连接
 
 当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
@@ -232,6 +248,13 @@ Smoke 结果：
 - 当前 55 个 request 全部进入 schedule；30 个 `process_completion_now` 可立即推进，25 个 `blocked_until_process_completion` 仍等待工艺补全。
 - 当前 immediate batch size 为 12，12 个任务全部是 `process_completion`；目标分布为 250 C 8 个、195 C 4 个。
 - 25 个 blocked observation request 完成后最高 authority weight 可到 3.0，但必须等对应 process completion 和 reviewer approval 之后才能进入 result intake。
+
+当前 process completion packet：
+
+- `scripts/build_process_completion_packet.py` 把 immediate batch 转成可填写字段包和 process record template。
+- 当前 packet 有 12 行，全部匹配已有 draft process record；目标分布仍为 250 C 8 个、195 C 4 个。
+- 必填字段频次最高的是 `cure_temperature_c` 和 `post_cure_temperature_c`，各 10 次；其次是 `mix_temperature_c`、`cure_time_h`、`post_cure_time_h`，各 6 次。
+- 当前 12 行基础 process record 格式通过，但 `ready_for_active_ledger_rows=0`；因为字段尚未人工填写，且 review status 仍不是 `approved_for_active_ledger`。
 
 当前 validation result intake：
 

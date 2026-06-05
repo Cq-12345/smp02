@@ -233,6 +233,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_valida
   --report reports/validation_execution_schedule.md \
   --immediate-batch-size 12
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_process_completion_packet.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/process_completion_packet.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_validation_request_results.py \
   --out-dir artifacts/trail/human_review \
   --report reports/validation_result_intake.md
@@ -265,6 +269,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --human-review-validation-summary artifacts/trail/human_review/pre_experiment_validation_plan_summary.json \
   --validation-request-summary artifacts/trail/human_review/validation_request_summary.json \
   --validation-execution-schedule-summary artifacts/trail/human_review/validation_execution_schedule_summary.json \
+  --process-completion-packet-summary artifacts/trail/human_review/process_completion_packet_summary.json \
   --validation-result-intake-summary artifacts/trail/human_review/validation_result_intake_summary.json \
   --active-observation-summary artifacts/trail/human_review/active_high_authority_observation_summary.json \
   --active-evidence-pievo-bridge-summary artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json \
@@ -425,6 +430,7 @@ Human experiment review queue 已补充：
 - `scripts/build_pre_experiment_validation_plan.py` 已把队列转成实验前验证计划：30 条都需要补工艺字段，25 条还需要高保真/扩展集成模型复核，0 条可不补工艺直接进入 DSC。
 - `scripts/build_validation_request_packet.py` 已把验证计划转成 55 个可分派 request：30 个只补工艺记录，25 个完成后可作为 `high_fidelity_simulation` 候选 observation，但都被工艺补全 gate 阻塞；当前 0 个 real DSC request。
 - `scripts/build_validation_execution_schedule.py` 已把 55 个 request 排成执行顺序：30 个 process completion 可立即执行，25 个 high-fidelity observation request 仍 blocked；当前 immediate batch 12 个任务全部是 process completion，其中 8 个来自 250 C sparse target 候选。
+- `scripts/build_process_completion_packet.py` 已把 immediate batch 展开成 12 行可填写工艺补全模板；12 行都能通过基础 process record 格式，但因字段未填和未批准，`ready_for_active_ledger=0`。
 - `scripts/import_validation_request_results.py` 已生成 25 条 high-fidelity result intake template；当前没有完成结果，因此 0 条 accepted observation、0 条 observation ledger pass。
 - `scripts/build_active_observation_ledger.py` 已把 result intake 后的 observation ledger 再过滤成 active high-authority evidence ledger；当前 0 条 active rows，因为尚无完成且获批的高保真/真实/文献观测。
 - PiEvo 外部观测加载器现在支持 `external_observation_allowed_source_types` 和 `external_observation_require_active_evidence`；active-evidence bridge 用这些二级过滤保护 posterior。

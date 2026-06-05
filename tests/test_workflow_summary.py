@@ -257,6 +257,22 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    process_completion_packet = tmp_path / "process_completion_packet.json"
+    process_completion_packet.write_text(
+        json.dumps(
+            {
+                "selected_process_completion_rows": 12,
+                "draft_record_matches": 12,
+                "unlocks_observation_rows": 12,
+                "process_record_pass_rows": 12,
+                "ready_for_active_ledger_rows": 0,
+                "process_incomplete_rows": 12,
+                "target_counts": {"195.0": 4, "250.0": 8},
+                "required_field_frequency": {"cure_temperature_c": 12, "post_cure_temperature_c": 12},
+            }
+        ),
+        encoding="utf-8",
+    )
     validation_result_intake = tmp_path / "validation_result_intake.json"
     validation_result_intake.write_text(
         json.dumps(
@@ -422,6 +438,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         human_validation,
         validation_requests,
         validation_execution,
+        process_completion_packet,
         validation_result_intake,
         active_observations,
         active_evidence_pievo_bridge,
@@ -520,6 +537,14 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["validation_execution_blocked_observation_rows"] == 25
     assert result["validation_execution_immediate_batch_target_counts"]["250.0"] == 7
     assert result["validation_execution_phase_counts"]["blocked_until_process_completion"] == 25
+    assert result["process_completion_packet_rows"] == 12
+    assert result["process_completion_packet_draft_matches"] == 12
+    assert result["process_completion_packet_unlocks_observation_rows"] == 12
+    assert result["process_completion_packet_record_pass_rows"] == 12
+    assert result["process_completion_packet_ready_for_active_ledger_rows"] == 0
+    assert result["process_completion_packet_incomplete_rows"] == 12
+    assert result["process_completion_packet_target_counts"]["250.0"] == 8
+    assert result["process_completion_packet_required_field_frequency"]["cure_temperature_c"] == 12
     assert result["validation_result_template_rows"] == 25
     assert result["validation_result_rows"] == 0
     assert result["validation_result_accepted_rows"] == 0

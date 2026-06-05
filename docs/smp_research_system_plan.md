@@ -168,10 +168,11 @@ Agent 分工：
 - `scripts/build_pre_experiment_validation_plan.py` 已把 30 条 review items 转成实验前验证计划：30 条都需要补工艺字段，25 条还需要高保真/扩展集成模型复核，0 条可在不补工艺的情况下直接进入 DSC。
 - `scripts/build_validation_request_packet.py` 已把验证计划转成 55 个可分派 request：30 个 `process_completion`、25 个 `high_fidelity_validation`、0 个 `real_dsc_planning`；25 个 high-fidelity request 都被 process completion gate 阻塞。
 - `scripts/build_validation_execution_schedule.py` 已把 request queue 转成执行排程：30 个 `process_completion_now` 可立即执行，25 个 high-fidelity request 仍 blocked；当前 immediate batch 为 12 个 process completion，其中 8 个来自 250 C sparse target。
+- `scripts/build_process_completion_packet.py` 已把 immediate batch 展开成 12 行可填写工艺补全包；12 行基础 process record 通过，但 `ready_for_active_ledger=0`，因为字段未填且未人工批准。
 - `scripts/import_validation_request_results.py` 已生成 25 条 high-fidelity result intake template；当前没有完成结果，`accepted_result_rows=0`、`observation_ledger_pass_rows=0`。
 - `scripts/build_active_observation_ledger.py` 已把 result intake 后的 observation ledger 再收敛为 active high-authority evidence ledger；当前 `active_rows=0`、`authority_weight_sum=0.0`，因为尚无完成且获批的高保真/真实/文献观测。
 - `scripts/run_active_evidence_pievo_bridge.py` 已验证 active ledger 可进入 PiEvo 外部观测加载和 full-history posterior 更新路径；当前 `bridge_status=no_active_evidence_noop`、`external_accepted_rows=0`、`active_evidence_updates_posterior=false`。
-- Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts`、`human_validation_*`、`validation_request_*`、`validation_execution_*`、`validation_result_*`、`active_observation_*`、`active_evidence_pievo_bridge_*`、全局 strategy policy 和 target-conditioned policy 的 high-authority status；这一步把“真实实验结果迭代优化”前的人工质量门禁、执行排程、posterior 消费路径和策略层 no-op 状态落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
+- Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts`、`human_validation_*`、`validation_request_*`、`validation_execution_*`、`process_completion_packet_*`、`validation_result_*`、`active_observation_*`、`active_evidence_pievo_bridge_*`、全局 strategy policy 和 target-conditioned policy 的 high-authority status；这一步把“真实实验结果迭代优化”前的人工质量门禁、执行排程、工艺补全模板、posterior 消费路径和策略层 no-op 状态落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
 
 ## 6. PiEvo-faithful 要求
 

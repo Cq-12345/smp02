@@ -382,6 +382,28 @@
     "process_completion_now": 30,
     "blocked_until_process_completion": 25
   },
+  "process_completion_packet_rows": 12,
+  "process_completion_packet_draft_matches": 12,
+  "process_completion_packet_unlocks_observation_rows": 12,
+  "process_completion_packet_record_pass_rows": 12,
+  "process_completion_packet_ready_for_active_ledger_rows": 0,
+  "process_completion_packet_incomplete_rows": 12,
+  "process_completion_packet_target_counts": {
+    "195.0": 4,
+    "250.0": 8
+  },
+  "process_completion_packet_required_field_frequency": {
+    "catalyst_loading": 3,
+    "cure_temperature_c": 10,
+    "post_cure_temperature_c": 10,
+    "mix_temperature_c": 6,
+    "cure_time_h": 6,
+    "post_cure_time_h": 6,
+    "solvent": 2,
+    "imidization_temperature_c": 2,
+    "imidization_time_h": 2,
+    "co_reactant_stoichiometry": 1
+  },
   "validation_result_template_rows": 25,
   "validation_result_rows": 0,
   "validation_result_accepted_rows": 0,

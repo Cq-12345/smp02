@@ -1,0 +1,35 @@
+{
+  "input_schedule_rows": 55,
+  "selected_process_completion_rows": 12,
+  "draft_record_matches": 12,
+  "unlocks_observation_rows": 12,
+  "target_counts": {
+    "195.0": 4,
+    "250.0": 8
+  },
+  "candidate_origin_counts": {
+    "sparse_target_replacement_250": 8,
+    "pievo_latent_local_search_selected": 3,
+    "vae_latent_local_search": 1
+  },
+  "required_field_frequency": {
+    "catalyst_loading": 3,
+    "cure_temperature_c": 10,
+    "post_cure_temperature_c": 10,
+    "mix_temperature_c": 6,
+    "cure_time_h": 6,
+    "post_cure_time_h": 6,
+    "solvent": 2,
+    "imidization_temperature_c": 2,
+    "imidization_time_h": 2,
+    "co_reactant_stoichiometry": 1
+  },
+  "process_record_pass_rows": 12,
+  "ready_for_active_ledger_rows": 0,
+  "process_incomplete_rows": 12,
+  "packet_path": "artifacts/trail/human_review/process_completion_packet.csv",
+  "process_template_path": "artifacts/trail/human_review/process_completion_process_record_template.csv",
+  "process_ledger_path": "artifacts/trail/human_review/process_completion_process_record_ledger.csv",
+  "summary_path": "artifacts/trail/human_review/process_completion_packet_summary.json",
+  "report_path": "reports/process_completion_packet.md"
+}
