@@ -1,0 +1,30 @@
+{
+  "n_components": 743,
+  "source_counts": {
+    "library": 225,
+    "generated": 10,
+    "chembl": 459,
+    "literature_template": 49
+  },
+  "n_functional_groups": 18,
+  "top_functional_groups": {
+    "aromatic": 520,
+    "ether": 442,
+    "hydroxyl": 289,
+    "secondary_amine": 234,
+    "ester": 219,
+    "vinyl": 214,
+    "primary_amine": 167,
+    "carboxylic_acid": 91,
+    "phenol": 75,
+    "epoxy": 52,
+    "nitrile": 36,
+    "imide": 28,
+    "acrylate_or_methacrylate": 28,
+    "thiol": 24,
+    "anhydride": 16,
+    "isocyanate": 16,
+    "maleimide": 16,
+    "cyanate_ester": 15
+  }
+}

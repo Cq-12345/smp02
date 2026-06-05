@@ -70,7 +70,8 @@ def build_inventory(data_path: Path, chembl_path: Path, chembl_limit: int, inclu
 def functional_group_index(inventory: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for _, row in inventory.iterrows():
-        groups = set(str(row.get("groups", "")).split(";")) - {""}
+        raw_groups = "" if pd.isna(row.get("groups", "")) else str(row.get("groups", ""))
+        groups = set(raw_groups.split(";")) - {"", "nan", "None"}
         for group in sorted(groups):
             rows.append({"group": group, "smiles": row["smiles"], "source": row["source"], "label": row["label"]})
     return pd.DataFrame(rows)

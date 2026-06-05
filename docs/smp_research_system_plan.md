@@ -45,6 +45,7 @@
 
 - `library`：`data/SMP_Dataset.xlsx` 中出现过的单体。
 - `generated`：人工模板/规则生成的小分子 monomer seeds。
+- `literature_template`：面向 cyanate ester、maleimide、isocyanate、anhydride、thiol 等稀疏高价值官能团的可审计小分子模板。
 - `chembl`：`data/chembl_36_chemreps.txt` 中经 RDKit、charset、元素和官能团规则筛选后的候选。
 
 组织方式：
@@ -59,6 +60,9 @@
 - `agent_discovery` 会输出 `monomer_pool.csv`。
 - `discovery` 会输出 `monomer_functional_groups.csv`、`compatible_monomer_pairs.csv`。
 - `pievo_faithful` 会复用同一候选池，但把候选选择交给 IDS。
+- `trail/candidates/build_component_inventory.py` 会输出 `component_inventory.csv` 和 `functional_group_index.csv`。
+- `scripts/expand_sparse_candidate_templates.py` 已生成 `artifacts/trail/candidates_expanded/component_inventory.csv`，候选数从 694 增至 743。
+- expanded source audit 显示 `cyanate_ester/maleimide/isocyanate/anhydride/thiol` 都已达到当前 sparse coverage 阈值。
 
 ## 3. 预测模型
 

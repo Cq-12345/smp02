@@ -11,6 +11,7 @@ Sources:
 
 - `library`: monomers appearing in `data/SMP_Dataset.xlsx`.
 - `generated`: thermoset-inspired generated monomer seeds from `src/smp02/agent_discovery.py`.
+- `literature_template`: curated small-molecule templates for sparse high-value thermoset groups.
 - `chembl`: screened molecules from `data/chembl_36_chemreps.txt`.
 - `generation_record`: generated hypotheses from the generation ledger; these are not trusted as library molecules.
 
@@ -47,3 +48,20 @@ Audit outputs:
 - `candidate_source_summary.csv`: source type, authority level, component count, and top functional groups.
 - `functional_group_source_coverage.csv`: functional-group coverage split by source.
 - `candidate_source_audit_summary.json`: sparse high-value groups that need literature or curated-template expansion.
+
+Sparse group expansion:
+
+```bash
+PYTHONPATH=src python scripts/expand_sparse_candidate_templates.py \
+  --base-inventory artifacts/trail/candidates_smoke/component_inventory.csv \
+  --templates trail/candidates/sparse_functional_group_templates.yaml \
+  --registry trail/candidates/source_registry.yaml \
+  --out-dir artifacts/trail/candidates_expanded \
+  --report reports/sparse_candidate_template_expansion.md
+
+PYTHONPATH=src python scripts/audit_candidate_sources.py \
+  --inventory artifacts/trail/candidates_expanded/component_inventory.csv \
+  --registry trail/candidates/source_registry.yaml \
+  --out-dir artifacts/trail/candidates_expanded_source_audit \
+  --report reports/candidate_source_audit_expanded.md
+```

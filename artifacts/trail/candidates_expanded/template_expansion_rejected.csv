@@ -1,0 +1,2 @@
+label,intended_group,family,smiles,canonical_smiles,detected_groups,reason
+template_diisocyanate_hdi,isocyanate,isocyanate,O=C=NCCCCCCN=C=O,O=C=NCCCCCCN=C=O,isocyanate,duplicate_with_existing_inventory

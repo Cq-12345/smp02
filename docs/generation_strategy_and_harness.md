@@ -131,6 +131,9 @@ h = (m_1..m_n, r_1..r_n)
 - `trail/rag/simple_retriever.py`：RAG smoke 检索器，已过滤单字符和纯数字 query token，避免 `C`、`0` 这类噪声压过 strict feedback 上下文。
 - `trail/knowledge/smp_prior_knowledge.yaml`
 - `artifacts/trail/candidates_smoke/component_inventory.csv`
+- `artifacts/trail/candidates_expanded/component_inventory.csv`
+- `reports/sparse_candidate_template_expansion.md`
+- `reports/candidate_source_audit_expanded.md`
 - `trail/generation/generation_record_schema.yaml`
 - `trail/generation/import_generation_records.py`
 - `scripts/build_prompt_generation_records.py`

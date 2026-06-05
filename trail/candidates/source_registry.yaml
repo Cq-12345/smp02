@@ -30,6 +30,20 @@ sources:
       - search_space_bootstrap
       - sparse_functional_group_augmentation
       - generation_prompt_examples
+  literature_template:
+    source_type: curated_literature_template
+    authority_level: 2
+    provenance:
+      - trail/candidates/sparse_functional_group_templates.yaml
+      - docs/functional_group_classification_and_matching.md
+      - trail/knowledge/smp_prior_knowledge.yaml
+    role: Curated small-molecule templates for sparse high-value thermoset functional groups such as cyanate ester, maleimide, isocyanate, anhydride, and thiol.
+    trust_notes: Template molecules are chemically motivated candidate components, not Tg-labelled observations; every use still requires RDKit, predictor, Harness, PiEvo, and human/process review.
+    expected_use:
+      - sparse_functional_group_augmentation
+      - replacement_pool
+      - generation_prompt_examples
+      - out_of_library_candidate_bootstrap
   chembl:
     source_type: database_screen
     authority_level: 1

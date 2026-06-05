@@ -127,6 +127,7 @@ def write_report(
             "",
             "- `library` 是当前最高权重来源，因为它直接来自本地 SMP 数据集和论文复现材料。",
             "- `generated` 用来补足热固性常见但数据稀疏的结构；它不是实验标签来源，必须继续通过 predictor/Harness/PiEvo。",
+            "- `literature_template` 用手工整理的小分子模板补足稀疏热固性官能团；它仍是候选来源，不是 Tg 标签来源。",
             "- `chembl` 提供新颖性和 OOD 探索，但 authority 较低，尤其需要过滤 drug-like 复杂结构。",
             "- 稀疏高价值官能团应优先从 SMP 论文或人工规则模板扩展，而不是盲目扩大 ChEMBL 数量。",
             "- 后续真实 LLM/RAG 生成出的候选应通过 generation record ledger 进入 `generation_record` 来源，而不是直接混入 library。",

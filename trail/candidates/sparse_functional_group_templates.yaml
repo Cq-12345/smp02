@@ -1,0 +1,63 @@
+template_set: sparse_high_value_smp_monomer_templates
+version: 1
+representation_scope: single_small_molecule_smiles_or_molecode
+source: literature_template
+trust_notes: >
+  Curated thermoset/SMP-inspired small-molecule monomer templates for sparse
+  high-value functional groups. These are candidate components only, not Tg
+  labels or verified physical observations.
+templates:
+  - {label: template_cyanate_phenyl, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1ccccc1"}
+  - {label: template_cyanate_cresyl, intended_group: cyanate_ester, family: cyanate_ester, smiles: "Cc1ccc(OC#N)cc1"}
+  - {label: template_dicyanate_hydroquinone, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1ccc(OC#N)cc1"}
+  - {label: template_dicyanate_resorcinol, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1cccc(OC#N)c1"}
+  - {label: template_dicyanate_methylene_bisphenyl, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1ccc(Cc2ccc(OC#N)cc2)cc1"}
+  - {label: template_dicyanate_sulfone_bisphenyl, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1ccc(S(=O)(=O)c2ccc(OC#N)cc2)cc1"}
+  - {label: template_dicyanate_ether_bisphenyl, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1ccc(Oc2ccc(OC#N)cc2)cc1"}
+  - {label: template_dicyanate_fluoromethylene, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1ccc(C(F)(F)c2ccc(OC#N)cc2)cc1"}
+  - {label: template_dicyanate_orthobiphenyl, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1ccc(-c2ccccc2OC#N)cc1"}
+  - {label: template_dicyanate_benzophenone, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1ccc(C(=O)c2ccc(OC#N)cc2)cc1"}
+  - {label: template_dicyanate_dimethyl_phenyl, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1cc(OC#N)ccc1C"}
+  - {label: template_dicyanate_hexafluoro_bisphenyl, intended_group: cyanate_ester, family: cyanate_ester, smiles: "N#COc1ccc(C(C(F)(F)F)(C(F)(F)F)c2ccc(OC#N)cc2)cc1"}
+
+  - {label: template_maleimide_unsubstituted, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1"}
+  - {label: template_maleimide_methyl, intended_group: maleimide, family: maleimide, smiles: "CN1C(=O)C=CC1=O"}
+  - {label: template_maleimide_phenyl, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1c1ccccc1"}
+  - {label: template_bismaleimide_phenylene_para, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1c1ccc(N2C(=O)C=CC2=O)cc1"}
+  - {label: template_bismaleimide_phenylene_meta, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1c1cccc(N2C(=O)C=CC2=O)c1"}
+  - {label: template_bismaleimide_ethylenediamine, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1CCN2C(=O)C=CC2=O"}
+  - {label: template_bismaleimide_ether_aliphatic, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1CCOCCN2C(=O)C=CC2=O"}
+  - {label: template_bismaleimide_sulfone_bisphenyl, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1c1ccc(S(=O)(=O)c2ccc(N3C(=O)C=CC3=O)cc2)cc1"}
+  - {label: template_bismaleimide_bpa_core, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1c1ccc(C(C)(C)c2ccc(N3C(=O)C=CC3=O)cc2)cc1"}
+  - {label: template_bismaleimide_fluoro_core, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1c1ccc(C(F)(F)c2ccc(N3C(=O)C=CC3=O)cc2)cc1"}
+  - {label: template_bismaleimide_ortho_phenyl, intended_group: maleimide, family: maleimide, smiles: "O=C1C=CC(=O)N1c1ccccc1N2C(=O)C=CC2=O"}
+
+  - {label: template_isocyanate_phenyl, intended_group: isocyanate, family: isocyanate, smiles: "O=C=Nc1ccccc1"}
+  - {label: template_isocyanate_tolyl, intended_group: isocyanate, family: isocyanate, smiles: "Cc1ccc(N=C=O)cc1"}
+  - {label: template_diisocyanate_metaphenylene, intended_group: isocyanate, family: isocyanate, smiles: "O=C=Nc1cccc(N=C=O)c1"}
+  - {label: template_diisocyanate_ether_bisphenyl, intended_group: isocyanate, family: isocyanate, smiles: "O=C=Nc1ccc(Oc2ccc(N=C=O)cc2)cc1"}
+  - {label: template_diisocyanate_sulfone_bisphenyl, intended_group: isocyanate, family: isocyanate, smiles: "O=C=Nc1ccc(S(=O)(=O)c2ccc(N=C=O)cc2)cc1"}
+  - {label: template_diisocyanate_bpa_core, intended_group: isocyanate, family: isocyanate, smiles: "CC(C)(c1ccc(N=C=O)cc1)c1ccc(N=C=O)cc1"}
+  - {label: template_diisocyanate_hdi, intended_group: isocyanate, family: isocyanate, smiles: "O=C=NCCCCCCN=C=O"}
+  - {label: template_diisocyanate_ethylene, intended_group: isocyanate, family: isocyanate, smiles: "O=C=NCCN=C=O"}
+  - {label: template_diisocyanate_tbutyl_phenyl, intended_group: isocyanate, family: isocyanate, smiles: "CC(C)(C)c1cc(N=C=O)ccc1N=C=O"}
+  - {label: template_diisocyanate_fluoro_core, intended_group: isocyanate, family: isocyanate, smiles: "O=C=Nc1ccc(C(F)(F)c2ccc(N=C=O)cc2)cc1"}
+
+  - {label: template_anhydride_phthalic, intended_group: anhydride, family: anhydride, smiles: "O=C1OC(=O)c2ccccc21"}
+  - {label: template_anhydride_maleic, intended_group: anhydride, family: anhydride, smiles: "O=C1OC(=O)C=C1"}
+  - {label: template_dianhydride_methylene_bisphenyl, intended_group: anhydride, family: anhydride, smiles: "O=C1OC(=O)c2ccc(Cc3ccc4c(c3)C(=O)OC4=O)cc21"}
+  - {label: template_dianhydride_sulfone_bisphenyl, intended_group: anhydride, family: anhydride, smiles: "O=C1OC(=O)c2ccc(S(=O)(=O)c3ccc4c(c3)C(=O)OC4=O)cc21"}
+  - {label: template_dianhydride_trifluoromethyl_phthalic, intended_group: anhydride, family: anhydride, smiles: "O=C1OC(=O)c2cc(C(F)(F)F)ccc21"}
+  - {label: template_dianhydride_fluoro_methylene_bisphenyl, intended_group: anhydride, family: anhydride, smiles: "O=C1OC(=O)c2cc(C(F)(F)c3ccc4c(c3)C(=O)OC4=O)ccc21"}
+
+  - {label: template_thiol_benzyl, intended_group: thiol, family: thiol, smiles: "SCc1ccccc1"}
+  - {label: template_dithiol_butane, intended_group: thiol, family: thiol, smiles: "SCCCCS"}
+  - {label: template_dithiol_secondary, intended_group: thiol, family: thiol, smiles: "CC(S)CCS"}
+  - {label: template_thiol_phenyl, intended_group: thiol, family: thiol, smiles: "Sc1ccccc1"}
+  - {label: template_dithiol_hydroquinone, intended_group: thiol, family: thiol, smiles: "Sc1ccc(S)cc1"}
+  - {label: template_dithiol_ether, intended_group: thiol, family: thiol, smiles: "SCCOCCS"}
+  - {label: template_dithiol_amine, intended_group: thiol, family: thiol, smiles: "SCCNCCS"}
+  - {label: template_thiol_acid, intended_group: thiol, family: thiol, smiles: "SCC(=O)O"}
+  - {label: template_thiol_allyl, intended_group: thiol, family: thiol, smiles: "C=CCS"}
+  - {label: template_dithiol_ethane, intended_group: thiol, family: thiol, smiles: "SCCS"}
+  - {label: template_dithiol_propoxy, intended_group: thiol, family: thiol, smiles: "SCCCOCCCS"}

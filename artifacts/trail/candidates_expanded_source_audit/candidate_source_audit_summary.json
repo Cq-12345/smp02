@@ -1,0 +1,13 @@
+{
+  "inventory_rows": 743,
+  "registered_sources": 5,
+  "inventory_sources": {
+    "chembl": 459,
+    "library": 225,
+    "literature_template": 49,
+    "generated": 10
+  },
+  "unregistered_inventory_sources": [],
+  "functional_groups": 18,
+  "sparse_high_value_groups_needing_expansion": []
+}

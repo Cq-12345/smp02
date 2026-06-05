@@ -1,0 +1,13 @@
+{
+  "base_inventory_rows": 694,
+  "expanded_inventory_rows": 743,
+  "added_templates": 49,
+  "rejected_templates": 1,
+  "source_counts": {
+    "chembl": 459,
+    "library": 225,
+    "literature_template": 49,
+    "generated": 10
+  },
+  "sparse_high_value_groups_needing_expansion": []
+}
