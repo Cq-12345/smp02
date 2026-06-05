@@ -177,6 +177,46 @@ pievo_faithful:
 - `src/smp02/pievo_faithful.py::target_guard_selection_pool`
 - `src/smp02/pievo_faithful.py::select_by_ids`
 
+### 2.9 Ensemble-Guard IDS
+
+上一轮 predictor ensemble disagreement 审计只覆盖了一个固定 discovery candidate CSV。为了让该信号真正进入 PiEvo，每轮 PiEvo 现在会对自己实际生成的候选批次运行同一组 top-k VAE-WVCM model-zoo predictors，并计算：
+
+```text
+mu_ens(h) = mean_m f_m(h)
+sigma_ens(h) = std_m f_m(h)
+```
+
+其中 `f_m` 是 GPR、NuSVR、XGBoost、ExtraTrees、GradientBoosting 等已训练 surrogate。`sigma_ens(h)` 是模型间分歧，不是物理真实不确定性。它不进入 principle likelihood，也不会被当成真实 observation；它只用于收缩选择域和标记人工审核优先级：
+
+```text
+H_target = {h in H : |T_primary(h) - T_target| <= delta}
+H_risk = {h in H_target : sigma_ens(h) <= tau_ens}
+h_t = argmin_{h in H_risk} Delta_t(h)^2 / (I_t(h) + eps)
+```
+
+如果 `H_risk` 数量不足，系统回退到 `H_target`，避免因为 ensemble 过保守而完全停止探索。这样保留 PiEvo 的 IDS 数学结构：posterior 仍由 full-history likelihood 更新，ensemble disagreement 只是候选选择/人工复核层面的 epistemic risk gate。
+
+配置：
+
+```yaml
+pievo_faithful:
+  ensemble_disagreement_enabled: true
+  ensemble_metrics_path: artifacts/reproduce/predictors/all_predictor_metrics.csv
+  ensemble_top_k: 6
+  ensemble_consensus_std_c: 10.0
+  ensemble_high_disagreement_std_c: 25.0
+  ensemble_disagreement_guard_enabled: true
+  ensemble_disagreement_guard_max_std_c: 25.0
+  ensemble_disagreement_guard_min_candidates: 1
+```
+
+实现位置：
+
+- `src/smp02/pievo_faithful.py::load_predictor_ensemble`
+- `src/smp02/pievo_faithful.py::attach_live_ensemble_disagreement`
+- `src/smp02/pievo_faithful.py::target_guard_selection_pool`
+- `src/smp02/pievo_faithful.py::select_by_ids`
+
 ## 3. 当前输出
 
 运行：
@@ -192,6 +232,7 @@ smp02 pievo-faithful --config configs/pievo_faithful_smoke.yaml
 - `external_observations_used.csv`：本轮实际接收的外部 ledger 观测。
 - `external_observation_summary.json`：外部观测接收、拒绝、来源计数和权重汇总。
 - `candidate_diagnostics.csv`：候选的 expected reward、IDS regret、information gain、IDS ratio。
+- `predictor_ensemble_members.csv`：当启用 live ensemble disagreement 时，本轮使用的 top-k predictor 成员。
 - `principle_posterior.json`：最终 principle 后验。
 - `principles.json`：初始和 anomaly-derived principles。
 - `round_history.json`：每轮 anomaly、posterior entropy、MAP principle、选择方式。

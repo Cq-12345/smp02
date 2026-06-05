@@ -32,6 +32,7 @@ def summarize(
     feedback_aware_observation_ledger: Path,
     feedback_aware_pievo_summary: Path,
     ensemble_disagreement_summary: Path,
+    ensemble_guard_pievo_summary: Path,
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -41,6 +42,7 @@ def summarize(
     feedback_aware_observations = pd.read_csv(feedback_aware_observation_ledger) if feedback_aware_observation_ledger.exists() else pd.DataFrame()
     feedback_aware_pievo = read_json(feedback_aware_pievo_summary, {})
     ensemble_disagreement = read_json(ensemble_disagreement_summary, {})
+    ensemble_guard_pievo = read_json(ensemble_guard_pievo_summary, {})
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
@@ -68,6 +70,10 @@ def summarize(
         "predictor_ensemble_high_disagreement_rows": ensemble_disagreement.get("near_target_high_disagreement_rows", 0),
         "predictor_ensemble_mean_std_c": ensemble_disagreement.get("mean_ensemble_std_c"),
         "predictor_ensemble_mean_abs_best_model_delta_c": ensemble_disagreement.get("mean_abs_best_model_delta_c"),
+        "pievo_ensemble_guard_selected_rows": ensemble_guard_pievo.get("selected_rows", 0),
+        "pievo_ensemble_guard_best_distance_c": ensemble_guard_pievo.get("best_selected_target_distance_c"),
+        "pievo_ensemble_guard_all_selected_within_guard": ensemble_guard_pievo.get("all_selected_within_ensemble_disagreement_guard"),
+        "pievo_ensemble_guard_mean_selected_std_c": ensemble_guard_pievo.get("mean_selected_predictor_ensemble_std_tg_c"),
         "generation_feedback": feedback,
     }
 
@@ -82,6 +88,7 @@ def main() -> None:
     parser.add_argument("--feedback-aware-observation-ledger", default="artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv")
     parser.add_argument("--feedback-aware-pievo-summary", default="artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--ensemble-disagreement-summary", default="artifacts/trail/predictors/ensemble_disagreement/ensemble_disagreement_summary.json")
+    parser.add_argument("--ensemble-guard-pievo-summary", default="artifacts/pievo_faithful_ensemble_guard_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
     result = summarize(
@@ -93,6 +100,7 @@ def main() -> None:
         Path(args.feedback_aware_observation_ledger),
         Path(args.feedback_aware_pievo_summary),
         Path(args.ensemble_disagreement_summary),
+        Path(args.ensemble_guard_pievo_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

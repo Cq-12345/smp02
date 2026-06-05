@@ -218,6 +218,57 @@ def test_target_guard_limits_warmup_selection_to_near_target_candidates() -> Non
     assert diagnostics.loc[0, "pievo_selection_method"] == "target_guard_warmup_max_variance"
 
 
+def test_ensemble_disagreement_guard_limits_warmup_selection_to_low_risk_candidates() -> None:
+    principles = [Principle("ensemble_guard_test", "soft", "test principle", "feature_a", 1.0, 1.0, 1.0)]
+    candidates = pd.DataFrame(
+        [
+            {
+                "formula_id": "low_disagreement",
+                "target_distance_c": 1.0,
+                "predicted_tg_mean_c": 249.0,
+                "predicted_tg_sigma_c": 1.0,
+                "predictor_ensemble_std_tg_c": 8.0,
+                "prior_score": 0.0,
+                "ood_penalty": 0.0,
+                "n_components": 2,
+                "new_component_count": 1,
+                "feature_feature_a": True,
+            },
+            {
+                "formula_id": "high_disagreement_high_variance",
+                "target_distance_c": 100.0,
+                "predicted_tg_mean_c": 150.0,
+                "predicted_tg_sigma_c": 1.0,
+                "predictor_ensemble_std_tg_c": 80.0,
+                "prior_score": 0.0,
+                "ood_penalty": 0.0,
+                "n_components": 2,
+                "new_component_count": 1,
+                "feature_feature_a": True,
+            },
+        ]
+    )
+    cfg = fake_pievo_cfg()
+    cfg.ensemble_disagreement_guard_enabled = True
+    cfg.ensemble_disagreement_guard_max_std_c = 25.0
+    selected, diagnostics = select_by_ids(
+        candidates,
+        principles,
+        {"ensemble_guard_test": 1.0},
+        {"ensemble_guard_test": DistanceVarianceExpert()},
+        [],
+        fake_agent_cfg(),
+        cfg,
+        np.random.default_rng(42),
+    )
+    assert selected["formula_id"] == "low_disagreement"
+    assert bool(diagnostics.loc[0, "pievo_selection_pool_member"]) is True
+    assert bool(diagnostics.loc[1, "pievo_selection_pool_member"]) is False
+    assert diagnostics.loc[0, "pievo_selection_method"] == "ensemble_disagreement_guard_warmup_max_variance"
+    assert bool(diagnostics.loc[0, "pievo_ensemble_disagreement_guard_active"]) is True
+    assert diagnostics.loc[0, "pievo_ensemble_disagreement_guard_candidate_count"] == 1
+
+
 def test_surprisal_score_increases_with_residual() -> None:
     low = surprisal_score(y=0.9, mean=0.88, model_variance=0.01, observation_noise=0.05)
     high = surprisal_score(y=0.9, mean=0.1, model_variance=0.01, observation_noise=0.05)

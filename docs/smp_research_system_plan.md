@@ -72,6 +72,7 @@
 - 扩展 model zoo：MLP、GBR、KRR、LightGBM、XGBoost、CatBoost、NGBoost、ExtraTrees、GPR、KNN、PLS、ElasticNet 等。
 - GNN 草案：`trail/gnn/train_gnn.py`。
 - 集成分歧审计：`scripts/run_predictor_ensemble_disagreement.py` 会从同一 latent size 的强模型中计算候选级 ensemble mean/std/range，把 epistemic/OOD 风险写入 `artifacts/trail/predictors/ensemble_disagreement/`。
+- PiEvo live ensemble guard：`configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 会对 PiEvo 每轮实际候选批次运行 top-k model zoo，并用 `predictor_ensemble_std_tg_c` 收缩 IDS selection pool。
 
 关键指标：
 
@@ -87,7 +88,7 @@
 - 默认遵循论文 85/15 train/test split。
 - 模型选择应优先看 `MAPEK test`、`MAE test`、`RMSE test` 和 R2 的综合表现。
 - 任何用于 agent 的 predictor 都必须保存模型路径、latent size、训练特征路径和指标。
-- 单一最佳模型不能单独决定推荐顺序；当前 workflow 同时记录 target distance、Harness、PiEvo posterior 和 predictor ensemble disagreement。
+- 单一最佳模型不能单独决定推荐顺序；当前 workflow 同时记录 target distance、Harness、PiEvo posterior 和 predictor ensemble disagreement，并已能在 PiEvo selection pool 中过滤高分歧候选。
 
 ## 4. 生成模型策略
 

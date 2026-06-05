@@ -40,6 +40,18 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    ensemble_guard_pievo = tmp_path / "ensemble_guard_pievo.json"
+    ensemble_guard_pievo.write_text(
+        json.dumps(
+            {
+                "selected_rows": 6,
+                "best_selected_target_distance_c": 0.059,
+                "all_selected_within_ensemble_disagreement_guard": True,
+                "mean_selected_predictor_ensemble_std_tg_c": 16.4,
+            }
+        ),
+        encoding="utf-8",
+    )
 
     result = summarize(
         candidates,
@@ -50,6 +62,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         observations,
         pievo_summary,
         ensemble_summary,
+        ensemble_guard_pievo,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -58,3 +71,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["predictor_ensemble_high_disagreement_rows"] == 526
     assert result["predictor_ensemble_mean_std_c"] == 32.16
     assert result["predictor_ensemble_mean_abs_best_model_delta_c"] == 30.37
+    assert result["pievo_ensemble_guard_selected_rows"] == 6
+    assert result["pievo_ensemble_guard_best_distance_c"] == 0.059
+    assert result["pievo_ensemble_guard_all_selected_within_guard"] is True
+    assert result["pievo_ensemble_guard_mean_selected_std_c"] == 16.4

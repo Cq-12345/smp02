@@ -233,6 +233,10 @@
   "predictor_ensemble_high_disagreement_rows": 526,
   "predictor_ensemble_mean_std_c": 32.16103728846615,
   "predictor_ensemble_mean_abs_best_model_delta_c": 30.374043040674035,
+  "pievo_ensemble_guard_selected_rows": 6,
+  "pievo_ensemble_guard_best_distance_c": 0.05903230553539629,
+  "pievo_ensemble_guard_all_selected_within_guard": true,
+  "pievo_ensemble_guard_mean_selected_std_c": 16.397674841209618,
   "generation_feedback": {
     "generation_records": 4,
     "generation_harness_pass": 3,

@@ -25,6 +25,7 @@ from smp02.agent_discovery import (
     encode_pool,
     evaluate_formulas,
     fingerprint_diversity,
+    formulas_to_features,
     formula_features,
     formula_key,
     functionality_estimate,
@@ -34,6 +35,7 @@ from smp02.agent_discovery import (
     monomer_pool_frame,
     ood_reference_scale,
     parse_agent_config,
+    predict_with_uncertainty,
     random_formulas,
     safe_slug,
     systematic_pair_formulas,
@@ -66,6 +68,16 @@ class PiEvoFaithfulConfig:
     target_guard_enabled: bool = False
     target_guard_max_distance_c: float = 5.0
     target_guard_min_candidates: int = 1
+    ensemble_disagreement_enabled: bool = False
+    ensemble_metrics_path: Path | None = None
+    ensemble_top_k: int = 6
+    ensemble_selection_metric: str = "MAPEK test dataset (%)"
+    ensemble_selection_higher_is_better: bool = False
+    ensemble_consensus_std_c: float = 10.0
+    ensemble_high_disagreement_std_c: float = 25.0
+    ensemble_disagreement_guard_enabled: bool = False
+    ensemble_disagreement_guard_max_std_c: float = 25.0
+    ensemble_disagreement_guard_min_candidates: int = 1
 
 
 @dataclass
@@ -141,6 +153,7 @@ def parse_pievo_faithful_config(cfg: dict, agent_cfg: AgentConfig) -> PiEvoFaith
     default_out = agent_cfg.output_dir.parent / f"{agent_cfg.output_dir.name}_pievo_faithful"
     external_ledger = raw.get("external_observation_ledger")
     external_limit = raw.get("external_observation_limit")
+    ensemble_metrics = raw.get("ensemble_metrics_path", "artifacts/reproduce/predictors/all_predictor_metrics.csv")
     return PiEvoFaithfulConfig(
         output_dir=Path(raw.get("output_dir", default_out)),
         rounds=int(raw.get("rounds", 12)),
@@ -160,6 +173,16 @@ def parse_pievo_faithful_config(cfg: dict, agent_cfg: AgentConfig) -> PiEvoFaith
         target_guard_enabled=bool(raw.get("target_guard_enabled", False)),
         target_guard_max_distance_c=float(raw.get("target_guard_max_distance_c", agent_cfg.target_window_c)),
         target_guard_min_candidates=int(raw.get("target_guard_min_candidates", 1)),
+        ensemble_disagreement_enabled=bool(raw.get("ensemble_disagreement_enabled", False)),
+        ensemble_metrics_path=None if ensemble_metrics in {None, ""} else Path(ensemble_metrics),
+        ensemble_top_k=int(raw.get("ensemble_top_k", 6)),
+        ensemble_selection_metric=str(raw.get("ensemble_selection_metric", "MAPEK test dataset (%)")),
+        ensemble_selection_higher_is_better=bool(raw.get("ensemble_selection_higher_is_better", False)),
+        ensemble_consensus_std_c=float(raw.get("ensemble_consensus_std_c", 10.0)),
+        ensemble_high_disagreement_std_c=float(raw.get("ensemble_high_disagreement_std_c", 25.0)),
+        ensemble_disagreement_guard_enabled=bool(raw.get("ensemble_disagreement_guard_enabled", False)),
+        ensemble_disagreement_guard_max_std_c=float(raw.get("ensemble_disagreement_guard_max_std_c", raw.get("ensemble_high_disagreement_std_c", 25.0))),
+        ensemble_disagreement_guard_min_candidates=int(raw.get("ensemble_disagreement_guard_min_candidates", 1)),
     )
 
 
@@ -220,6 +243,105 @@ def finite_or_default(value: object, default: float) -> float:
     except (TypeError, ValueError):
         return float(default)
     return number if math.isfinite(number) else float(default)
+
+
+def disagreement_bucket(std_c: float, consensus_std_c: float, high_std_c: float) -> str:
+    if not math.isfinite(float(std_c)):
+        return "unavailable"
+    if float(std_c) <= float(consensus_std_c):
+        return "low_disagreement"
+    if float(std_c) >= float(high_std_c):
+        return "high_disagreement"
+    return "moderate_disagreement"
+
+
+def select_ensemble_predictors(metrics: pd.DataFrame, agent_cfg: AgentConfig, pievo_cfg: PiEvoFaithfulConfig) -> pd.DataFrame:
+    metric = pievo_cfg.ensemble_selection_metric
+    if metric not in metrics.columns:
+        raise ValueError(f"Missing ensemble selection metric column: {metric}")
+    frame = metrics.copy()
+    frame = frame[(frame["latent_size"].astype(int) == int(agent_cfg.latent_size)) & (frame["predictor_kind"].astype(str) == "joblib")]
+    frame = frame[frame["model_path"].astype(str).map(lambda path: Path(path).exists())]
+    frame = frame.replace([np.inf, -np.inf], np.nan).dropna(subset=[metric])
+    if frame.empty:
+        raise ValueError(f"No usable ensemble predictors for latent_size={agent_cfg.latent_size}, metric={metric}.")
+    return frame.sort_values(metric, ascending=not pievo_cfg.ensemble_selection_higher_is_better).head(pievo_cfg.ensemble_top_k).reset_index(drop=True)
+
+
+def load_predictor_ensemble(agent_cfg: AgentConfig, pievo_cfg: PiEvoFaithfulConfig) -> tuple[list[dict[str, object]], pd.DataFrame]:
+    if not pievo_cfg.ensemble_disagreement_enabled:
+        return [], pd.DataFrame()
+    if pievo_cfg.ensemble_metrics_path is None:
+        raise ValueError("ensemble_disagreement_enabled requires ensemble_metrics_path.")
+    if not pievo_cfg.ensemble_metrics_path.exists():
+        raise FileNotFoundError(f"Missing ensemble metrics file: {pievo_cfg.ensemble_metrics_path}")
+    predictors = select_ensemble_predictors(pd.read_csv(pievo_cfg.ensemble_metrics_path), agent_cfg, pievo_cfg)
+    members: list[dict[str, object]] = []
+    for _, row in predictors.iterrows():
+        members.append(
+            {
+                "name": str(row["ML method"]),
+                "slug": safe_slug(str(row["ML method"]).replace(f"VAE ({agent_cfg.latent_size}) + ", "")),
+                "path": str(row["model_path"]),
+                "bundle": load_predictor(row["model_path"]),
+            }
+        )
+    return members, predictors
+
+
+def attach_live_ensemble_disagreement(
+    scored: pd.DataFrame,
+    formulas: list[FormulaCandidate],
+    vectors: dict[str, np.ndarray],
+    ensemble_members: list[dict[str, object]],
+    agent_cfg: AgentConfig,
+    pievo_cfg: PiEvoFaithfulConfig,
+) -> pd.DataFrame:
+    if not ensemble_members or scored.empty:
+        return scored
+    result = scored.copy()
+    x = formulas_to_features(formulas, vectors, agent_cfg.latent_size)
+    prediction_values: list[np.ndarray] = []
+    for member in ensemble_members:
+        pred, sigma = predict_with_uncertainty(member["bundle"], x)
+        slug = str(member["slug"])
+        result[f"predictor_ensemble_pred_{slug}_tg_c"] = pred
+        if np.isfinite(sigma).any():
+            result[f"predictor_ensemble_sigma_{slug}_tg_c"] = sigma
+        prediction_values.append(np.asarray(pred, dtype=float))
+    values = np.vstack(prediction_values).T
+    result["predictor_ensemble_model_count"] = int(values.shape[1])
+    result["predictor_ensemble_mean_tg_c"] = np.mean(values, axis=1)
+    result["predictor_ensemble_std_tg_c"] = np.std(values, axis=1, ddof=0)
+    result["predictor_ensemble_min_tg_c"] = np.min(values, axis=1)
+    result["predictor_ensemble_max_tg_c"] = np.max(values, axis=1)
+    result["predictor_ensemble_range_tg_c"] = result["predictor_ensemble_max_tg_c"] - result["predictor_ensemble_min_tg_c"]
+    result["predictor_ensemble_target_distance_c"] = (result["predictor_ensemble_mean_tg_c"] - float(agent_cfg.target_tg_c)).abs()
+    result["predictor_ensemble_best_model_delta_c"] = result["predictor_ensemble_mean_tg_c"] - pd.to_numeric(
+        result["predicted_tg_mean_c"],
+        errors="coerce",
+    )
+    result["predictor_ensemble_disagreement_bucket"] = [
+        disagreement_bucket(value, pievo_cfg.ensemble_consensus_std_c, pievo_cfg.ensemble_high_disagreement_std_c)
+        for value in result["predictor_ensemble_std_tg_c"].astype(float)
+    ]
+    result["predictor_ensemble_near_target"] = result["predictor_ensemble_target_distance_c"] <= float(agent_cfg.target_window_c)
+    result["predictor_ensemble_near_target_low_disagreement"] = (
+        result["predictor_ensemble_near_target"]
+        & (result["predictor_ensemble_std_tg_c"] <= float(pievo_cfg.ensemble_consensus_std_c))
+    )
+    result["predictor_ensemble_near_target_high_disagreement"] = (
+        result["predictor_ensemble_near_target"]
+        & (result["predictor_ensemble_std_tg_c"] >= float(pievo_cfg.ensemble_high_disagreement_std_c))
+    )
+    result["human_review_priority"] = "standard_surrogate_review"
+    result.loc[result["predictor_ensemble_near_target_low_disagreement"], "human_review_priority"] = "priority_low_disagreement_near_target"
+    result.loc[result["predictor_ensemble_near_target_high_disagreement"], "human_review_priority"] = "review_high_disagreement_near_target"
+    result.loc[
+        (~result["predictor_ensemble_near_target"]) & (result["predictor_ensemble_std_tg_c"] >= float(pievo_cfg.ensemble_high_disagreement_std_c)),
+        "human_review_priority",
+    ] = "review_high_disagreement"
+    return result
 
 
 def principle_feature_vector(row: dict[str, object], principle: Principle, agent_cfg: AgentConfig, pievo_cfg: PiEvoFaithfulConfig) -> np.ndarray:
@@ -622,7 +744,8 @@ def target_guard_selection_pool(
     feasible = distances <= max_distance
     feasible_count = int(feasible.sum())
     if not pievo_cfg.target_guard_enabled:
-        return candidates, {
+        pool = candidates
+        guard = {
             "enabled": False,
             "active": False,
             "max_distance_c": max_distance,
@@ -630,9 +753,9 @@ def target_guard_selection_pool(
             "pool_size": int(len(candidates)),
             "reason": "disabled",
         }
-    if feasible_count >= max(1, int(pievo_cfg.target_guard_min_candidates)):
+    elif feasible_count >= max(1, int(pievo_cfg.target_guard_min_candidates)):
         pool = candidates.loc[feasible].copy()
-        return pool, {
+        guard = {
             "enabled": True,
             "active": True,
             "max_distance_c": max_distance,
@@ -640,14 +763,50 @@ def target_guard_selection_pool(
             "pool_size": int(len(pool)),
             "reason": f"target_distance_c <= {max_distance:g}",
         }
-    return candidates, {
-        "enabled": True,
-        "active": False,
-        "max_distance_c": max_distance,
-        "candidate_count": feasible_count,
-        "pool_size": int(len(candidates)),
-        "reason": f"insufficient feasible candidates for target_window={agent_cfg.target_window_c:g}",
-    }
+    else:
+        pool = candidates
+        guard = {
+            "enabled": True,
+            "active": False,
+            "max_distance_c": max_distance,
+            "candidate_count": feasible_count,
+            "pool_size": int(len(candidates)),
+            "reason": f"insufficient feasible candidates for target_window={agent_cfg.target_window_c:g}",
+        }
+    max_std = float(pievo_cfg.ensemble_disagreement_guard_max_std_c)
+    guard.update(
+        {
+            "disagreement_enabled": bool(pievo_cfg.ensemble_disagreement_guard_enabled),
+            "disagreement_active": False,
+            "disagreement_max_std_c": max_std,
+            "disagreement_candidate_count": 0,
+            "disagreement_missing_count": int(len(pool)),
+            "disagreement_pool_size": int(len(pool)),
+            "disagreement_reason": "disabled",
+        }
+    )
+    if not pievo_cfg.ensemble_disagreement_guard_enabled:
+        return pool, guard
+    if "predictor_ensemble_std_tg_c" not in pool.columns:
+        guard["disagreement_reason"] = "missing predictor_ensemble_std_tg_c"
+        return pool, guard
+    std_values = pd.to_numeric(pool["predictor_ensemble_std_tg_c"], errors="coerce")
+    disagreement_feasible = std_values <= max_std
+    disagreement_count = int(disagreement_feasible.sum())
+    missing_count = int(std_values.isna().sum())
+    guard["disagreement_candidate_count"] = disagreement_count
+    guard["disagreement_missing_count"] = missing_count
+    min_candidates = max(1, int(pievo_cfg.ensemble_disagreement_guard_min_candidates))
+    if disagreement_count >= min_candidates:
+        guarded_pool = pool.loc[disagreement_feasible].copy()
+        guard["disagreement_active"] = True
+        guard["disagreement_pool_size"] = int(len(guarded_pool))
+        guard["disagreement_reason"] = f"predictor_ensemble_std_tg_c <= {max_std:g}"
+        guard["pool_size"] = int(len(guarded_pool))
+        return guarded_pool, guard
+    guard["disagreement_reason"] = f"insufficient low-disagreement candidates for max_std={max_std:g}"
+    guard["disagreement_pool_size"] = int(len(pool))
+    return pool, guard
 
 
 def attach_selection_pool_diagnostics(
@@ -661,7 +820,25 @@ def attach_selection_pool_diagnostics(
     diagnostics["pievo_target_guard_candidate_count"] = int(guard["candidate_count"])
     diagnostics["pievo_selection_pool_size"] = int(guard["pool_size"])
     diagnostics["pievo_selection_pool_reason"] = str(guard["reason"])
+    diagnostics["pievo_ensemble_disagreement_guard_enabled"] = bool(guard.get("disagreement_enabled", False))
+    diagnostics["pievo_ensemble_disagreement_guard_active"] = bool(guard.get("disagreement_active", False))
+    diagnostics["pievo_ensemble_disagreement_guard_max_std_c"] = float(guard.get("disagreement_max_std_c", math.nan))
+    diagnostics["pievo_ensemble_disagreement_guard_candidate_count"] = int(guard.get("disagreement_candidate_count", 0))
+    diagnostics["pievo_ensemble_disagreement_guard_missing_count"] = int(guard.get("disagreement_missing_count", 0))
+    diagnostics["pievo_ensemble_disagreement_guard_reason"] = str(guard.get("disagreement_reason", "disabled"))
     diagnostics["pievo_selection_pool_member"] = diagnostics.index.isin(selection_pool.index)
+
+
+def selection_method_name(base: str, guard: dict[str, object]) -> str:
+    target_active = bool(guard.get("active", False))
+    disagreement_active = bool(guard.get("disagreement_active", False))
+    if target_active and disagreement_active:
+        return f"target_and_ensemble_guard_{base}"
+    if target_active:
+        return f"target_guard_{base}"
+    if disagreement_active:
+        return f"ensemble_disagreement_guard_{base}"
+    return base
 
 
 def select_by_ids(
@@ -688,7 +865,7 @@ def select_by_ids(
             warmup_scores.append(variance_sum)
         idx = int(np.argmax(warmup_scores))
         selected_index = selection_pool.index[idx]
-        method = "target_guard_warmup_max_variance" if guard["active"] else "warmup_max_variance"
+        method = selection_method_name("warmup_max_variance", guard)
         diagnostics["pievo_selection_method"] = method
         diagnostics["pievo_warmup_variance"] = np.nan
         diagnostics.loc[selection_pool.index, "pievo_warmup_variance"] = warmup_scores
@@ -719,7 +896,7 @@ def select_by_ids(
         ids_regrets.append(regret)
         ids_information.append(info)
         ids_ratios.append(ratio)
-    diagnostics["pievo_selection_method"] = "target_guard_ids_min_regret2_over_information" if guard["active"] else "ids_min_regret2_over_information"
+    diagnostics["pievo_selection_method"] = selection_method_name("ids_min_regret2_over_information", guard)
     diagnostics["pievo_expected_reward"] = np.nan
     diagnostics["pievo_regret"] = np.nan
     diagnostics["pievo_information_gain"] = np.nan
@@ -767,6 +944,8 @@ def write_pievo_report(
         f"- Posterior entropy: {entropy(beliefs):.6f}",
         f"- MAP principle: {max(beliefs, key=beliefs.get) if beliefs else '-'}",
         f"- Target guard: {pievo_cfg.target_guard_enabled} within {pievo_cfg.target_guard_max_distance_c:.2f} C",
+        f"- Predictor ensemble disagreement: {pievo_cfg.ensemble_disagreement_enabled}",
+        f"- Ensemble disagreement guard: {pievo_cfg.ensemble_disagreement_guard_enabled} within std <= {pievo_cfg.ensemble_disagreement_guard_max_std_c:.2f} C",
         "",
         "## External Evidence",
         "",
@@ -777,15 +956,19 @@ def write_pievo_report(
         "",
         "## Selected Observations",
         "",
-        "| Round | Tg mean (C) | target distance (C) | reward | selected by | guard active | feasible candidates | anomalies | added principles |",
-        "| --- | ---: | ---: | ---: | --- | --- | ---: | ---: | --- |",
+        "| Round | Tg mean (C) | target distance (C) | reward | selected by | target guard | ensemble guard | risk-feasible candidates | ensemble std (C) | review | anomalies | added principles |",
+        "| --- | ---: | ---: | ---: | --- | --- | --- | ---: | ---: | --- | ---: | --- |",
     ]
     for item in round_history:
+        ensemble_std = item.get("selected_predictor_ensemble_std_tg_c", math.nan)
+        ensemble_std_text = "-" if not math.isfinite(float(ensemble_std)) else f"{float(ensemble_std):.2f}"
         lines.append(
             f"| {item['round']} | {item['selected_predicted_tg_mean_c']:.2f} | "
             f"{item['selected_target_distance_c']:.2f} | {item['selected_reward']:.4f} | "
             f"{item['selection_method']} | {item.get('target_guard_active', False)} | "
-            f"{int(item.get('target_guard_candidate_count', 0))} | {item['anomaly_count']} | "
+            f"{item.get('ensemble_disagreement_guard_active', False)} | "
+            f"{int(item.get('ensemble_disagreement_guard_candidate_count', 0))} | {ensemble_std_text} | "
+            f"{item.get('selected_human_review_priority', '-') or '-'} | {item['anomaly_count']} | "
             f"{', '.join(item['added_principles']) or '-'} |"
         )
     lines.extend(
@@ -837,6 +1020,9 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
     monomer_pool_frame(pool).to_csv(out / "monomer_pool.csv", index=False)
     vectors, _, _ = encode_pool(pool, agent_cfg.vae_checkpoint, device, agent_cfg.encode_batch_size)
     predictor = load_predictor(agent_cfg.predictor_path)
+    ensemble_members, ensemble_predictors = load_predictor_ensemble(agent_cfg, pievo_cfg)
+    if not ensemble_predictors.empty:
+        ensemble_predictors.to_csv(out / "predictor_ensemble_members.csv", index=False)
     train_features = np.asarray(np.load(agent_cfg.training_features_path)["x"], dtype=np.float32)
     ood_scale = ood_reference_scale(train_features)
     principles = initial_principles()
@@ -879,6 +1065,7 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
             )
         )
         scored = evaluate_formulas(formulas, vectors, predictor, train_features, ood_scale, agent_cfg)
+        scored = attach_live_ensemble_disagreement(scored, formulas, vectors, ensemble_members, agent_cfg, pievo_cfg)
         if scored.empty:
             round_history.append(
                 {
@@ -891,6 +1078,8 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
                     "anomaly_count": len(anomalies),
                     "added_principles": added,
                     "posterior_entropy": entropy(beliefs),
+                    "ensemble_disagreement_enabled": bool(ensemble_members),
+                    "ensemble_disagreement_guard_active": False,
                 }
             )
             continue
@@ -923,6 +1112,12 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
             "pievo_target_guard_candidate_count",
             "pievo_selection_pool_size",
             "pievo_selection_pool_reason",
+            "pievo_ensemble_disagreement_guard_enabled",
+            "pievo_ensemble_disagreement_guard_active",
+            "pievo_ensemble_disagreement_guard_max_std_c",
+            "pievo_ensemble_disagreement_guard_candidate_count",
+            "pievo_ensemble_disagreement_guard_missing_count",
+            "pievo_ensemble_disagreement_guard_reason",
         ]:
             selected_dict[field] = selected_diag.get(field)
         history.append(
@@ -952,6 +1147,15 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
                 "target_guard_max_distance_c": float(selected_diag.get("pievo_target_guard_max_distance_c", math.nan)),
                 "target_guard_candidate_count": int(selected_diag.get("pievo_target_guard_candidate_count", 0)),
                 "selection_pool_size": int(selected_diag.get("pievo_selection_pool_size", len(scored))),
+                "ensemble_disagreement_enabled": bool(ensemble_members),
+                "ensemble_disagreement_guard_enabled": bool(selected_diag.get("pievo_ensemble_disagreement_guard_enabled", False)),
+                "ensemble_disagreement_guard_active": bool(selected_diag.get("pievo_ensemble_disagreement_guard_active", False)),
+                "ensemble_disagreement_guard_max_std_c": float(selected_diag.get("pievo_ensemble_disagreement_guard_max_std_c", math.nan)),
+                "ensemble_disagreement_guard_candidate_count": int(selected_diag.get("pievo_ensemble_disagreement_guard_candidate_count", 0)),
+                "ensemble_disagreement_guard_missing_count": int(selected_diag.get("pievo_ensemble_disagreement_guard_missing_count", 0)),
+                "selected_predictor_ensemble_std_tg_c": finite_or_default(selected_row.get("predictor_ensemble_std_tg_c"), math.nan),
+                "selected_predictor_ensemble_bucket": str(selected_row.get("predictor_ensemble_disagreement_bucket", "")),
+                "selected_human_review_priority": str(selected_row.get("human_review_priority", "")),
                 "anomaly_count": len(anomalies),
                 "added_principles": added,
                 "posterior_entropy": entropy(beliefs),
@@ -1004,6 +1208,8 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
     save_json({name: float(prob) for name, prob in beliefs.items()}, out / "principle_posterior.json")
     save_json([asdict(p) for p in principles], out / "principles.json")
     validation = validate_formula_frame(selected, agent_cfg) if not selected.empty else {"selected_rows": 0, "all_selected_pass": False}
+    selected_has_ensemble = not selected.empty and "predictor_ensemble_std_tg_c" in selected.columns
+    selected_ensemble_std = pd.to_numeric(selected["predictor_ensemble_std_tg_c"], errors="coerce") if selected_has_ensemble else pd.Series(dtype=float)
     save_json(validation, out / "validation_summary.json")
     save_json(
         {
@@ -1013,6 +1219,13 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
             "target_guard_enabled": pievo_cfg.target_guard_enabled,
             "target_guard_max_distance_c": pievo_cfg.target_guard_max_distance_c,
             "target_guard_min_candidates": pievo_cfg.target_guard_min_candidates,
+            "ensemble_disagreement_enabled": pievo_cfg.ensemble_disagreement_enabled,
+            "ensemble_metrics_path": None if pievo_cfg.ensemble_metrics_path is None else str(pievo_cfg.ensemble_metrics_path),
+            "ensemble_top_k": pievo_cfg.ensemble_top_k,
+            "ensemble_selection_metric": pievo_cfg.ensemble_selection_metric,
+            "ensemble_disagreement_guard_enabled": pievo_cfg.ensemble_disagreement_guard_enabled,
+            "ensemble_disagreement_guard_max_std_c": pievo_cfg.ensemble_disagreement_guard_max_std_c,
+            "ensemble_disagreement_guard_min_candidates": pievo_cfg.ensemble_disagreement_guard_min_candidates,
             "pool_stats": pool_stats,
             "rounds": pievo_cfg.rounds,
             "selected_rows": int(len(selected)),
@@ -1028,6 +1241,17 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
             "all_selected_within_target_guard": False
             if selected.empty
             else bool((selected["target_distance_c"] <= pievo_cfg.target_guard_max_distance_c).all()),
+            "selected_with_ensemble_disagreement_rows": 0 if not selected_has_ensemble else int(selected_ensemble_std.notna().sum()),
+            "selected_low_disagreement_rows": 0
+            if not selected_has_ensemble
+            else int((selected_ensemble_std <= pievo_cfg.ensemble_consensus_std_c).sum()),
+            "selected_high_disagreement_rows": 0
+            if not selected_has_ensemble
+            else int((selected_ensemble_std >= pievo_cfg.ensemble_high_disagreement_std_c).sum()),
+            "all_selected_within_ensemble_disagreement_guard": None
+            if not selected_has_ensemble
+            else bool((selected_ensemble_std <= pievo_cfg.ensemble_disagreement_guard_max_std_c).all()),
+            "mean_selected_predictor_ensemble_std_tg_c": None if not selected_has_ensemble else float(selected_ensemble_std.mean()),
             "top25_diversity": None if selected.empty else fingerprint_diversity(selected.head(25)["smiles"].map(lambda value: str(value).split("|")[0])),
             "validation": validation,
         },

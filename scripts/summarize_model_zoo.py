@@ -112,8 +112,10 @@ def write_report(metrics_path: Path, best_path: Path, out_path: Path, top_n: int
             "- 当前最佳用于闭环的默认选择仍可保持 `VAE(512)+GaussianProcess_RBF`，因为它兼顾 MAPEK 和不确定性。",
             "- 若只追求点预测误差，`VAE(512)+NuSVR_RBF` 是强候选，MAE/RMSE/R2 优于 GPR。",
             "- RF/CNN/SVR 论文基线应保留为可复现实验对照，但当前 model zoo 已明显扩展。",
-            "- 下一步应加入模型集成：GPR 提供不确定性，NuSVR/GBDT/ExtraTrees 提供稳健点预测，PiEvo 使用 disagreement 作为 OOD 或 epistemic signal。",
-            "- GNN 已有草案，但还需要和同一 85/15 split、同一指标体系统一比较。",
+            "- 模型集成分歧审计已加入：`reports/predictor_ensemble_disagreement.md` 使用 GPR、NuSVR、XGBoost、ExtraTrees 和 GradientBoosting 的强模型集体判断候选级 epistemic/OOD 风险。",
+            "- 当前 195±5 C 近目标候选按 ensemble mean 有 1045 条，其中低分歧 84 条、高分歧 526 条；PiEvo/人工审核应同时看 target distance、Harness、principle posterior 和 disagreement。",
+            "- Live ensemble guard 已接入 PiEvo：`reports/pievo_ensemble_disagreement_guard_smoke.md` 证明每轮实际候选批次会重新计算 ensemble std，并在 IDS 前过滤高分歧候选。",
+            "- GNN 已完成同一 85/15 split、同一指标体系的 smoke 对齐和 GCN/GIN/GAT/MPNN leaderboard，但仍需更长训练和全局特征补强。",
         ]
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)

@@ -270,4 +270,5 @@ PYTHONPATH=src python trail/harness/constraints.py \
 3. 对 feedback-guided replacement 做更大候选池和真实/高保真 observation 版本的 PiEvo sweep，确认 surrogate posterior 规律是否能被物理证据保留。
 4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 和 feedback-aware LLM/RAG 侧都已完成 observation ledger -> PiEvo posterior 的 smoke 闭环。
 5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
-6. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。
+6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
+7. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。
