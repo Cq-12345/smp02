@@ -13,7 +13,7 @@ This run uses the VAE-WVCM predictor as the experiment environment, while the ag
 - Active principles: 40
 - Total observations in posterior history: 14
 - Total authority weight: 14.000
-- Posterior entropy: 2.440724
+- Posterior entropy: 2.486933
 - MAP principle: long_aliphatic_penalty
 - Target guard: True within 5.00 C
 
@@ -37,31 +37,31 @@ This run uses the VAE-WVCM predictor as the experiment environment, while the ag
 
 | Principle | posterior | feature | effect | description |
 | --- | ---: | --- | ---: | --- |
-| long_aliphatic_penalty | 0.492680 | long_aliphatic_risk | -1.0 | Long aliphatic segments usually lower Tg. |
-| reaction_a5dd26ae10ad | 0.031395 | reaction::异氰酸酯-伯胺形成聚脲。 | 1.0 | Reaction principle: 异氰酸酯-伯胺形成聚脲。 |
-| druglike_hetero_complexity_penalty | 0.026905 | druglike_hetero_complexity_risk | -1.0 | High HBA/HBD complexity is a risk for out-of-library monomer transfer. |
-| stereochemical_complexity_penalty | 0.026209 | stereochemical_complexity_risk | -1.0 | Many stereocenters often indicate bioactive-molecule complexity rather than monomer suitability. |
-| reaction_839cd29ef5d7 | 0.025042 | reaction::环氧-伯胺开环固化。 | 1.0 | Reaction principle: 环氧-伯胺开环固化。 |
-| cyanate_ester_triazine | 0.024822 | cyanate_ester | 1.0 | Cyanate ester triazine networks can be high Tg. |
-| nitrile_rich_rigidity | 0.024822 | nitrile_rich | 1.0 | Nitrile-rich aromatic monomers often stiffen networks. |
-| reaction_536dfe22d324 | 0.024822 | reaction::氰酸酯-胺共反应。 | 1.0 | Reaction principle: 氰酸酯-胺共反应。 |
-| too_flexible_penalty | 0.023316 | too_flexible_risk | -1.0 | High rotatable-bond count increases flexibility risk. |
-| aromatic_backbones_raise_tg | 0.014645 | aromatic_backbone | 1.0 | Aromatic backbones tend to raise Tg. |
-| multi_aromatic_rigidity | 0.014645 | rigid_multi_aromatic | 1.0 | Multiple aromatic rings increase chain rigidity. |
-| high_functionality_crosslink_density | 0.014645 | high_functionality | 1.0 | Higher reactive functionality can increase crosslink density. |
-| peg_like_penalty | 0.014645 | peg_like_risk | -1.0 | PEG-like segments are a strong low-Tg risk. |
-| peptide_like_out_of_domain | 0.014645 | peptide_like_risk | -1.0 | Peptide-like ChEMBL molecules are poor monomer hypotheses. |
-| heavy_halogen_practical_risk | 0.014645 | heavy_halogen_risk | -1.0 | Iodinated or brominated drug-like structures are lower-priority monomer hypotheses. |
-| formal_charge_practical_penalty | 0.014645 | formal_charge_practical_risk | -1.0 | Charged molecules are lower-priority thermoset monomer hypotheses unless specifically justified. |
-| reaction_1d41d1c7896e | 0.014645 | reaction::酸酐-酚羟基酯化。 | 1.0 | Reaction principle: 酸酐-酚羟基酯化。 |
-| reaction_bc75cf8f07d2 | 0.014645 | reaction::异氰酸酯-酚羟基形成氨基甲酸酯。 | 1.0 | Reaction principle: 异氰酸酯-酚羟基形成氨基甲酸酯。 |
-| reaction_michael_thiol_ene | 0.014645 | reaction::硫醇-Michael/thiol-ene 反应。 | 1.0 | Reaction principle: 硫醇-Michael/thiol-ene 反应。 |
-| reaction_bd312644298f | 0.014645 | reaction::自由基共聚。 | 1.0 | Reaction principle: 自由基共聚。 |
-| reaction_461e81fa276b | 0.014645 | reaction::自由基均/共聚形成交联网络。 | 1.0 | Reaction principle: 自由基均/共聚形成交联网络。 |
-| reaction_michael | 0.014434 | reaction::马来酰亚胺-硫醇 Michael 加成。 | 1.0 | Reaction principle: 马来酰亚胺-硫醇 Michael 加成。 |
-| reaction_aab22a9380a2 | 0.014434 | reaction::马来酰亚胺与烯基共聚/加成。 | 1.0 | Reaction principle: 马来酰亚胺与烯基共聚/加成。 |
-| imide_anhydride_networks_raise_tg | 0.014434 | imide_or_anhydride | 1.0 | Imide or anhydride-derived networks often provide high Tg. |
-| maleimide_rigid_network | 0.014434 | maleimide | 1.0 | Bismaleimide motifs can create rigid high-Tg networks. |
+| long_aliphatic_penalty | 0.474851 | long_aliphatic_risk | -1.0 | Long aliphatic segments usually lower Tg. |
+| reaction_a5dd26ae10ad | 0.044640 | reaction::异氰酸酯-伯胺形成聚脲。 | 1.0 | Reaction principle: 异氰酸酯-伯胺形成聚脲。 |
+| druglike_hetero_complexity_penalty | 0.028892 | druglike_hetero_complexity_risk | -1.0 | High HBA/HBD complexity is a risk for out-of-library monomer transfer. |
+| stereochemical_complexity_penalty | 0.028724 | stereochemical_complexity_risk | -1.0 | Many stereocenters often indicate bioactive-molecule complexity rather than monomer suitability. |
+| too_flexible_penalty | 0.025928 | too_flexible_risk | -1.0 | High rotatable-bond count increases flexibility risk. |
+| reaction_536dfe22d324 | 0.025341 | reaction::氰酸酯-胺共反应。 | 1.0 | Reaction principle: 氰酸酯-胺共反应。 |
+| cyanate_ester_triazine | 0.025340 | cyanate_ester | 1.0 | Cyanate ester triazine networks can be high Tg. |
+| nitrile_rich_rigidity | 0.025340 | nitrile_rich | 1.0 | Nitrile-rich aromatic monomers often stiffen networks. |
+| reaction_839cd29ef5d7 | 0.020334 | reaction::环氧-伯胺开环固化。 | 1.0 | Reaction principle: 环氧-伯胺开环固化。 |
+| aromatic_backbones_raise_tg | 0.014697 | aromatic_backbone | 1.0 | Aromatic backbones tend to raise Tg. |
+| multi_aromatic_rigidity | 0.014697 | rigid_multi_aromatic | 1.0 | Multiple aromatic rings increase chain rigidity. |
+| high_functionality_crosslink_density | 0.014697 | high_functionality | 1.0 | Higher reactive functionality can increase crosslink density. |
+| peg_like_penalty | 0.014697 | peg_like_risk | -1.0 | PEG-like segments are a strong low-Tg risk. |
+| peptide_like_out_of_domain | 0.014697 | peptide_like_risk | -1.0 | Peptide-like ChEMBL molecules are poor monomer hypotheses. |
+| heavy_halogen_practical_risk | 0.014697 | heavy_halogen_risk | -1.0 | Iodinated or brominated drug-like structures are lower-priority monomer hypotheses. |
+| formal_charge_practical_penalty | 0.014697 | formal_charge_practical_risk | -1.0 | Charged molecules are lower-priority thermoset monomer hypotheses unless specifically justified. |
+| reaction_1d41d1c7896e | 0.014697 | reaction::酸酐-酚羟基酯化。 | 1.0 | Reaction principle: 酸酐-酚羟基酯化。 |
+| reaction_bc75cf8f07d2 | 0.014697 | reaction::异氰酸酯-酚羟基形成氨基甲酸酯。 | 1.0 | Reaction principle: 异氰酸酯-酚羟基形成氨基甲酸酯。 |
+| reaction_michael_thiol_ene | 0.014697 | reaction::硫醇-Michael/thiol-ene 反应。 | 1.0 | Reaction principle: 硫醇-Michael/thiol-ene 反应。 |
+| reaction_bd312644298f | 0.014697 | reaction::自由基共聚。 | 1.0 | Reaction principle: 自由基共聚。 |
+| reaction_461e81fa276b | 0.014697 | reaction::自由基均/共聚形成交联网络。 | 1.0 | Reaction principle: 自由基均/共聚形成交联网络。 |
+| reaction_michael | 0.014491 | reaction::马来酰亚胺-硫醇 Michael 加成。 | 1.0 | Reaction principle: 马来酰亚胺-硫醇 Michael 加成。 |
+| reaction_aab22a9380a2 | 0.014491 | reaction::马来酰亚胺与烯基共聚/加成。 | 1.0 | Reaction principle: 马来酰亚胺与烯基共聚/加成。 |
+| imide_anhydride_networks_raise_tg | 0.014491 | imide_or_anhydride | 1.0 | Imide or anhydride-derived networks often provide high Tg. |
+| maleimide_rigid_network | 0.014491 | maleimide | 1.0 | Bismaleimide motifs can create rigid high-Tg networks. |
 
 ## Validation
 

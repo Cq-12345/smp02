@@ -4,7 +4,7 @@
   "source_counts": {
     "surrogate": 10
   },
-  "mean_target_distance_c": 1.8002899116508075,
-  "mean_weighted_reward": 0.7186236422130328,
+  "mean_target_distance_c": 1.8272768762578864,
+  "mean_weighted_reward": 0.7148151001324632,
   "reward_temperature_c": 5.0
 }

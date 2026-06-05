@@ -4,7 +4,7 @@
   "scored_formulas": 107,
   "harness_pass": 10,
   "rejected_proposals": 13,
-  "best_distance_c": 0.377581,
+  "best_distance_c": 0.373243,
   "within_1c": 4,
   "within_5c": 10,
   "predictor": "VAE (512) + GaussianProcess_RBF",

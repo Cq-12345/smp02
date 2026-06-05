@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import torch
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
@@ -286,17 +287,22 @@ def main() -> None:
     parser.add_argument("--best-model", default="artifacts/reproduce/predictors/best_model.json")
     parser.add_argument("--target-tg-c", type=float, default=195.0)
     parser.add_argument("--target-window-c", type=float, default=5.0)
+    parser.add_argument("--device", default="cpu", help="Device for deterministic VAE encoding; use cuda only when speed is required.")
     parser.add_argument("--out-dir", default="artifacts/trail/generation/replacement_eval")
     parser.add_argument("--report", default="reports/replacement_proposal_evaluation.md")
     args = parser.parse_args()
 
     cfg = load_config(args.config)
+    seed = int(cfg.get("seed", 42))
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.use_deterministic_algorithms(True, warn_only=True)
     best_model = load_json(args.best_model)
     latent_size = int(best_model["latent_size"])
     predictor_path = Path(best_model["model_path"])
     checkpoint_path = Path(cfg["output_dir"]) / "vae" / f"finetuned_latent_{latent_size}.pt"
     features_path = Path(cfg["output_dir"]) / "predictors" / f"latent_{latent_size}" / f"wvcm_features_latent_{latent_size}.npz"
-    device = resolve_device(cfg.get("device", "cuda"))
+    device = resolve_device(args.device)
     vae, checkpoint = load_vae_checkpoint(checkpoint_path, map_location=device)
     vae.to(device)
     proposals = pd.read_csv(args.proposals)

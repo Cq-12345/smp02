@@ -14,7 +14,7 @@ strategies:
     best_use: seed chemically plausible thermoset monomers
   functional_group_replacement:
     maturity: implemented
-    generator: trail/generation/vae_replacement_strategy.py
+    generator: trail/generation/vae_replacement_strategy.py + scripts/evaluate_replacement_proposals.py
     harness_required: true
     best_use: local exploration around high-scoring formulations
   vae_latent_local_search:
@@ -23,13 +23,13 @@ strategies:
     harness_required: true
     best_use: local decode around high-reward latent neighborhoods
   llm_rag_principle_generation:
-    maturity: planned
-    generator: future_llm_agent
+    maturity: record_contract_implemented
+    generator: scripts/build_prompt_generation_records.py
     harness_required: true
     best_use: propose new principles or functional group combinations from anomalies
   llm_smiles_generation:
-    maturity: risky_planned
-    generator: future_llm_agent
+    maturity: draft_record_contract_implemented
+    generator: scripts/build_prompt_generation_records.py
     harness_required: true
     best_use: draft candidates only; never trust without RDKit and reaction validation
   sft_candidate_generator:
@@ -43,13 +43,33 @@ strategies:
     harness_required: true
     best_use: not prioritized until larger molecule/polymer dataset exists
 record_schema:
+  schema_path: trail/generation/generation_record_schema.yaml
+  importer: trail/generation/import_generation_records.py
+  smoke_runner: scripts/build_prompt_generation_records.py
+  smoke_outputs:
+    - artifacts/trail/generation/prompt_records/prompt_generation_records_input.csv
+    - artifacts/trail/generation/prompt_records/generation_record_ledger.csv
+    - artifacts/trail/generation/prompt_records/generation_record_summary.json
+    - artifacts/trail/generation/prompt_records/prompt_rag_packet.md
   required_fields:
     - generation_id
     - strategy
+    - stage
     - target_tg_c
+    - target_window_c
     - candidate_smiles
     - candidate_ratios
     - source_context
+  recommended_audit_fields:
+    - prompt_id
+    - prompt_text
+    - prompt_hash
+    - rag_query
+    - rag_context_refs
+    - rag_context_digest
+    - principle_hypothesis
+    - functional_group_plan
+    - candidate_json
     - harness_pass
     - harness_failure_reason
     - predicted_tg_mean_c

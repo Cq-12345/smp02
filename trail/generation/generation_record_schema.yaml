@@ -1,0 +1,158 @@
+schema_name: smp_generation_record_ledger
+version: 1
+representation_scope: single_small_molecule_smiles_or_molecode
+deferred:
+  - commodity_grade_component_hypergraph
+  - polymer_repeat_unit_hypergraph
+purpose: >
+  Record every generated SMP formulation hypothesis before it is trusted.
+  The record keeps source strategy, prompt/RAG context, candidate formulation,
+  predictor outputs, Harness results, and PiEvo selection state in one audit
+  ledger.
+required_fields:
+  generation_id:
+    type: string
+    description: Stable unique id for this generated hypothesis.
+  strategy:
+    type: enum
+    values:
+      - rule_template
+      - functional_group_replacement
+      - vae_latent_local_search
+      - llm_rag_principle_generation
+      - llm_smiles_generation
+      - sft_candidate_generator
+      - diffusion_or_flow_matching
+    description: Generator family that produced the hypothesis.
+  stage:
+    type: enum
+    values:
+      - draft
+      - predicted
+      - harnessed
+      - selected
+      - observed
+    description: Furthest completed workflow stage for this hypothesis.
+  target_tg_c:
+    type: float
+    description: Requested Tg target in Celsius. This is record-local and not globally fixed.
+  target_window_c:
+    type: float
+    description: Allowed absolute distance from the target Tg in Celsius.
+  candidate_smiles:
+    type: string
+    description: Component SMILES joined by "|".
+  candidate_ratios:
+    type: string
+    description: Component molar ratios joined by ":" and summing to 1.
+  source_context:
+    type: string
+    description: Short provenance tag, e.g. rag, prompt, vae_replacement, human_review.
+recommended_fields:
+  generator_id:
+    type: string
+    description: Concrete agent, script, prompt template, model, or human generator id.
+  generation_time:
+    type: string
+    description: ISO date or timestamp.
+  prompt_id:
+    type: string
+    description: Stable prompt template id.
+  prompt_text:
+    type: string
+    description: Prompt or instruction given to an LLM/human/procedural generator.
+  prompt_hash:
+    type: string
+    description: Hash of prompt_text for reproducibility.
+  rag_query:
+    type: string
+    description: Query used to retrieve context.
+  rag_context_refs:
+    type: string
+    description: Retrieved context references joined by "|".
+  rag_context_digest:
+    type: string
+    description: Short digest of retrieved context actually used.
+  principle_hypothesis:
+    type: string
+    description: Candidate rule or explanation proposed by the generator.
+  functional_group_plan:
+    type: string
+    description: Intended functional group pairing or reaction route.
+  candidate_json:
+    type: string
+    description: Raw candidate payload, usually JSON, preserved for audit.
+  compatibility_reasons:
+    type: string
+    description: Reaction compatibility evidence from knowledge base or Harness.
+  predicted_tg_mean_c:
+    type: float
+    description: Surrogate predicted Tg mean, if prediction has run.
+  predicted_tg_sigma_c:
+    type: float
+    description: Surrogate uncertainty, if available.
+  ood_penalty:
+    type: float
+    description: Out-of-domain penalty from the current predictor.
+  pievo_round:
+    type: integer
+    description: PiEvo round where the candidate was generated or selected.
+  selected_by_ids:
+    type: boolean
+    description: Whether PiEvo IDS selected this generated hypothesis.
+  harness_failure_reason:
+    type: string
+    description: Human or script-supplied failure reason; importer appends automatic reasons.
+  review_status:
+    type: enum
+    values:
+      - needs_review
+      - approved_for_prediction
+      - rejected_by_harness
+      - selected_for_experiment
+      - observed
+    description: Human-facing review state.
+  notes:
+    type: string
+    description: Free-form audit notes.
+computed_fields:
+  strategy_allowed:
+    type: boolean
+  required_fields_present:
+    type: boolean
+  valid_smiles:
+    type: boolean
+  ratio_ok:
+    type: boolean
+  prediction_available:
+    type: boolean
+  target_distance_c:
+    type: float
+  target_ok:
+    type: boolean
+  chemistry_ok:
+    type: boolean
+  harness_pass:
+    type: boolean
+  generation_reward:
+    type: float
+  record_pass:
+    type: boolean
+failure_reason_order:
+  - missing_required_fields
+  - unknown_strategy
+  - invalid_smiles
+  - ratio_sum_not_one
+  - prediction_missing
+  - target_out_of_window
+  - chemistry_evidence_missing
+reward:
+  form: exp(-abs(predicted_tg_mean_c - target_tg_c) / reward_temperature_c)
+  default_reward_temperature_c: 5.0
+usage:
+  llm:
+    description: LLM outputs are draft hypotheses until RDKit, ratio, prediction, and Harness checks pass.
+  rag:
+    description: RAG refs and digests must be recorded so successful and failed generations can be traced back to context.
+  pievo:
+    description: PiEvo may consume harness-passing records as candidate history or use failures to update generation priors.

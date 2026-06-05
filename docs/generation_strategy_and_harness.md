@@ -82,7 +82,8 @@ h = (m_1..m_n, r_1..r_n)
 - 120 条 replacement proposals 输入。
 - 107 条可重建为完整双组分配方并完成 VAE-WVCM-GPR 预测。
 - 10 条通过 Harness。
-- 最佳 replacement 预测 Tg 为 194.93 C，距 195 C 目标 0.07 C。
+- `scripts/evaluate_replacement_proposals.py` 默认使用 CPU deterministic VAE encoding，避免 CUDA 数值路径导致 surrogate ledger 漂移。
+- 最佳 replacement 预测 Tg 为 194.63 C，距 195 C 目标 0.37 C；4 条在 1 C 内，10 条在 5 C 内。
 - 通过项已写入 observation ledger，并进入 `configs/pievo_faithful_replacement_195_smoke.yaml` 的 PiEvo-faithful external history。
 
 ### 3.3 VAE latent 生成
@@ -111,6 +112,30 @@ h = (m_1..m_n, r_1..r_n)
 - `trail/rag/simple_retriever.py`
 - `trail/knowledge/smp_prior_knowledge.yaml`
 - `artifacts/trail/candidates_smoke/component_inventory.csv`
+- `trail/generation/generation_record_schema.yaml`
+- `trail/generation/import_generation_records.py`
+- `scripts/build_prompt_generation_records.py`
+- `artifacts/trail/generation/prompt_records/generation_record_ledger.csv`
+- `reports/generation_record_schema_smoke.md`
+
+当前 record schema 已覆盖：
+
+- `generation_id / strategy / stage / target_tg_c / target_window_c`
+- `candidate_smiles / candidate_ratios`
+- `prompt_id / prompt_text / prompt_hash`
+- `rag_query / rag_context_refs / rag_context_digest`
+- `principle_hypothesis / functional_group_plan / candidate_json`
+- `predicted_tg_mean_c / predicted_tg_sigma_c / ood_penalty`
+- `harness_pass / harness_failure_reason`
+- `pievo_round / selected_by_ids / review_status`
+
+Prompt/RAG smoke 结果：
+
+- 4 条输入 generation records。
+- 2 条 `llm_rag_principle_generation`、1 条 `functional_group_replacement`、1 条 `llm_smiles_generation`。
+- 3 条通过 Harness，1 条 draft 失败并记录 `prediction_missing;chemistry_evidence_missing;replacement_formula_failed_reaction_or_ratio_constraints`。
+- 最佳 generation record 预测 Tg 为 195.00 C，距 195 C 目标 0.003 C。
+- 这一步没有调用外部 LLM；它固定的是未来 LLM/SFT/扩散/流匹配生成器必须遵守的记录契约。
 
 ### 3.5 SFT / 内部微调
 
@@ -167,7 +192,8 @@ PYTHONPATH=src python trail/harness/constraints.py \
 
 ## 6. 近期优先级
 
-1. 建立 generation record schema，记录来源、prompt、RAG context、harness 失败原因。
-2. 将 LLM 生成限制在“提出 principle/官能团组合/候选模板”，先不直接相信其 SMILES。
+1. 将真实 LLM/RAG agent 接到 `generation_record_schema.yaml`，要求先输出 generation record，再进入 predictor/Harness/PiEvo。
+2. 将 LLM 生成限制在“提出 principle/官能团组合/候选模板”，SMILES 草案必须由 RDKit、预测模型和 Harness 再验证。
 3. 对 replacement 的失败原因做回流：13 条失败均为反应/比例约束失败，应改进官能团匹配或比例搜索。
-4. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。
+4. 将 generation ledger 的失败统计接入 PiEvo anomaly/principle posterior，用失败案例压低弱生成规则。
+5. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。

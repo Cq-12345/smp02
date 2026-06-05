@@ -26,10 +26,10 @@
       "surrogate": 10
     },
     "total_authority_weight": 10.0,
-    "mean_reward": 0.7186236422130333
+    "mean_reward": 0.7148151001324632
   },
   "total_authority_weight": 14.0,
-  "posterior_entropy": 2.440723871269764,
+  "posterior_entropy": 2.4869334798070555,
   "map_principle": "long_aliphatic_penalty",
   "best_selected_target_distance_c": 0.005546302352854582,
   "selected_within_target_guard": 4,

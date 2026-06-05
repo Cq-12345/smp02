@@ -13,7 +13,7 @@
     "selection_pool_size": 2,
     "anomaly_count": 0,
     "added_principles": [],
-    "posterior_entropy": 3.0772052108751535,
+    "posterior_entropy": 3.093473443489841,
     "map_principle": "long_aliphatic_penalty"
   },
   {
@@ -30,7 +30,7 @@
     "selection_pool_size": 10,
     "anomaly_count": 0,
     "added_principles": [],
-    "posterior_entropy": 2.821333481270863,
+    "posterior_entropy": 2.851202007678499,
     "map_principle": "long_aliphatic_penalty"
   },
   {
@@ -47,7 +47,7 @@
     "selection_pool_size": 8,
     "anomaly_count": 0,
     "added_principles": [],
-    "posterior_entropy": 2.440724308057473,
+    "posterior_entropy": 2.4869350406710065,
     "map_principle": "long_aliphatic_penalty"
   },
   {
@@ -64,7 +64,7 @@
     "selection_pool_size": 9,
     "anomaly_count": 0,
     "added_principles": [],
-    "posterior_entropy": 2.440727126406783,
+    "posterior_entropy": 2.4869364363377953,
     "map_principle": "long_aliphatic_penalty"
   }
 ]
