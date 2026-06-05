@@ -153,6 +153,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_genera
   --out-dir artifacts/trail/generation/generative_training_sets \
   --report reports/generative_training_set_readiness.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/update_generation_strategy_policy.py \
+  --out-dir artifacts/trail/generation_strategy_policy \
+  --report reports/generation_strategy_bandit_policy.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
@@ -166,6 +170,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --vae-latent-local-search-summary artifacts/trail/generation/vae_latent_local_search/latent_local_search_summary.json \
   --vae-latent-local-search-eval-summary artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json \
   --vae-latent-local-search-pievo-summary artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json \
+  --generation-strategy-policy-summary artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
@@ -240,5 +245,14 @@ SFT / diffusion / flow readiness 已补充：
 - SFT JSONL 为 4 条 train、1 条 eval，`sft_ready=false`；当前门槛 20 条，还缺 15 条。
 - diffusion/flow seed table 为 4 条 train、1 条 eval，`diffusion_flow_ready=false`；当前门槛 100 条，还缺 95 条。
 - 这一步不是训练生成模型，而是建立训练数据合同和 readiness gate，防止用过小的 smoke 数据训练出不可泛化生成器。
+
+Generation strategy bandit policy 已补充：
+
+- `scripts/update_generation_strategy_policy.py` 把 strategy feedback、replacement/latent eval、LLM/RAG summary 和生成模型 readiness 汇总为 strategy-level contextual bandit。
+- 当前 arm 包括 `vae_latent_local_search`、`functional_group_replacement`、`llm_rag_principle_generation`、`llm_smiles_generation`、`sft_candidate_generator`、`diffusion_or_flow_matching`。
+- 输出的 `allocation_per_100` 是下一轮 proposal 预算建议，不是最终配方推荐；所有候选仍必须经过 predictor、Harness、PiEvo 和人工审核。
+- 当前 6 个策略中 3 个 eligible active，1 个 suppressed，2 个 data_collection_only；top strategy 为 `llm_rag_principle_generation`。
+- `llm_smiles_generation` 因缺 predictor/chemistry evidence 继续 suppressed；SFT 和 diffusion/flow 因 readiness gate 未通过，不获得训练/生成预算，只获得继续收集 validated records 的建议。
+- Workflow summary 已读取 `generation_strategy_bandit_summary.json`，让“RL/策略优化”进入总览链路。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

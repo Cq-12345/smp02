@@ -91,6 +91,19 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         json.dumps({"best_selected_target_distance_c": 0.059, "external_observation_summary": {"accepted_rows": 42}}),
         encoding="utf-8",
     )
+    strategy_policy = tmp_path / "strategy_policy.json"
+    strategy_policy.write_text(
+        json.dumps(
+            {
+                "top_strategy": "llm_rag_principle_generation",
+                "eligible_active_strategies": 3,
+                "suppressed_strategies": 1,
+                "data_collection_only_strategies": 2,
+                "total_budget": 100,
+            }
+        ),
+        encoding="utf-8",
+    )
     gnn_global = tmp_path / "gnn_global.json"
     gnn_global.write_text(
         json.dumps(
@@ -135,6 +148,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         latent_local_search,
         latent_local_search_eval,
         latent_local_search_pievo,
+        strategy_policy,
         gnn_global,
         generative_training,
     )
@@ -164,6 +178,11 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["vae_latent_local_search_observations"] == 42
     assert result["vae_latent_local_search_pievo_external_rows"] == 42
     assert result["vae_latent_local_search_pievo_best_distance_c"] == 0.059
+    assert result["generation_strategy_policy_top_strategy"] == "llm_rag_principle_generation"
+    assert result["generation_strategy_policy_eligible_active_strategies"] == 3
+    assert result["generation_strategy_policy_suppressed_strategies"] == 1
+    assert result["generation_strategy_policy_data_collection_only_strategies"] == 2
+    assert result["generation_strategy_policy_total_budget"] == 100
     assert result["gnn_global_feature_architecture"] == "mpnn"
     assert result["gnn_global_feature_best_case"] == "mpnn_global"
     assert result["gnn_global_feature_mapek_delta_pct"] == -0.5

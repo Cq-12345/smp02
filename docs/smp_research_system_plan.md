@@ -103,6 +103,7 @@
 - VAE latent 邻域搜索：`trail/generation/vae_latent_local_search.py` 已在 expanded inventory 内按 VAE latent 距离检索局部替换单体；当前是 decoder-free inventory search，不声称直接 decoder 生成新 SMILES。
 - LLM/RAG 生成：未来可用知识库检索约束 prompt，生成 SMILES 或候选规则。
 - SFT / diffusion / flow 数据契约：`scripts/build_generative_training_sets.py` 已把通过 Harness 的 generation records 转成 SFT JSONL 和 diffusion/flow seed table，并用 readiness gate 阻止小样本过早训练。
+- Strategy-level bandit policy：`scripts/update_generation_strategy_policy.py` 会把各生成策略的 Harness pass、target reward、失败回流和 readiness gate 汇总成下一轮 proposal 预算建议。
 - Harness 控制：所有生成结果必须通过 RDKit、charset、元素、官能团、反应兼容、ratio simplex 等约束。
 
 生成不是最终决策；生成只产生候选 `h`，评估和选择由 predictor、PiEvo posterior、IDS 共同完成。
@@ -135,7 +136,14 @@ Agent 分工：
 
 - `trail/workflow/multi_agent_workflow.py` 是摘要级 workflow。
 - `src/smp02/pievo_faithful.py` 是更接近 PiEvo 数学的闭环实现。
-- workflow summary 已读取 expanded replacement、VAE latent local search 和 expanded LLM/RAG summary，用来确认 expanded inventory 是否真正进入生成链路，而不只是停留在 source audit。
+- workflow summary 已读取 expanded replacement、VAE latent local search、expanded LLM/RAG summary 和 generation strategy bandit policy，用来确认 expanded inventory 与策略优化是否真正进入生成链路，而不只是停留在 source audit。
+
+当前 bandit policy 状态：
+
+- 6 个策略被纳入 arm：VAE latent local search、functional-group replacement、LLM/RAG principle generation、LLM SMILES draft、SFT candidate generator、diffusion/flow matching。
+- 3 个策略 eligible active；1 个 suppressed；2 个 data_collection_only。
+- top strategy 为 `llm_rag_principle_generation`。
+- `llm_smiles_generation` 在缺 predictor/chemistry evidence 时不进入下一轮预算；SFT 和 diffusion/flow 在 readiness gate 未通过前只进入数据收集目标。
 
 ## 6. PiEvo-faithful 要求
 

@@ -6,6 +6,26 @@ scope:
 target:
   variable_target_tg_c: true
   reward_form: exp_negative_absolute_target_distance
+strategy_policy:
+  maturity: contextual_bandit_policy_implemented
+  updater: scripts/update_generation_strategy_policy.py
+  policy_type: strategy_level_contextual_bandit_with_ucb_exploration
+  objective: allocate next-round proposal budget across generator strategies while preserving predictor/Harness/PiEvo gates
+  outputs:
+    - artifacts/trail/generation_strategy_policy/generation_strategy_bandit_policy.csv
+    - artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json
+    - reports/generation_strategy_bandit_policy.md
+  current_summary:
+    top_strategy: llm_rag_principle_generation
+    eligible_active_strategies: 3
+    suppressed_strategies: 1
+    data_collection_only_strategies: 2
+    total_budget: 100
+  guardrails:
+    - llm_smiles_generation remains suppressed until predictor and chemistry evidence are present
+    - sft_candidate_generator gets no training/generation budget until SFT readiness gate passes
+    - diffusion_or_flow_matching gets no training/generation budget until seed-table readiness gate passes
+    - allocation_per_100 is a proposal-budget hint, not a final formulation recommendation
 strategies:
   rule_template:
     maturity: implemented

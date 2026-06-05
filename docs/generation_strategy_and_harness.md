@@ -336,6 +336,33 @@ PYTHONPATH=src python trail/harness/constraints.py \
 - `validity`: 通过 Harness 的比例。
 - `utility`: 被 PiEvo IDS 选中并获得高 reward 的比例。
 
+### 5.1 Strategy-level RL / Bandit Policy
+
+当前已经新增一个轻量 strategy-level contextual bandit，用于回应 TODO 中“RL、人工闭环、搜索空间优化”的部分：
+
+- `scripts/update_generation_strategy_policy.py`
+- `artifacts/trail/generation_strategy_policy/generation_strategy_bandit_policy.csv`
+- `artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json`
+- `reports/generation_strategy_bandit_policy.md`
+
+数学含义：
+
+```text
+arm = generation strategy
+score = utility_mean + UCB_exploration_bonus + feedback_delta - readiness_penalty - suppression_penalty
+allocation = softmax(score / temperature)
+```
+
+其中 `utility_mean` 由 Beta-smoothed Harness pass mean 和 target reward 混合得到；UCB bonus 用于继续探索样本少但当前表现好的策略。这个 policy 只分配下一轮 proposal 预算，不替代 PiEvo IDS，也不允许绕过 predictor/Harness。
+
+当前结果：
+
+- 6 个策略进入 policy：VAE latent local search、functional-group replacement、LLM/RAG principle generation、LLM SMILES draft、SFT candidate generator、diffusion/flow matching。
+- 3 个策略为 eligible active。
+- `llm_smiles_generation` 仍 suppressed，因为它缺 predictor/chemistry evidence。
+- `sft_candidate_generator` 和 `diffusion_or_flow_matching` 仍是 data_collection_only，因为 readiness gate 未通过。
+- 当前 top strategy 为 `llm_rag_principle_generation`，原因是 2/2 generation records 通过 Harness 且 UCB 鼓励继续探索低样本高回报策略。
+
 ## 6. 近期优先级
 
 1. 若接入外部 LLM，使用 `scripts/run_feedback_aware_llm_rag_agent.py --provider openai_compatible`，并保持 generation record -> predictor/Harness -> observation ledger -> PiEvo 的审计链。
@@ -346,3 +373,4 @@ PYTHONPATH=src python trail/harness/constraints.py \
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
 7. 持续运行 `scripts/build_generative_training_sets.py`，等 SFT 样本达到 20 条、diffusion/flow seed rows 达到 100 条且有 eval split 后，再考虑训练对应生成模型。
 8. 对 VAE latent local search 做多目标 sweep，并比较 latent-distance ranking、Tanimoto ranking 和 PiEvo posterior 的差异；当前 195 C smoke 已证明链路可运行，但还不能说明 latent metric 已是最优生成策略。
+9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。
