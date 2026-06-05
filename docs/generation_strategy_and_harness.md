@@ -413,6 +413,32 @@ allocation = softmax(score / temperature)
 - `diffusion_or_flow_matching` 已因 23 条 trained projection generation records 成为 active arm，获得 19/100 下一轮 proposal budget 建议；这只表示训练型投影链路已可用，不表示已有可信直接 SMILES diffusion/flow 模型输出。
 - 当前 top strategy 为 `llm_rag_principle_generation`，原因是 2/2 generation records 通过 Harness 且 UCB 鼓励继续探索低样本高回报策略。
 
+### 5.2 Target-conditioned Strategy Policy
+
+单一全局 policy 默认接近 195 C 任务。为了回应“真实 Tg 不固定”，现在新增目标条件化预算层：
+
+- `scripts/update_target_conditioned_generation_policy.py`
+- `artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_policy.csv`
+- `artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_summary.json`
+- `reports/target_conditioned_generation_strategy_policy.md`
+
+数学含义：
+
+```text
+target-specific arms = replacement target sweep + VAE latent target sweep
+global-transfer arms = LLM/RAG + SFT projection + diffusion/flow projection + suppressed SMILES draft
+target_score = 0.25 * beta_pass_mean + 0.30 * mean_reward + 0.45 * best_selected_reward + posterior_uncertainty_bonus + UCB_bonus
+transfer_budget(T) = base_transfer_budget * exp(-abs(T - 195) / transfer_decay)
+```
+
+当前结果：
+
+- 每个目标 Tg 都单独分配 100 proposal budget，且所有目标预算和都为 100。
+- 190/195/200 C 的 target-specific top strategy 为 `vae_latent_local_search`。
+- 250 C 的 target-specific top strategy 变成 `functional_group_replacement`；原因是 250 C 下 VAE latent 只有 5 条 pass、best selected distance 为 0.511 C，而 replacement 虽然也只有 4 条 pass，但 best selected distance 为 0.099 C。
+- 195 C 可迁移 budget 为 25/100；190/200 C 衰减到 23/100；250 C 衰减到 13/100。
+- 250 C 被标记为 sparse target，后续应扩展高 Tg source pool、目标条件化 retrieval 或新 principle，而不是把 195 C 的全局规律硬外推。
+
 ## 6. 近期优先级
 
 1. 若接入外部 LLM，使用 `scripts/run_feedback_aware_llm_rag_agent.py --provider openai_compatible`，并保持 generation record -> predictor/Harness -> observation ledger -> PiEvo 的审计链。
@@ -422,5 +448,5 @@ allocation = softmax(score / temperature)
 5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
 7. SFT dry-run、SFT trained projection、diffusion/flow dry-run 和轻量条件 flow-matching 训练 smoke 都已跑通；下一步应做真实 LLM/SFT fine-tune 输出对比、改进 flow 训练/投影质量，或加入有效 SMILES decoder。任何训练输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。
-8. VAE latent local search 多目标 sweep 已跑通；下一步应比较 target-wise latent search、Tanimoto replacement、rule-template 和 trained SFT/flow projection 的目标级预算，而不是只看 195 C 单点结果。
+8. Target-conditioned strategy policy 已接入；下一步应针对 250 C 稀疏目标扩大 source pool、做目标条件化 retrieval，或让 LLM/RAG 提出新的高 Tg principle，再进入同一 ledger/Harness/PiEvo 链路。
 9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。

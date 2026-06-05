@@ -242,6 +242,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --diffusion-flow-candidate-generation-summary artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json \
   --diffusion-flow-trained-generation-summary artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_summary.json \
   --sft-trained-candidate-generation-summary artifacts/trail/generation/sft_trained_projection_generator/generation_record_summary.json \
+  --target-conditioned-strategy-policy-summary artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
 ```
 
@@ -365,6 +366,14 @@ Generation strategy bandit policy 已补充：
 - `diffusion_or_flow_matching` 已因 23 条 trained projection records 全部通过 Harness 成为 active arm，获得 19/100 proposal budget 建议；当前仍只是训练型 projection 链路已开放，不代表已有直接 SMILES 扩散/流模型推荐。
 - `llm_smiles_generation` 因缺 predictor/chemistry evidence 继续 suppressed。
 - Workflow summary 已读取 `generation_strategy_bandit_summary.json`，让“RL/策略优化”进入总览链路。
+
+Target-conditioned generation strategy policy 已补充：
+
+- `scripts/update_target_conditioned_generation_policy.py` 读取 replacement target sweep、VAE latent target sweep 和全局 strategy bandit，把下一轮预算从单一 195 C 全局配置改成每个目标 Tg 单独分配。
+- 当前 190/195/200/250 C 每个目标预算和都为 100；190/195/200 C 的 target-specific top strategy 为 `vae_latent_local_search`，250 C 切换为 `functional_group_replacement`。
+- 全局 LLM/RAG、SFT projection、flow projection 只拿可迁移 exploration budget；该 budget 以 195 C 为参考衰减，250 C 只保留 13/100，避免把 195 C evidence 硬外推到高 Tg 区间。
+- 250 C 被标记为 sparse target；下一轮应优先扩展高 Tg source pool、目标条件化 latent retrieval 或新的 high-Tg principle，再经 predictor/Harness/PiEvo 复评。
+- Workflow summary 已读取 `target_conditioned_generation_strategy_summary.json`，记录每个目标的 top strategy、transfer budget 和 sparse target。
 
 Human experiment review queue 已补充：
 

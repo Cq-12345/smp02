@@ -1,0 +1,48 @@
+{
+  "targets": 4,
+  "target_values": [
+    190.0,
+    195.0,
+    200.0,
+    250.0
+  ],
+  "strategies_per_target": 6,
+  "total_budget_per_target": 100,
+  "base_transfer_budget": 25,
+  "min_transfer_budget": 8,
+  "reference_transfer_target_tg_c": 195.0,
+  "transfer_decay_c": 80.0,
+  "target_specific_strategies": [
+    "functional_group_replacement",
+    "vae_latent_local_search"
+  ],
+  "transfer_strategies": [
+    "llm_rag_principle_generation",
+    "sft_candidate_generator",
+    "diffusion_or_flow_matching",
+    "llm_smiles_generation"
+  ],
+  "all_targets_allocation_sum_100": true,
+  "top_strategy_by_target": {
+    "190.0": "vae_latent_local_search",
+    "195.0": "vae_latent_local_search",
+    "200.0": "vae_latent_local_search",
+    "250.0": "functional_group_replacement"
+  },
+  "top_target_specific_strategy_by_target": {
+    "190.0": "vae_latent_local_search",
+    "195.0": "vae_latent_local_search",
+    "200.0": "vae_latent_local_search",
+    "250.0": "functional_group_replacement"
+  },
+  "transfer_budget_by_target": {
+    "190.0": 23,
+    "195.0": 25,
+    "200.0": 23,
+    "250.0": 13
+  },
+  "sparse_targets": [
+    250.0
+  ],
+  "sparse_target_count": 1
+}

@@ -104,6 +104,7 @@
 - LLM/RAG 生成：未来可用知识库检索约束 prompt，生成 SMILES 或候选规则。
 - SFT / diffusion / flow 数据契约：`scripts/import_proposal_eval_generation_records.py` 先把已评分 proposals 写回 generation record ledger，`scripts/build_rule_template_generation_records.py` 提供规则模板基线种子，`scripts/build_generative_training_sets.py` 再把通过 Harness 的 records 转成 SFT JSONL 和 diffusion/flow seed table；当前 SFT readiness 和 diffusion/flow seed-table readiness 均已通过，SFT dry-run、SFT trained projection、diffusion/flow dry-run 和轻量条件 flow-matching 训练 smoke 都已产生 records。
 - Strategy-level bandit policy：`scripts/update_generation_strategy_policy.py` 会把各生成策略的 Harness pass、target reward、失败回流和 readiness gate 汇总成下一轮 proposal 预算建议。
+- Target-conditioned strategy policy：`scripts/update_target_conditioned_generation_policy.py` 会在 190/195/200/250 C 下分别读取 target sweep evidence，并只给 195 C 全局策略可衰减的 transfer-exploration budget；当前 250 C 已被标为 sparse target，top target-specific strategy 从 VAE latent 切到 functional-group replacement。
 - Harness 控制：所有生成结果必须通过 RDKit、charset、元素、官能团、反应兼容、ratio simplex 等约束。
 
 生成不是最终决策；生成只产生候选 `h`，评估和选择由 predictor、PiEvo posterior、IDS 共同完成。

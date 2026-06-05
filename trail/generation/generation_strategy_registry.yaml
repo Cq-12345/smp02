@@ -15,18 +15,44 @@ strategy_policy:
     - artifacts/trail/generation_strategy_policy/generation_strategy_bandit_policy.csv
     - artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json
     - reports/generation_strategy_bandit_policy.md
+    - artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_policy.csv
+    - artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_summary.json
+    - reports/target_conditioned_generation_strategy_policy.md
   current_summary:
     top_strategy: llm_rag_principle_generation
     eligible_active_strategies: 5
     suppressed_strategies: 1
     data_collection_only_strategies: 0
-    total_attempts: 451
+    total_attempts: 449
     total_budget: 100
+  target_conditioned_policy:
+    maturity: implemented
+    updater: scripts/update_target_conditioned_generation_policy.py
+    policy_type: target_tg_conditioned_budget_with_global_transfer_exploration
+    target_specific_sources:
+      - artifacts/trail/generation/feedback_guided_replacement_target_sweep/feedback_replacement_target_sweep_summary.json
+      - artifacts/trail/generation/vae_latent_local_search_target_sweep/vae_latent_local_search_target_sweep_summary.json
+    transferable_sources:
+      - artifacts/trail/generation_strategy_policy/generation_strategy_bandit_policy.csv
+    targets: [190.0, 195.0, 200.0, 250.0]
+    total_budget_per_target: 100
+    transfer_budget_by_target:
+      "190.0": 23
+      "195.0": 25
+      "200.0": 23
+      "250.0": 13
+    top_target_specific_strategy_by_target:
+      "190.0": vae_latent_local_search
+      "195.0": vae_latent_local_search
+      "200.0": vae_latent_local_search
+      "250.0": functional_group_replacement
+    sparse_targets: [250.0]
   guardrails:
     - llm_smiles_generation remains suppressed until predictor and chemistry evidence are present
     - sft_candidate_generator is active only after SFT readiness passes and still stays behind predictor/Harness/PiEvo gates
     - diffusion_or_flow_matching gets no training/generation budget until seed-table readiness gate passes
     - allocation_per_100 is a proposal-budget hint, not a final formulation recommendation
+    - target-conditioned policy uses target-sweep evidence for replacement/VAE latent and only assigns decayed transfer-exploration budget to global 195 C strategies
 strategies:
   rule_template:
     maturity: implemented

@@ -120,6 +120,36 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    target_conditioned_policy = tmp_path / "target_conditioned_policy.json"
+    target_conditioned_policy.write_text(
+        json.dumps(
+            {
+                "targets": 4,
+                "all_targets_allocation_sum_100": True,
+                "top_strategy_by_target": {
+                    "190.0": "vae_latent_local_search",
+                    "195.0": "vae_latent_local_search",
+                    "200.0": "vae_latent_local_search",
+                    "250.0": "functional_group_replacement",
+                },
+                "top_target_specific_strategy_by_target": {
+                    "190.0": "vae_latent_local_search",
+                    "195.0": "vae_latent_local_search",
+                    "200.0": "vae_latent_local_search",
+                    "250.0": "functional_group_replacement",
+                },
+                "transfer_budget_by_target": {
+                    "190.0": 23,
+                    "195.0": 25,
+                    "200.0": 23,
+                    "250.0": 13,
+                },
+                "sparse_targets": [250.0],
+                "sparse_target_count": 1,
+            }
+        ),
+        encoding="utf-8",
+    )
     human_review = tmp_path / "human_review.json"
     human_review.write_text(
         json.dumps(
@@ -249,6 +279,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         diffusion_flow_candidate_generation,
         diffusion_flow_trained_generation,
         sft_trained_generation,
+        target_conditioned_policy,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -289,6 +320,12 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["generation_strategy_policy_suppressed_strategies"] == 1
     assert result["generation_strategy_policy_data_collection_only_strategies"] == 2
     assert result["generation_strategy_policy_total_budget"] == 100
+    assert result["target_conditioned_strategy_policy_targets"] == 4
+    assert result["target_conditioned_strategy_policy_all_targets_allocation_sum_100"] is True
+    assert result["target_conditioned_strategy_policy_top_strategy_by_target"]["250.0"] == "functional_group_replacement"
+    assert result["target_conditioned_strategy_policy_top_target_specific_strategy_by_target"]["190.0"] == "vae_latent_local_search"
+    assert result["target_conditioned_strategy_policy_transfer_budget_by_target"]["250.0"] == 13
+    assert result["target_conditioned_strategy_policy_sparse_target_count"] == 1
     assert result["human_review_queue_rows"] == 30
     assert result["human_review_ready_for_active_ledger_rows"] == 0
     assert result["human_review_draft_ready_for_active_ledger_rows"] == 0

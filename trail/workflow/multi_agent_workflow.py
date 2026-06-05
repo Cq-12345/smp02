@@ -47,6 +47,9 @@ def summarize(
     diffusion_flow_candidate_generation_summary: Path = Path("artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json"),
     diffusion_flow_trained_generation_summary: Path = Path("artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_summary.json"),
     sft_trained_candidate_generation_summary: Path = Path("artifacts/trail/generation/sft_trained_projection_generator/generation_record_summary.json"),
+    target_conditioned_strategy_policy_summary: Path = Path(
+        "artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_summary.json"
+    ),
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -71,6 +74,7 @@ def summarize(
     diffusion_flow_candidate_generation = read_json(diffusion_flow_candidate_generation_summary, {})
     diffusion_flow_trained_generation = read_json(diffusion_flow_trained_generation_summary, {})
     sft_trained_candidate_generation = read_json(sft_trained_candidate_generation_summary, {})
+    target_conditioned_strategy_policy = read_json(target_conditioned_strategy_policy_summary, {})
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
@@ -130,6 +134,19 @@ def summarize(
         "generation_strategy_policy_suppressed_strategies": strategy_policy.get("suppressed_strategies", 0),
         "generation_strategy_policy_data_collection_only_strategies": strategy_policy.get("data_collection_only_strategies", 0),
         "generation_strategy_policy_total_budget": strategy_policy.get("total_budget", 0),
+        "target_conditioned_strategy_policy_targets": target_conditioned_strategy_policy.get("targets", 0),
+        "target_conditioned_strategy_policy_all_targets_allocation_sum_100": target_conditioned_strategy_policy.get(
+            "all_targets_allocation_sum_100"
+        ),
+        "target_conditioned_strategy_policy_top_strategy_by_target": target_conditioned_strategy_policy.get("top_strategy_by_target", {}),
+        "target_conditioned_strategy_policy_top_target_specific_strategy_by_target": target_conditioned_strategy_policy.get(
+            "top_target_specific_strategy_by_target", {}
+        ),
+        "target_conditioned_strategy_policy_transfer_budget_by_target": target_conditioned_strategy_policy.get(
+            "transfer_budget_by_target", {}
+        ),
+        "target_conditioned_strategy_policy_sparse_targets": target_conditioned_strategy_policy.get("sparse_targets", []),
+        "target_conditioned_strategy_policy_sparse_target_count": target_conditioned_strategy_policy.get("sparse_target_count", 0),
         "human_review_queue_rows": human_review.get("queue_rows", 0),
         "human_review_ready_for_active_ledger_rows": human_review.get("ready_for_active_ledger_rows", 0),
         "human_review_draft_ready_for_active_ledger_rows": human_review.get("draft_ready_for_active_ledger_rows", 0),
@@ -205,6 +222,10 @@ def main() -> None:
     parser.add_argument("--diffusion-flow-candidate-generation-summary", default="artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json")
     parser.add_argument("--diffusion-flow-trained-generation-summary", default="artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_summary.json")
     parser.add_argument("--sft-trained-candidate-generation-summary", default="artifacts/trail/generation/sft_trained_projection_generator/generation_record_summary.json")
+    parser.add_argument(
+        "--target-conditioned-strategy-policy-summary",
+        default="artifacts/trail/generation_strategy_policy_target_conditioned/target_conditioned_generation_strategy_summary.json",
+    )
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
     result = summarize(
@@ -231,6 +252,7 @@ def main() -> None:
         Path(args.diffusion_flow_candidate_generation_summary),
         Path(args.diffusion_flow_trained_generation_summary),
         Path(args.sft_trained_candidate_generation_summary),
+        Path(args.target_conditioned_strategy_policy_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
