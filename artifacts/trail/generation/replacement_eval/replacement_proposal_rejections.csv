@@ -1,0 +1,14 @@
+proposal_index,reason,source_candidate_tg,replace_side,original_smiles,replacement_smiles,shared_groups,tanimoto
+4,replacement_formula_failed_reaction_or_ratio_constraints,194.99681974863265,b,Cc1ccc(N=C=O)cc1N=C=O,Cc1cc(C)c(C(=O)P(=O)(c2ccccc2)c2ccccc2)c(C)c1,aromatic;isocyanate,0.2093023255813953
+11,replacement_formula_failed_reaction_or_ratio_constraints,195.005365464446,b,O=C1C=CC(=O)N(c2ccc(Cc3ccc(N4C(=O)C=CC4=O)cc3)cc2)C1=O,Nc1ccc(Cc2ccc(N)cc2)cc1,aromatic;imide;maleimide;vinyl,0.28125
+33,replacement_formula_failed_reaction_or_ratio_constraints,195.02246564460987,b,CC(C)(c1ccc(OC#N)cc1)c1ccc(OC#N)cc1,CC(C)(c1ccc(Oc2ccc(C#N)c(C#N)c2)cc1)c1ccc(Oc2ccc(C#N)c(C#N)c2)cc1,aromatic;cyanate_ester;ether;nitrile,0.5
+34,replacement_formula_failed_reaction_or_ratio_constraints,195.02246564460987,b,CC(C)(c1ccc(OC#N)cc1)c1ccc(OC#N)cc1,CC(C)(c1ccc(N)cc1)c1ccc(C(C)(C)c2ccc(N)cc2)cc1,aromatic;cyanate_ester;ether;nitrile,0.4074074074074074
+36,replacement_formula_failed_reaction_or_ratio_constraints,194.9718692273616,a,CC(C)(c1ccc(OC#N)cc1)c1ccc(OC#N)cc1,CC(C)(c1ccc(Oc2ccc(C#N)c(C#N)c2)cc1)c1ccc(Oc2ccc(C#N)c(C#N)c2)cc1,aromatic;cyanate_ester;ether;nitrile,0.5
+37,replacement_formula_failed_reaction_or_ratio_constraints,194.9718692273616,a,CC(C)(c1ccc(OC#N)cc1)c1ccc(OC#N)cc1,CC(C)(c1ccc(N)cc1)c1ccc(C(C)(C)c2ccc(N)cc2)cc1,aromatic;cyanate_ester;ether;nitrile,0.4074074074074074
+67,replacement_formula_failed_reaction_or_ratio_constraints,194.9660282816112,a,O=C=Nc1ccc(Cc2ccc(N=C=O)cc2)cc1,Nc1ccc(Cc2ccc(N)cc2)cc1,aromatic;isocyanate,0.36
+81,replacement_formula_failed_reaction_or_ratio_constraints,194.95941713278893,b,O=c1cc(-c2ccc3c(c2)CN(Cc2ccco2)CO3)c2c3c(c(O)cc2o1)CN(Cc1ccco1)CO3,c1coc(CN2COc3ccccc3C2)c1,aromatic;ether;hydroxyl;phenol,0.453125
+83,replacement_formula_failed_reaction_or_ratio_constraints,194.95941713278893,b,O=c1cc(-c2ccc3c(c2)CN(Cc2ccco2)CO3)c2c3c(c(O)cc2o1)CN(Cc1ccco1)CO3,CC(C)(c1ccc2c(c1)CN(c1ccccc1)CO2)c1ccc2c(c1)CN(c1ccccc1)CO2,aromatic;ether;hydroxyl;phenol,0.2179487179487179
+96,replacement_formula_failed_reaction_or_ratio_constraints,194.9547102397765,a,CCCCC1OC1CCCCC1OC1CCCCCCCC(=O)Oc1ccccc1,C=C(C)C(=O)OCCOc1ccccc1,aromatic;epoxy;ester;ether,0.2692307692307692
+97,replacement_formula_failed_reaction_or_ratio_constraints,194.9547102397765,a,CCCCC1OC1CCCCC1OC1CCCCCCCC(=O)Oc1ccccc1,C=CC(=O)OCCOCCOc1ccccc1,aromatic;epoxy;ester;ether,0.2363636363636363
+98,replacement_formula_failed_reaction_or_ratio_constraints,194.9547102397765,a,CCCCC1OC1CCCCC1OC1CCCCCCCC(=O)Oc1ccccc1,C=CC(=O)OCCOCCOCCOc1ccccc1,aromatic;epoxy;ester;ether,0.2363636363636363
+103,replacement_formula_failed_reaction_or_ratio_constraints,194.94929841273185,a,N#COc1ccc(CC2CCCC(Cc3ccc(OC#N)cc3)C2)cc1,C#CCOc1ccc(Cc2ccc(O)cc2OCC#C)cc1,aromatic;cyanate_ester;ether;nitrile,0.2037037037037037

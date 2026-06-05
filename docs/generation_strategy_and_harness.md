@@ -68,6 +68,23 @@ h = (m_1..m_n, r_1..r_n)
 
 - 在保持反应兼容性的前提下做局部探索。
 
+当前评估闭环：
+
+- `scripts/evaluate_replacement_proposals.py`
+- `artifacts/trail/generation/replacement_eval/replacement_proposals_scored.csv`
+- `artifacts/trail/generation/replacement_eval/replacement_proposals_harness.csv`
+- `artifacts/trail/generation/replacement_eval/replacement_observation_ledger.csv`
+- `reports/replacement_proposal_evaluation.md`
+- `reports/replacement_pievo_feedback_smoke.md`
+
+结果：
+
+- 120 条 replacement proposals 输入。
+- 107 条可重建为完整双组分配方并完成 VAE-WVCM-GPR 预测。
+- 10 条通过 Harness。
+- 最佳 replacement 预测 Tg 为 194.93 C，距 195 C 目标 0.07 C。
+- 通过项已写入 observation ledger，并进入 `configs/pievo_faithful_replacement_195_smoke.yaml` 的 PiEvo-faithful external history。
+
 ### 3.3 VAE latent 生成
 
 当前策略：
@@ -150,7 +167,7 @@ PYTHONPATH=src python trail/harness/constraints.py \
 
 ## 6. 近期优先级
 
-1. 继续完善替换生成，把替换候选重新送入 predictor 和 PiEvo。
-2. 建立 generation record schema，记录来源、prompt、RAG context、harness 失败原因。
-3. 将 LLM 生成限制在“提出 principle/官能团组合/候选模板”，先不直接相信其 SMILES。
+1. 建立 generation record schema，记录来源、prompt、RAG context、harness 失败原因。
+2. 将 LLM 生成限制在“提出 principle/官能团组合/候选模板”，先不直接相信其 SMILES。
+3. 对 replacement 的失败原因做回流：13 条失败均为反应/比例约束失败，应改进官能团匹配或比例搜索。
 4. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。

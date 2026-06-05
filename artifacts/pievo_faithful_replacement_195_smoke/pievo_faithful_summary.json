@@ -1,0 +1,47 @@
+{
+  "target_tg_c": 195.0,
+  "target_window_c": 5.0,
+  "reward_temperature_c": 5.0,
+  "target_guard_enabled": true,
+  "target_guard_max_distance_c": 5.0,
+  "target_guard_min_candidates": 1,
+  "pool_stats": [
+    "library=80",
+    "generated=10",
+    "chembl=60",
+    "chembl_scanned=875"
+  ],
+  "rounds": 4,
+  "selected_rows": 4,
+  "history_rows": 14,
+  "external_observation_summary": {
+    "enabled": true,
+    "ledger_path": "artifacts/trail/generation/replacement_eval/replacement_observation_ledger.csv",
+    "input_rows": 10,
+    "candidate_rows_after_filter": 10,
+    "accepted_rows": 10,
+    "rejected_rows": 0,
+    "rejected": [],
+    "source_counts": {
+      "surrogate": 10
+    },
+    "total_authority_weight": 10.0,
+    "mean_reward": 0.7186236422130333
+  },
+  "total_authority_weight": 14.0,
+  "posterior_entropy": 2.440723871269764,
+  "map_principle": "long_aliphatic_penalty",
+  "best_selected_target_distance_c": 0.005546302352854582,
+  "selected_within_target_guard": 4,
+  "all_selected_within_target_guard": true,
+  "top25_diversity": 0.94649471382756,
+  "validation": {
+    "selected_rows": 4,
+    "ratio_sum_ok": 4,
+    "has_out_of_library": 4,
+    "n_range_ok": 4,
+    "compatibility_nonempty": 4,
+    "rdkit_valid": 4,
+    "all_selected_pass": true
+  }
+}
