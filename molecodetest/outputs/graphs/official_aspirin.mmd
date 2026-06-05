@@ -1,0 +1,31 @@
+graph TB
+    %% Original molecule name: official_aspirin
+    subgraph officialaspirin["official_aspirin"]
+        officialaspirin_C_1[CH3]
+        officialaspirin_C_2[C]
+        officialaspirin_O_1[O]
+        officialaspirin_O_2[O]
+        officialaspirin_C_3[C]
+        officialaspirin_C_4[CH]
+        officialaspirin_C_5[CH]
+        officialaspirin_C_6[CH]
+        officialaspirin_C_7[CH]
+        officialaspirin_C_8[C]
+        officialaspirin_C_9[C]
+        officialaspirin_O_3[O]
+        officialaspirin_O_4[OH]
+
+        officialaspirin_C_1 --- officialaspirin_C_2
+        officialaspirin_C_2 === officialaspirin_O_1
+        officialaspirin_C_2 --- officialaspirin_O_2
+        officialaspirin_O_2 --- officialaspirin_C_3
+        officialaspirin_C_3 === officialaspirin_C_4
+        officialaspirin_C_4 --- officialaspirin_C_5
+        officialaspirin_C_5 === officialaspirin_C_6
+        officialaspirin_C_6 --- officialaspirin_C_7
+        officialaspirin_C_7 === officialaspirin_C_8
+        officialaspirin_C_8 --- officialaspirin_C_9
+        officialaspirin_C_9 === officialaspirin_O_3
+        officialaspirin_C_9 --- officialaspirin_O_4
+        officialaspirin_C_8 --- officialaspirin_C_3
+    end

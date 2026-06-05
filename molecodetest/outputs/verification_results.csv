@@ -1,0 +1,15 @@
+domain,case,claim,status,detail,evidence_path
+environment,package,MoleCode package is installed in the active environment,info,molecode==0.1.0; rdkit canonicalization used for structural equality,
+scope,property_prediction,"MoleCode is tested here as a structural representation, not as a Tg predictor",info,No MoleCode API was used for Tg/property prediction; the existing SMP predictor remains the property model.,
+small_molecule,official_aspirin,SMILES -> MoleCode -> SMILES is canonical-equivalent,pass,canonical=CC(=O)Oc1ccccc1C(=O)O; nodes=13; edges=13,molecodetest/outputs/graphs/official_aspirin.mmd
+small_molecule,official_aspirin,MoleCode exposes typed nodes and edges in Mermaid graph text,pass,graph_header=True; atom_nodes=13; edges=13,molecodetest/outputs/graphs/official_aspirin.mmd
+small_molecule,project_bpab,SMILES -> MoleCode -> SMILES is canonical-equivalent,pass,canonical=Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1; nodes=28; edges=31,molecodetest/outputs/graphs/project_bpab.mmd
+small_molecule,project_bpab,MoleCode exposes typed nodes and edges in Mermaid graph text,pass,graph_header=True; atom_nodes=28; edges=31,molecodetest/outputs/graphs/project_bpab.mmd
+small_molecule,project_bpada,SMILES -> MoleCode -> SMILES is canonical-equivalent,pass,canonical=CC(C)(c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1)c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1; nodes=39; edges=44,molecodetest/outputs/graphs/project_bpada.mmd
+small_molecule,project_bpada,MoleCode exposes typed nodes and edges in Mermaid graph text,pass,graph_header=True; atom_nodes=39; edges=44,molecodetest/outputs/graphs/project_bpada.mmd
+project_smp,BPAB/BPADA,MoleCode round-trip preserves SMP functional-group classification and pair compatibility,pass,BPAB groups=aromatic;ether;primary_amine; BPADA groups=anhydride;aromatic;ester;ether; compatibility=酸酐-胺形成聚酰胺酸/聚酰亚胺前体。,
+project_smp,BPAB/BPADA,Paper BPAB/BPADA ratios are present in the local full candidate table,pass,"ratio_a/b=0.50/0.50: row=17565, Tg=226.28 C; ratio_a/b=0.55/0.45: row=17566, Tg=202.01 C",artifacts/reproduce/discovery/all_ratio_candidates.csv
+polymer,nylon6,PSMILES repeat unit -> MoleCode -> PSMILES is canonical-equivalent,pass,canonical=*NCCCCCC(*)=O; repeat_marker=×8; termini=TL/TR,molecodetest/outputs/graphs/polymer_nylon6.mmd
+polymer,polyethylene,PSMILES repeat unit -> MoleCode -> PSMILES is canonical-equivalent,pass,canonical=*CC*; repeat_marker=×100; termini=TL/TR,molecodetest/outputs/graphs/polymer_polyethylene.mmd
+markush,abbrev_nodes,Markush-style abbreviation nodes are parsed as graph nodes,pass,"abbrev_labels=['Boc', 'R1']; edges=2",molecodetest/outputs/graphs/markush_abbrev_nodes.mmd
+markush,graph_isomorphism,Markush graph comparison detects same and changed topology,pass,self-isomorphic=True; missing-edge-isomorphic=False,molecodetest/outputs/graphs/markush_abbrev_nodes.mmd

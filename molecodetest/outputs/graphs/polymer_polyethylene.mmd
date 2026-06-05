@@ -1,0 +1,15 @@
+graph LR
+    %% Polymer: polyethylene
+
+    TL[H]
+    subgraph B0["×100"]
+        B0_C1[CH2]
+        B0_C2[CH2]
+
+        B0_C1 --- B0_C2
+    end
+
+    TR[H]
+
+    TL --- B0_C1
+    B0_C2 --- TR

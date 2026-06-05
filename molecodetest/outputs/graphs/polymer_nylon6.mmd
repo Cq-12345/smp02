@@ -1,0 +1,27 @@
+graph LR
+    %% Polymer: nylon6
+
+    TL[H]
+    subgraph B0["×8"]
+        B0_N1[NH]
+        B0_C1[CH2]
+        B0_C2[CH2]
+        B0_C3[CH2]
+        B0_C4[CH2]
+        B0_C5[CH2]
+        B0_C6[C]
+        B0_O1[O]
+
+        B0_N1 --- B0_C1
+        B0_C1 --- B0_C2
+        B0_C2 --- B0_C3
+        B0_C3 --- B0_C4
+        B0_C4 --- B0_C5
+        B0_C5 --- B0_C6
+        B0_C6 === B0_O1
+    end
+
+    TR[H]
+
+    TL --- B0_N1
+    B0_C6 --- TR

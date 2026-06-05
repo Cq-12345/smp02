@@ -1,0 +1,121 @@
+{
+  "summary": {
+    "pass": 12,
+    "fail": 0,
+    "info": 2
+  },
+  "results": [
+    {
+      "domain": "environment",
+      "case": "package",
+      "claim": "MoleCode package is installed in the active environment",
+      "status": "info",
+      "detail": "molecode==0.1.0; rdkit canonicalization used for structural equality",
+      "evidence_path": ""
+    },
+    {
+      "domain": "scope",
+      "case": "property_prediction",
+      "claim": "MoleCode is tested here as a structural representation, not as a Tg predictor",
+      "status": "info",
+      "detail": "No MoleCode API was used for Tg/property prediction; the existing SMP predictor remains the property model.",
+      "evidence_path": ""
+    },
+    {
+      "domain": "small_molecule",
+      "case": "official_aspirin",
+      "claim": "SMILES -> MoleCode -> SMILES is canonical-equivalent",
+      "status": "pass",
+      "detail": "canonical=CC(=O)Oc1ccccc1C(=O)O; nodes=13; edges=13",
+      "evidence_path": "molecodetest/outputs/graphs/official_aspirin.mmd"
+    },
+    {
+      "domain": "small_molecule",
+      "case": "official_aspirin",
+      "claim": "MoleCode exposes typed nodes and edges in Mermaid graph text",
+      "status": "pass",
+      "detail": "graph_header=True; atom_nodes=13; edges=13",
+      "evidence_path": "molecodetest/outputs/graphs/official_aspirin.mmd"
+    },
+    {
+      "domain": "small_molecule",
+      "case": "project_bpab",
+      "claim": "SMILES -> MoleCode -> SMILES is canonical-equivalent",
+      "status": "pass",
+      "detail": "canonical=Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1; nodes=28; edges=31",
+      "evidence_path": "molecodetest/outputs/graphs/project_bpab.mmd"
+    },
+    {
+      "domain": "small_molecule",
+      "case": "project_bpab",
+      "claim": "MoleCode exposes typed nodes and edges in Mermaid graph text",
+      "status": "pass",
+      "detail": "graph_header=True; atom_nodes=28; edges=31",
+      "evidence_path": "molecodetest/outputs/graphs/project_bpab.mmd"
+    },
+    {
+      "domain": "small_molecule",
+      "case": "project_bpada",
+      "claim": "SMILES -> MoleCode -> SMILES is canonical-equivalent",
+      "status": "pass",
+      "detail": "canonical=CC(C)(c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1)c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1; nodes=39; edges=44",
+      "evidence_path": "molecodetest/outputs/graphs/project_bpada.mmd"
+    },
+    {
+      "domain": "small_molecule",
+      "case": "project_bpada",
+      "claim": "MoleCode exposes typed nodes and edges in Mermaid graph text",
+      "status": "pass",
+      "detail": "graph_header=True; atom_nodes=39; edges=44",
+      "evidence_path": "molecodetest/outputs/graphs/project_bpada.mmd"
+    },
+    {
+      "domain": "project_smp",
+      "case": "BPAB/BPADA",
+      "claim": "MoleCode round-trip preserves SMP functional-group classification and pair compatibility",
+      "status": "pass",
+      "detail": "BPAB groups=aromatic;ether;primary_amine; BPADA groups=anhydride;aromatic;ester;ether; compatibility=酸酐-胺形成聚酰胺酸/聚酰亚胺前体。",
+      "evidence_path": ""
+    },
+    {
+      "domain": "project_smp",
+      "case": "BPAB/BPADA",
+      "claim": "Paper BPAB/BPADA ratios are present in the local full candidate table",
+      "status": "pass",
+      "detail": "ratio_a/b=0.50/0.50: row=17565, Tg=226.28 C; ratio_a/b=0.55/0.45: row=17566, Tg=202.01 C",
+      "evidence_path": "artifacts/reproduce/discovery/all_ratio_candidates.csv"
+    },
+    {
+      "domain": "polymer",
+      "case": "nylon6",
+      "claim": "PSMILES repeat unit -> MoleCode -> PSMILES is canonical-equivalent",
+      "status": "pass",
+      "detail": "canonical=*NCCCCCC(*)=O; repeat_marker=×8; termini=TL/TR",
+      "evidence_path": "molecodetest/outputs/graphs/polymer_nylon6.mmd"
+    },
+    {
+      "domain": "polymer",
+      "case": "polyethylene",
+      "claim": "PSMILES repeat unit -> MoleCode -> PSMILES is canonical-equivalent",
+      "status": "pass",
+      "detail": "canonical=*CC*; repeat_marker=×100; termini=TL/TR",
+      "evidence_path": "molecodetest/outputs/graphs/polymer_polyethylene.mmd"
+    },
+    {
+      "domain": "markush",
+      "case": "abbrev_nodes",
+      "claim": "Markush-style abbreviation nodes are parsed as graph nodes",
+      "status": "pass",
+      "detail": "abbrev_labels=['Boc', 'R1']; edges=2",
+      "evidence_path": "molecodetest/outputs/graphs/markush_abbrev_nodes.mmd"
+    },
+    {
+      "domain": "markush",
+      "case": "graph_isomorphism",
+      "claim": "Markush graph comparison detects same and changed topology",
+      "status": "pass",
+      "detail": "self-isomorphic=True; missing-edge-isomorphic=False",
+      "evidence_path": "molecodetest/outputs/graphs/markush_abbrev_nodes.mmd"
+    }
+  ]
+}
