@@ -24,6 +24,12 @@ def _maybe_parallel(model: nn.Module, device: torch.device) -> nn.Module:
     return model
 
 
+def _loader_kwargs(num_workers: int) -> dict:
+    if num_workers <= 0:
+        return {}
+    return {"persistent_workers": True, "prefetch_factor": 4}
+
+
 def train_vae_model(
     smiles: list[str],
     charset: list[str],
@@ -46,6 +52,7 @@ def train_vae_model(
         shuffle=True,
         num_workers=num_workers,
         pin_memory=device.type == "cuda",
+        **_loader_kwargs(num_workers),
     )
     model = SmilesVAE(latent_size=latent_size, max_length=max_length, charset_size=len(charset)).to(device)
     model = _maybe_parallel(model, device)
@@ -114,6 +121,7 @@ def fine_tune_vae_decoder(
         shuffle=True,
         num_workers=num_workers,
         pin_memory=device.type == "cuda",
+        **_loader_kwargs(num_workers),
     )
     metrics: list[dict[str, float]] = []
     for epoch in range(1, epochs + 1):
@@ -140,4 +148,3 @@ def fine_tune_vae_decoder(
         save_vae_checkpoint(out_path, model, charset, max_length, latent_size, metrics)
     pd.DataFrame(metrics).to_csv(Path(out_path).with_suffix(".metrics.csv"), index=False)
     return metrics
-

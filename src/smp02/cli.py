@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 from pathlib import Path
 
 import pandas as pd
@@ -9,9 +10,9 @@ from smp02.closed_loop import run_closed_loop
 from smp02.data import augment_smiles, filter_smiles_by_charset, iter_chembl_smiles, load_smp_records, records_to_frame, unique_monomers
 from smp02.discovery import discover_candidates
 from smp02.functional_groups import classify_many
-from smp02.predictors import train_predictor_suite
+from smp02.predictors import select_best_model, train_predictor_suite
 from smp02.training import fine_tune_vae_decoder, train_vae_model
-from smp02.utils import ensure_dir, load_config, resolve_device, save_json, set_seed
+from smp02.utils import ensure_dir, load_config, load_json, resolve_device, save_json, set_seed
 from smp02.vae import build_charset
 
 
@@ -126,21 +127,36 @@ def train_predictors(cfg: dict) -> None:
         metrics = train_predictor_suite(records, checkpoint, paths["predictors"] / f"latent_{latent_size}", cfg, device)
         all_metrics.append(metrics)
     if all_metrics:
-        pd.concat(all_metrics, ignore_index=True).to_csv(paths["predictors"] / "all_predictor_metrics.csv", index=False)
+        metrics_df = pd.concat(all_metrics, ignore_index=True)
+        metrics_df.to_csv(paths["predictors"] / "all_predictor_metrics.csv", index=False)
+        best = select_best_model(metrics_df, paths["predictors"] / "best_model.json", cfg)
+        if best:
+            print(f"Best predictor: {best['ML method']} by {best['selection_metric']}={best[best['selection_metric']]}", flush=True)
 
 
 def discover(cfg: dict) -> None:
     paths = _paths(cfg)
     device = resolve_device(cfg.get("device", "cuda"))
     records = load_smp_records(cfg["data_path"])
+    run_cfg = copy.deepcopy(cfg)
+    predictor_setting = str(cfg["discovery"].get("predictor", "svr"))
     latent_size = int(cfg["discovery"]["latent_size"])
+    if predictor_setting == "best":
+        best_path = paths["predictors"] / "best_model.json"
+        if not best_path.exists():
+            raise FileNotFoundError(f"Missing global best model file: {best_path}")
+        best = load_json(best_path)
+        latent_size = int(best["latent_size"])
+        predictor = Path(best["model_path"])
+        run_cfg["discovery"]["latent_size"] = latent_size
+    else:
+        predictor = paths["predictors"] / f"latent_{latent_size}" / f"svr_latent_{latent_size}.joblib"
     checkpoint = paths["vae"] / f"finetuned_latent_{latent_size}.pt"
-    predictor = paths["predictors"] / f"latent_{latent_size}" / f"svr_latent_{latent_size}.joblib"
     if not checkpoint.exists():
         raise FileNotFoundError(f"Missing VAE checkpoint: {checkpoint}")
     if not predictor.exists():
-        raise FileNotFoundError(f"Missing SVR predictor: {predictor}")
-    discover_candidates(records, checkpoint, predictor, paths["discovery"], cfg, device)
+        raise FileNotFoundError(f"Missing predictor: {predictor}")
+    discover_candidates(records, checkpoint, predictor, paths["discovery"], run_cfg, device)
 
 
 def closed_loop(cfg: dict) -> None:

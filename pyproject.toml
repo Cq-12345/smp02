@@ -4,9 +4,12 @@ version = "0.1.0"
 description = "Reproduction workflow for ML-driven discovery of thermoset shape memory polymers."
 requires-python = ">=3.10"
 dependencies = [
+  "catboost",
   "joblib",
+  "lightgbm",
   "matplotlib",
   "networkx",
+  "ngboost",
   "numpy",
   "openpyxl",
   "pandas",
@@ -18,6 +21,7 @@ dependencies = [
   "torch",
   "torch-geometric",
   "tqdm",
+  "xgboost",
 ]
 
 [project.scripts]
@@ -25,4 +29,3 @@ smp02 = "smp02.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-

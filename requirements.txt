@@ -1,6 +1,9 @@
+catboost
 joblib
+lightgbm
 matplotlib
 networkx
+ngboost
 numpy
 openpyxl
 pandas
@@ -12,4 +15,4 @@ seaborn
 torch
 torch-geometric
 tqdm
-
+xgboost
