@@ -1,0 +1,21 @@
+{
+  "input_rows": 50,
+  "record_pass_rows": 50,
+  "ready_for_prediction_rows": 0,
+  "harness_pass_rows": 50,
+  "harness_fail_rows": 0,
+  "strategy_counts": {
+    "rule_template": 50
+  },
+  "stage_counts": {
+    "harnessed": 50
+  },
+  "best_distance_c": 0.0031802513673540034,
+  "mean_generation_reward": 0.9887598357832142,
+  "reward_temperature_c": 5.0,
+  "target_tg_c": 195.0,
+  "target_window_c": 5.0,
+  "selected_candidates_path": "artifacts/reproduce/discovery/selected_candidates.csv",
+  "input_records_path": "artifacts/trail/generation/rule_template_records/rule_template_generation_records_input.csv",
+  "generation_record_ledger_path": "artifacts/trail/generation/rule_template_records/generation_record_ledger.csv"
+}

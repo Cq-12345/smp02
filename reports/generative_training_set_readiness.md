@@ -12,26 +12,27 @@
 
 | item | value |
 | --- | ---: |
-| input_rows | 408 |
-| harness_pass_rows | 67 |
-| training_candidate_rows | 64 |
-| sft_examples | 64 |
-| sft_train_examples | 52 |
-| sft_eval_examples | 12 |
+| input_rows | 1165 |
+| harness_pass_rows | 177 |
+| training_candidate_rows | 143 |
+| sft_examples | 143 |
+| sft_train_examples | 124 |
+| sft_eval_examples | 19 |
 | sft_ready | True |
-| diffusion_flow_seed_rows | 64 |
-| diffusion_flow_train_rows | 52 |
-| diffusion_flow_eval_rows | 12 |
-| diffusion_flow_ready | False |
+| diffusion_flow_seed_rows | 143 |
+| diffusion_flow_train_rows | 124 |
+| diffusion_flow_eval_rows | 19 |
+| diffusion_flow_ready | True |
 | next_data_needed_for_sft | 0 |
-| next_data_needed_for_diffusion_flow | 36 |
+| next_data_needed_for_diffusion_flow | 0 |
 
 ## Strategy Counts
 
 | strategy | records |
 | --- | ---: |
+| rule_template | 50 |
+| functional_group_replacement | 47 |
 | vae_latent_local_search | 42 |
-| functional_group_replacement | 18 |
 | llm_rag_principle_generation | 4 |
 
 ## Interpretation

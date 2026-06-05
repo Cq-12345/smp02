@@ -17,9 +17,10 @@ strategy_policy:
     - reports/generation_strategy_bandit_policy.md
   current_summary:
     top_strategy: llm_rag_principle_generation
-    eligible_active_strategies: 4
+    eligible_active_strategies: 5
     suppressed_strategies: 1
-    data_collection_only_strategies: 1
+    data_collection_only_strategies: 0
+    total_attempts: 571
     total_budget: 100
   guardrails:
     - llm_smiles_generation remains suppressed until predictor and chemistry evidence are present
@@ -32,6 +33,19 @@ strategies:
     generator: src/smp02/agent_discovery.py::GENERATED_MONOMER_SEEDS
     harness_required: true
     best_use: seed chemically plausible thermoset monomers
+    generation_records:
+      script: scripts/build_rule_template_generation_records.py
+      source: artifacts/reproduce/discovery/selected_candidates.csv
+      records: 50
+      harness_pass: 50
+      best_distance_c: 0.0031802513673540034
+      mean_generation_reward: 0.9887598357832142
+      note: rule/template baseline seeds from current selected candidate space; surrogate evidence only
+      outputs:
+        - artifacts/trail/generation/rule_template_records/rule_template_generation_records_input.csv
+        - artifacts/trail/generation/rule_template_records/generation_record_ledger.csv
+        - artifacts/trail/generation/rule_template_records/generation_record_summary.json
+        - reports/rule_template_generation_records.md
   functional_group_replacement:
     maturity: implemented
     generator: trail/generation/vae_replacement_strategy.py + scripts/evaluate_replacement_proposals.py
@@ -159,26 +173,33 @@ strategies:
     training_corpus:
       jsonl: artifacts/trail/generation/generative_training_sets/sft_generation_records.jsonl
       summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
-      examples: 64
-      train_examples: 52
-      eval_examples: 12
+      examples: 143
+      train_examples: 124
+      eval_examples: 19
       readiness_gate_pass: true
       min_examples: 20
       source_ledgers:
+        - artifacts/trail/generation/rule_template_records/generation_record_ledger.csv
         - artifacts/trail/generation/prompt_records/generation_record_ledger.csv
         - artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv
         - artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv
+        - artifacts/trail/generation/original_replacement_records/generation_record_ledger.csv
+        - artifacts/trail/generation/feedback_guided_replacement_records/generation_record_ledger.csv
         - artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv
         - artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv
+        - artifacts/trail/generation/feedback_guided_replacement_target_records/target_190/generation_record_ledger.csv
+        - artifacts/trail/generation/feedback_guided_replacement_target_records/target_195/generation_record_ledger.csv
+        - artifacts/trail/generation/feedback_guided_replacement_target_records/target_200/generation_record_ledger.csv
+        - artifacts/trail/generation/feedback_guided_replacement_target_records/target_250/generation_record_ledger.csv
     dry_run:
       mode: prototype_replay_not_weight_update
       script: scripts/run_sft_candidate_generator_dry_run.py
       records: 25
       harness_pass: 25
       best_distance_c: 0.0031802513673540034
-      mean_generation_reward: 0.7778092820404912
-      heldout_eval_rows: 12
-      heldout_exact_candidate_matches: 3
+      mean_generation_reward: 0.9921940687487707
+      heldout_eval_rows: 19
+      heldout_exact_candidate_matches: 0
       outputs:
         - artifacts/trail/generation/sft_candidate_dry_run/sft_candidate_records_input.csv
         - artifacts/trail/generation/sft_candidate_dry_run/generation_record_ledger.csv
@@ -186,19 +207,19 @@ strategies:
         - artifacts/trail/generation/sft_candidate_dry_run/heldout_eval_retrieval.csv
         - reports/sft_candidate_generator_dry_run.md
   diffusion_or_flow_matching:
-    maturity: seed_table_contract_implemented
+    maturity: seed_table_ready_for_dry_run_or_training
     generator: scripts/build_generative_training_sets.py
     harness_required: true
-    best_use: not prioritized until more harness-passing small-molecule formulation records exist
+    best_use: train or dry-run conditional diffusion/flow only after all generated records are revalidated by predictor/Harness/PiEvo
     training_seed_table:
       table: artifacts/trail/generation/generative_training_sets/diffusion_flow_seed_table.csv
       summary: artifacts/trail/generation/generative_training_sets/generative_training_summary.json
-      seed_rows: 64
-      train_rows: 52
-      eval_rows: 12
-      readiness_gate_pass: false
+      seed_rows: 143
+      train_rows: 124
+      eval_rows: 19
+      readiness_gate_pass: true
       min_examples: 100
-      next_data_needed: 36
+      next_data_needed: 0
 record_schema:
   schema_path: trail/generation/generation_record_schema.yaml
   importer: trail/generation/import_generation_records.py

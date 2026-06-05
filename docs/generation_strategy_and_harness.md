@@ -53,6 +53,13 @@ h = (m_1..m_n, r_1..r_n)
 
 - 新颖性有限。
 
+当前 record 化结果：
+
+- `scripts/build_rule_template_generation_records.py` 会把 `artifacts/reproduce/discovery/selected_candidates.csv` 中的近目标规则/模板候选写成 `rule_template` generation records。
+- 本轮 195±5 C 生成 50 条 records，50 条通过 importer/Harness；最佳 target distance 为 0.003 C，mean generation reward 为 0.9888。
+- 这些 records 是当前小分子搜索空间的规则基线种子，不是真实 DSC 或新物理实验；它们进入 SFT/diffusion/flow 训练语料前仍保留 source/context/audit 字段。
+- 输出见 `artifacts/trail/generation/rule_template_records/*` 和 `reports/rule_template_generation_records.md`。
+
 ### 3.2 替换生成
 
 已有脚本：
@@ -113,6 +120,7 @@ h = (m_1..m_n, r_1..r_n)
 - Expanded inventory 已进入 strict replacement 生成器：`--component-inventory artifacts/trail/candidates_expanded/component_inventory.csv` 会保留 `replacement_source/label/template_family/template_intended_group`。
 - Expanded replacement smoke 生成 200 条 strict proposals、200 条可重建并评分、18 条通过 Harness；其中 `literature_template` 被评分 29 条，3 条通过 Harness，最佳 template 候选距 195 C 目标 0.52 C。
 - 这 200 条 scored proposals 已通过 `scripts/import_proposal_eval_generation_records.py` 写回 generation record ledger：200 条 record 全部基础字段通过，18 条 Harness pass，失败项保留 target/chemistry failure reason 用于策略回流。
+- 原始 replacement、feedback-guided replacement 以及 190/195/200/250 C 多目标 strict replacement scored proposals 也已写回 generation record ledgers；这些账本为 SFT 和 diffusion/flow 提供更多目标条件、更多失败原因和更多 Harness-passing 小分子种子。
 
 ### 3.3 VAE latent 生成
 
@@ -285,16 +293,16 @@ Feedback-aware LLM/RAG agent 状态：
 
 当前 readiness：
 
-- 5 个 generation ledgers 共 408 条输入，其中 67 条通过 Harness；去重和 reward 过滤后得到 64 条训练候选。
-- SFT JSONL 为 52 条 train、12 条 eval。
+- 12 个 generation ledgers 共 1165 条输入，其中 177 条通过 Harness；去重和 reward 过滤后得到 143 条训练候选。
+- SFT JSONL 为 124 条 train、19 条 eval。
 - `sft_ready=true`，当前最小门槛为 20 条样本，已超过；下一步可以做 SFT dry-run 或训练作业。
 - SFT 生成器即使训练完成，也只能生成 auditable generation record JSON；候选仍必须重新经过 predictor、Harness、PiEvo 和人工审核，不能直接推荐。
 
 当前 SFT dry-run：
 
 - `scripts/run_sft_candidate_generator_dry_run.py` 已用 train split 中的 validated prototypes 生成 25 条 `sft_candidate_generator` records。
-- 25 条 records 全部通过 generation record/Harness，最佳 target distance 为 0.003 C，mean generation reward 为 0.7778。
-- heldout eval 有 12 条，其中 3 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 SFT 已学会分布外生成。
+- 25 条 records 全部通过 generation record/Harness，最佳 target distance 为 0.003 C，mean generation reward 为 0.9922。
+- heldout eval 有 19 条，其中 0 条和 dry-run prototypes 完全同候选；这说明 dry-run 主要验证链路，不证明神经 SFT 已学会分布外生成。
 - dry-run mode 明确为 `prototype_replay_not_weight_update`。后续真正训练 LLM/SFT 权重时，应把模型输出写入同一 ledger，并和该 dry-run 的 pass rate、target distance、重复率对比。
 
 ### 3.7 扩散/流匹配
@@ -312,9 +320,9 @@ Seed table 记录：
 
 当前 readiness：
 
-- diffusion/flow seed rows 为 64，52 条 train、12 条 eval。
-- `diffusion_flow_ready=false`，因为当前最小门槛设为 100 条 seed rows；还缺 36 条。
-- 这一步把扩散/流匹配从“空泛未来项”推进为数据契约；在样本不足前不训练，避免生成器学习到过窄的 195 C smoke 分布。
+- diffusion/flow seed rows 为 143，124 条 train、19 条 eval。
+- `diffusion_flow_ready=true`，当前最小门槛 100 条 seed rows 已通过；下一步可以启动 diffusion/flow dry-run 或训练作业。
+- 这一步把扩散/流匹配从“空泛未来项”推进为可训练数据契约；训练后输出仍必须重新写入 generation ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 ## 4. Harness 约束
 
@@ -373,10 +381,10 @@ allocation = softmax(score / temperature)
 当前结果：
 
 - 6 个策略进入 policy：VAE latent local search、functional-group replacement、LLM/RAG principle generation、LLM SMILES draft、SFT candidate generator、diffusion/flow matching。
-- 4 个策略为 eligible active。
+- 5 个策略为 eligible active。
 - `llm_smiles_generation` 仍 suppressed，因为它缺 predictor/chemistry evidence。
-- `sft_candidate_generator` 已因 64 条 SFT 样本通过 readiness gate 而成为 active arm；当前 policy 优先读取 25 条 SFT dry-run generation records，SFT 获得 21/100 下一轮 proposal budget 建议。
-- `diffusion_or_flow_matching` 仍是 data_collection_only，因为 seed rows 还差 36 条。
+- `sft_candidate_generator` 已因 143 条 SFT 样本和 25 条 dry-run generation records 成为 active arm，获得 23/100 下一轮 proposal budget 建议。
+- `diffusion_or_flow_matching` 已因 143 条 seed rows 通过 readiness gate 成为 active arm，获得 19/100 下一轮 proposal budget 建议；这只表示可以做 dry-run/训练，不表示已有可信生成模型输出。
 - 当前 top strategy 为 `llm_rag_principle_generation`，原因是 2/2 generation records 通过 Harness 且 UCB 鼓励继续探索低样本高回报策略。
 
 ## 6. 近期优先级
@@ -387,6 +395,6 @@ allocation = softmax(score / temperature)
 4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 和 feedback-aware LLM/RAG 侧都已完成 observation ledger -> PiEvo posterior 的 smoke 闭环。
 5. 生成候选排序时同步读取 `reports/predictor_ensemble_disagreement.md` 和 `artifacts/trail/predictors/ensemble_disagreement/low_disagreement_near_target.csv`；高分歧近目标候选应优先被标记为复核对象，而不是直接推荐。
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
-7. SFT dry-run 已跑通；下一步可替换为真实神经 SFT/LLM 权重训练，训练后输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。diffusion/flow seed rows 仍需补到 100 条。
+7. SFT dry-run 已跑通，diffusion/flow seed table 也已通过 100 条门槛；下一步可分别替换为真实神经 SFT/LLM 权重训练和 diffusion/flow dry-run/训练，训练后输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。
 8. 对 VAE latent local search 做多目标 sweep，并比较 latent-distance ranking、Tanimoto ranking 和 PiEvo posterior 的差异；当前 195 C smoke 已证明链路可运行，但还不能说明 latent metric 已是最优生成策略。
 9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。

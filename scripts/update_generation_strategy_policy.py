@@ -122,11 +122,13 @@ def arm_from_training_readiness(strategy: str, summary: dict[str, Any]) -> dict[
         ready = bool(summary.get("sft_ready", False))
         needed = int(summary.get("next_data_needed_for_sft", 0) or 0)
         minimum = int(summary.get("sft_min_examples", 0) or 0)
+        ready_next = "run SFT dry-run or training job with generation_record JSONL, then evaluate behind predictor/Harness/PiEvo gates."
     else:
         examples = int(summary.get("diffusion_flow_seed_rows", 0) or 0)
         ready = bool(summary.get("diffusion_flow_ready", False))
         needed = int(summary.get("next_data_needed_for_diffusion_flow", 0) or 0)
         minimum = int(summary.get("diffusion_flow_min_examples", 0) or 0)
+        ready_next = "run diffusion/flow dry-run or training job with seed table, then evaluate generated records behind predictor/Harness/PiEvo gates."
     return {
         "strategy": strategy,
         "status": "active" if ready else "data_collection_only",
@@ -142,7 +144,7 @@ def arm_from_training_readiness(strategy: str, summary: dict[str, Any]) -> dict[
         "readiness_gate": ready,
         "readiness_reason": "ready for training" if ready else f"not ready; need {needed} more validated records before training.",
         "next_constraint": (
-            "run SFT dry-run or training job with generation_record JSONL, then evaluate behind predictor/Harness/PiEvo gates."
+            ready_next
             if ready
             else "collect more Harness-passing, prediction-backed generation records before training."
         ),
@@ -316,7 +318,7 @@ def write_report(policy: pd.DataFrame, summary: dict[str, Any], out_dir: Path, r
             "",
             "- `allocation_per_100` 是下一轮生成预算建议，不是最终推荐配方。",
             "- `sft_candidate_generator` 只有在 SFT JSONL 达到最小样本和 eval split 后才会成为 active arm；否则只保留数据收集建议。",
-            "- `diffusion_or_flow_matching` 在 seed table 未达到最小样本前不获得训练/生成预算，只获得数据收集建议。",
+            "- `diffusion_or_flow_matching` 在 seed table 未达到最小样本前不获得训练/生成预算；达到门槛后可成为 active arm，但生成结果仍必须重新进入 ledger/Harness/PiEvo。",
             "- `llm_smiles_generation` 若仍缺 predictor 或 chemistry evidence，会被压到 gate review，而不是进入 PiEvo 或实验推荐。",
             "- 高 allocation 的策略仍必须把候选写入 generation/proposal ledger，再经过 predictor、Harness、PiEvo 和人工审核。",
         ]

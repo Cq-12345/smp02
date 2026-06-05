@@ -113,6 +113,37 @@ def test_bandit_policy_prefers_sft_dry_run_summary_when_available() -> None:
     assert by_strategy["sft_candidate_generator"]["status"] == "active"
 
 
+def test_bandit_policy_activates_ready_diffusion_flow() -> None:
+    arms = collect_arms(
+        pd.DataFrame(),
+        expanded_replacement={"input_proposals": 200, "harness_pass": 18, "best_distance_c": 0.2, "replacement_observations": 18},
+        latent_local_search_eval={"input_proposals": 200, "harness_pass": 42, "best_distance_c": 0.2, "replacement_observations": 42},
+        expanded_generation={"input_rows": 2, "harness_pass_rows": 2, "best_distance_c": 0.01, "mean_generation_reward": 0.95},
+        training_summary={
+            "sft_examples": 143,
+            "sft_ready": True,
+            "next_data_needed_for_sft": 0,
+            "sft_min_examples": 20,
+            "diffusion_flow_seed_rows": 143,
+            "diffusion_flow_ready": True,
+            "next_data_needed_for_diffusion_flow": 0,
+            "diffusion_flow_min_examples": 100,
+        },
+    )
+
+    policy, summary = score_policy(arms, exploration_c=0.25, softmax_temperature=0.25, total_budget=100)
+
+    by_strategy = {row["strategy"]: row for _, row in policy.iterrows()}
+    assert summary["eligible_active_strategies"] == 5
+    assert summary["data_collection_only_strategies"] == 0
+    assert by_strategy["diffusion_or_flow_matching"]["status"] == "active"
+    assert by_strategy["diffusion_or_flow_matching"]["readiness_gate"]
+    assert by_strategy["diffusion_or_flow_matching"]["attempts"] == 143
+    assert by_strategy["diffusion_or_flow_matching"]["successes"] == 143
+    assert by_strategy["diffusion_or_flow_matching"]["allocation_per_100"] > 0
+    assert "diffusion/flow dry-run" in by_strategy["diffusion_or_flow_matching"]["next_constraint"]
+
+
 def test_run_policy_writes_outputs(tmp_path: Path) -> None:
     feedback = tmp_path / "strategy_feedback.csv"
     pd.DataFrame(

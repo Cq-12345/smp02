@@ -10,11 +10,18 @@ import pandas as pd
 
 
 DEFAULT_LEDGERS = [
+    "artifacts/trail/generation/rule_template_records/generation_record_ledger.csv",
     "artifacts/trail/generation/prompt_records/generation_record_ledger.csv",
     "artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv",
     "artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv",
+    "artifacts/trail/generation/original_replacement_records/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_records/generation_record_ledger.csv",
     "artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv",
     "artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_190/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_195/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_200/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_250/generation_record_ledger.csv",
 ]
 
 

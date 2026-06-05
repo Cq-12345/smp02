@@ -1,0 +1,21 @@
+{
+  "input_rows": 120,
+  "record_pass_rows": 120,
+  "ready_for_prediction_rows": 0,
+  "harness_pass_rows": 11,
+  "harness_fail_rows": 109,
+  "strategy_counts": {
+    "functional_group_replacement": 120
+  },
+  "stage_counts": {
+    "predicted": 109,
+    "harnessed": 11
+  },
+  "best_distance_c": 0.3732434861057641,
+  "mean_generation_reward": 0.10160049542801396,
+  "reward_temperature_c": 5.0,
+  "strategy": "functional_group_replacement",
+  "source_context": "feedback_guided_replacement_eval_195",
+  "input_records_path": "artifacts/trail/generation/feedback_guided_replacement_records/proposal_generation_records_input.csv",
+  "generation_record_ledger_path": "artifacts/trail/generation/feedback_guided_replacement_records/generation_record_ledger.csv"
+}

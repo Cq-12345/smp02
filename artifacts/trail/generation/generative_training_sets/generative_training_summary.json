@@ -1,37 +1,51 @@
 {
   "input_ledgers": [
+    "artifacts/trail/generation/rule_template_records/generation_record_ledger.csv",
     "artifacts/trail/generation/prompt_records/generation_record_ledger.csv",
     "artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv",
     "artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv",
+    "artifacts/trail/generation/original_replacement_records/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_records/generation_record_ledger.csv",
     "artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv",
-    "artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv"
+    "artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_190/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_195/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_200/generation_record_ledger.csv",
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_250/generation_record_ledger.csv"
   ],
-  "input_rows": 408,
-  "harness_pass_rows": 67,
-  "training_candidate_rows": 64,
+  "input_rows": 1165,
+  "harness_pass_rows": 177,
+  "training_candidate_rows": 143,
   "min_reward": 0.0,
-  "sft_examples": 64,
-  "sft_train_examples": 52,
-  "sft_eval_examples": 12,
+  "sft_examples": 143,
+  "sft_train_examples": 124,
+  "sft_eval_examples": 19,
   "sft_ready": true,
   "sft_min_examples": 20,
-  "diffusion_flow_seed_rows": 64,
-  "diffusion_flow_train_rows": 52,
-  "diffusion_flow_eval_rows": 12,
-  "diffusion_flow_ready": false,
+  "diffusion_flow_seed_rows": 143,
+  "diffusion_flow_train_rows": 124,
+  "diffusion_flow_eval_rows": 19,
+  "diffusion_flow_ready": true,
   "diffusion_flow_min_examples": 100,
   "strategy_counts": {
+    "rule_template": 50,
+    "functional_group_replacement": 47,
     "vae_latent_local_search": 42,
-    "functional_group_replacement": 18,
     "llm_rag_principle_generation": 4
   },
   "source_ledger_counts": {
+    "artifacts/trail/generation/rule_template_records/generation_record_ledger.csv": 50,
     "artifacts/trail/generation/vae_latent_local_search_records/generation_record_ledger.csv": 42,
-    "artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv": 17,
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_190/generation_record_ledger.csv": 13,
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_200/generation_record_ledger.csv": 11,
+    "artifacts/trail/generation/original_replacement_records/generation_record_ledger.csv": 9,
+    "artifacts/trail/generation/expanded_inventory_replacement_records/generation_record_ledger.csv": 8,
+    "artifacts/trail/generation/feedback_guided_replacement_target_records/target_250/generation_record_ledger.csv": 4,
     "artifacts/trail/generation/prompt_records/generation_record_ledger.csv": 3,
     "artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv": 1,
-    "artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv": 1
+    "artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv": 1,
+    "artifacts/trail/generation/feedback_guided_replacement_records/generation_record_ledger.csv": 1
   },
   "next_data_needed_for_sft": 0,
-  "next_data_needed_for_diffusion_flow": 36
+  "next_data_needed_for_diffusion_flow": 0
 }
