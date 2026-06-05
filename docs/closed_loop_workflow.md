@@ -63,6 +63,22 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_feedback
   --rounds 6 \
   --candidate-batch-size 260
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/generation/vae_replacement_strategy.py \
+  --candidates artifacts/reproduce/discovery/selected_candidates.csv \
+  --component-inventory artifacts/trail/candidates_expanded/component_inventory.csv \
+  --top-k 20 \
+  --per-side 5 \
+  --require-counterpart-compatibility \
+  --out artifacts/trail/generation/expanded_inventory_replacement_proposals.csv
+
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/evaluate_replacement_proposals.py \
+  --proposals artifacts/trail/generation/expanded_inventory_replacement_proposals.csv \
+  --out-dir artifacts/trail/generation/expanded_inventory_replacement_eval \
+  --report reports/expanded_inventory_replacement_evaluation.md \
+  --target-tg-c 195 \
+  --target-window-c 5 \
+  --device cpu
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/analyze_generation_feedback.py \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
   --replacement-rejections artifacts/trail/generation/feedback_guided_replacement_eval/replacement_proposal_rejections.csv \
@@ -71,6 +87,13 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/analyze_gene
 
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_feedback_aware_llm_rag_agent.py \
   --provider offline_policy
+
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_feedback_aware_llm_rag_agent.py \
+  --provider offline_policy \
+  --replacement-scored artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_proposals_scored.csv \
+  --preferred-replacement-source literature_template \
+  --out-dir artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag \
+  --report reports/expanded_inventory_feedback_aware_llm_rag_agent.md
 
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_generation_ledger_observations.py \
   --generation-ledger artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv \
@@ -106,6 +129,8 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --feedback-aware-pievo-summary artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json \
   --ensemble-disagreement-summary artifacts/trail/predictors/ensemble_disagreement/ensemble_disagreement_summary.json \
   --ensemble-guard-pievo-summary artifacts/pievo_faithful_ensemble_guard_195_smoke/pievo_faithful_summary.json \
+  --expanded-replacement-summary artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json \
+  --expanded-generation-summary artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
 ```
 
@@ -133,9 +158,18 @@ LLM/RAG 反馈闭环已经补充：
 
 - strict feedback 中 `functional_group_replacement` 和 `llm_rag_principle_generation` 均为保留策略，`llm_smiles_generation` 继续被抑制。
 - feedback-aware LLM/RAG agent 生成 2 条 `llm_rag_principle_generation` records，2 条都通过 Harness。
+- expanded inventory 版本会从 `expanded_inventory_replacement_eval/replacement_proposals_scored.csv` 中优先取 `replacement_source=literature_template` 的成功 record 作为 RAG 证据。
+- expanded LLM/RAG smoke 同样生成 2 条通过 Harness 的 records，其中 1 条明确使用 `literature_template` 上下文。
 - 这 2 条 records 已通过 `scripts/import_generation_ledger_observations.py` 转成 surrogate observation ledger，并进入 195 C PiEvo-faithful 6 轮 smoke。
 - PiEvo 接收 2 条外部 observations、0 条拒绝；6 轮 selected 全部通过 target guard，最佳 selected distance 为 0.0055 C，MAP principle 为 `reaction_a5dd26ae10ad`。
 - 当前运行使用 `offline_policy` provider 保持可复现；外部 LLM 只替换候选 JSON 生成步骤，不改变 ledger/Harness/PiEvo 审计链。
+
+Expanded inventory replacement 已补充：
+
+- strict replacement 现在可用 `--component-inventory artifacts/trail/candidates_expanded/component_inventory.csv` 替代旧 `monomer_functional_groups.csv`，并保留 `replacement_source/label/template_family/template_intended_group`。
+- 本轮 expanded replacement 生成 200 条 strict proposals，200 条全部可重建并评分，18 条通过 Harness。
+- `literature_template` 候选被评分 29 条，其中 3 条通过 Harness；最佳 template 候选预测 Tg 为 194.48 C，距 195 C 目标 0.52 C。
+- Workflow summary 已读取 expanded replacement 和 expanded LLM/RAG summary，因此 expanded inventory 不再只是候选池审计结果，而是进入了生成与总览链路。
 
 Predictor ensemble disagreement 已补充：
 

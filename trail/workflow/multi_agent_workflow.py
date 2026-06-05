@@ -33,6 +33,8 @@ def summarize(
     feedback_aware_pievo_summary: Path,
     ensemble_disagreement_summary: Path,
     ensemble_guard_pievo_summary: Path,
+    expanded_replacement_summary: Path,
+    expanded_generation_summary: Path,
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -43,6 +45,8 @@ def summarize(
     feedback_aware_pievo = read_json(feedback_aware_pievo_summary, {})
     ensemble_disagreement = read_json(ensemble_disagreement_summary, {})
     ensemble_guard_pievo = read_json(ensemble_guard_pievo_summary, {})
+    expanded_replacement = read_json(expanded_replacement_summary, {})
+    expanded_generation = read_json(expanded_generation_summary, {})
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
@@ -74,6 +78,13 @@ def summarize(
         "pievo_ensemble_guard_best_distance_c": ensemble_guard_pievo.get("best_selected_target_distance_c"),
         "pievo_ensemble_guard_all_selected_within_guard": ensemble_guard_pievo.get("all_selected_within_ensemble_disagreement_guard"),
         "pievo_ensemble_guard_mean_selected_std_c": ensemble_guard_pievo.get("mean_selected_predictor_ensemble_std_tg_c"),
+        "expanded_inventory_replacement_scored": expanded_replacement.get("scored_formulas", 0),
+        "expanded_inventory_replacement_harness_pass": expanded_replacement.get("harness_pass", 0),
+        "expanded_inventory_replacement_literature_template_scored": expanded_replacement.get("literature_template_scored", 0),
+        "expanded_inventory_replacement_literature_template_harness_pass": expanded_replacement.get("literature_template_harness_pass", 0),
+        "expanded_inventory_llm_rag_rows": expanded_generation.get("input_rows", 0),
+        "expanded_inventory_llm_rag_harness_pass": expanded_generation.get("harness_pass_rows", 0),
+        "expanded_inventory_llm_rag_literature_template_context_rows": expanded_generation.get("literature_template_context_rows", 0),
         "generation_feedback": feedback,
     }
 
@@ -89,6 +100,8 @@ def main() -> None:
     parser.add_argument("--feedback-aware-pievo-summary", default="artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--ensemble-disagreement-summary", default="artifacts/trail/predictors/ensemble_disagreement/ensemble_disagreement_summary.json")
     parser.add_argument("--ensemble-guard-pievo-summary", default="artifacts/pievo_faithful_ensemble_guard_195_smoke/pievo_faithful_summary.json")
+    parser.add_argument("--expanded-replacement-summary", default="artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json")
+    parser.add_argument("--expanded-generation-summary", default="artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
     result = summarize(
@@ -101,6 +114,8 @@ def main() -> None:
         Path(args.feedback_aware_pievo_summary),
         Path(args.ensemble_disagreement_summary),
         Path(args.ensemble_guard_pievo_summary),
+        Path(args.expanded_replacement_summary),
+        Path(args.expanded_generation_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

@@ -82,12 +82,16 @@ def closest_selected_candidate(selected_path: Path, target_tg_c: float) -> pd.Se
     return selected.sort_values("target_distance_c").iloc[0]
 
 
-def closest_replacement_candidate(scored_path: Path, target_tg_c: float) -> pd.Series | None:
+def closest_replacement_candidate(scored_path: Path, target_tg_c: float, preferred_source: str = "") -> pd.Series | None:
     scored = pd.read_csv(scored_path)
     if "harness_pass" in scored.columns:
         scored = scored[scored["harness_pass"].map(lambda value: str(value).lower() in {"1", "true", "yes"})].copy()
     if scored.empty:
         return None
+    if preferred_source and "replacement_source" in scored.columns:
+        preferred = scored[scored["replacement_source"].astype(str) == preferred_source].copy()
+        if not preferred.empty:
+            scored = preferred
     scored["target_distance_c"] = (scored["predicted_tg_mean_c"].astype(float) - float(target_tg_c)).abs()
     return scored.sort_values(["target_distance_c", "ood_penalty", "predicted_tg_sigma_c"]).iloc[0]
 
@@ -210,6 +214,10 @@ def replacement_context_record(
                 "replacement_metadata": {
                     "proposal_index": int(row["proposal_index"]),
                     "replace_side": str(row["replace_side"]),
+                    "replacement_source": str(row.get("replacement_source", "")),
+                    "replacement_label": str(row.get("replacement_label", "")),
+                    "replacement_template_family": str(row.get("replacement_template_family", "")),
+                    "replacement_template_intended_group": str(row.get("replacement_template_intended_group", "")),
                     "counterpart_compatibility_reason": str(row.get("counterpart_compatibility_reason", "")),
                 },
             },
@@ -223,7 +231,7 @@ def replacement_context_record(
         "selected_by_ids": False,
         "harness_failure_reason": "",
         "review_status": "needs_review",
-        "notes": "RAG agent used replacement feedback as context but emitted an LLM/RAG principle-generation record.",
+        "notes": f"RAG agent used replacement feedback as context; replacement_source={row.get('replacement_source', '')}.",
     }
 
 
@@ -237,6 +245,7 @@ def offline_policy_records(
     refs: str,
     digest: str,
     policy: dict[str, Any],
+    preferred_replacement_source: str = "",
 ) -> list[dict[str, object]]:
     records = [
         selected_record(
@@ -251,7 +260,7 @@ def offline_policy_records(
             policy,
         )
     ]
-    replacement = closest_replacement_candidate(replacement_scored_path, target_tg_c)
+    replacement = closest_replacement_candidate(replacement_scored_path, target_tg_c, preferred_replacement_source)
     if replacement is not None:
         records.append(
             replacement_context_record(
@@ -348,7 +357,17 @@ def write_report(
     report_path: Path,
     packet_path: Path,
     provider: str,
+    input_path: Path,
+    ledger_path: Path,
+    summary_path: Path,
 ) -> None:
+    literature_template_context_rows = (
+        int(ledger["notes"].fillna("").astype(str).str.contains("replacement_source=literature_template").sum())
+        if "notes" in ledger.columns
+        else 0
+    )
+    summary = dict(summary)
+    summary.setdefault("literature_template_context_rows", literature_template_context_rows)
     lines = [
         "# Feedback-Aware LLM/RAG Agent Smoke",
         "",
@@ -357,9 +376,9 @@ def write_report(
         "## Outputs",
         "",
         f"- Agent packet: `{packet_path}`",
-        "- Input records: `artifacts/trail/generation/feedback_aware_llm_rag/feedback_aware_generation_records_input.csv`",
-        "- Ledger: `artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv`",
-        "- Summary: `artifacts/trail/generation/feedback_aware_llm_rag/generation_record_summary.json`",
+        f"- Input records: `{input_path}`",
+        f"- Ledger: `{ledger_path}`",
+        f"- Summary: `{summary_path}`",
         "",
         "## Provider And Policy",
         "",
@@ -399,6 +418,7 @@ def write_report(
             "",
             "- `llm_smiles_generation` 当前被 policy 抑制，因为上一轮反馈显示其 pass rate 为 0 且缺 predictor/chemistry evidence。",
             "- `functional_group_replacement` 和 `llm_rag_principle_generation` 在 strict feedback 中都被保留；agent 用成功 strict replacement 记录作为 RAG 证据，而不是继续沿用旧失败状态。",
+            "- 如果 replacement scored 输入来自 expanded inventory，`literature_template_context_rows` 会显示有多少条 LLM/RAG record 使用了 curated sparse functional-group template 作为上下文证据。",
             "- `llm_rag_principle_generation` 被保留，用 RAG 上下文和成功 strict replacement 记录提出候选原则/配方证据。",
             "- 这一步不是绕过 Harness 的自由文本生成；所有候选先进入 generation record ledger，再由 importer 计算 SMILES、ratio、prediction、target 和 chemistry gate。",
             "- 真正外部 LLM 只负责提出候选 JSON；是否可信仍由 RDKit、predictor、Harness、PiEvo 和人工审核决定。",
@@ -414,7 +434,8 @@ def run_agent(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[str, Any]]:
     query = (
         f"SMP target_tg_{args.target_tg_c:.0f} strict generation_feedback_strict strategy_feedback "
         "functional_group_replacement llm_rag_principle_generation llm_smiles_generation "
-        "feedback-guided generation functional group compatibility PiEvo posterior Harness"
+        "feedback-guided generation functional group compatibility expanded inventory literature_template "
+        "cyanate ester maleimide isocyanate PiEvo posterior Harness"
     )
     docs = [Path(path) for path in args.docs]
     refs, digest = context_bundle(query, docs, args.top_k)
@@ -432,6 +453,7 @@ def run_agent(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[str, Any]]:
             refs,
             digest,
             policy,
+            args.preferred_replacement_source,
         )
     else:
         text = call_openai_compatible(prompt, args.model, args.base_url)
@@ -443,11 +465,17 @@ def run_agent(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[str, Any]]:
     policy_path = out_dir / "feedback_aware_policy.json"
     pd.DataFrame(records).to_csv(input_path, index=False)
     ledger, summary = import_generation_records(input_path, Path(args.schema), args.target_window_c)
+    summary = dict(summary)
+    summary["literature_template_context_rows"] = (
+        int(ledger["notes"].fillna("").astype(str).str.contains("replacement_source=literature_template").sum())
+        if "notes" in ledger.columns
+        else 0
+    )
     ledger.to_csv(ledger_path, index=False)
     summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     policy_path.write_text(json.dumps(policy, indent=2, ensure_ascii=False), encoding="utf-8")
     write_packet(records, prompt, packet_path, policy, args.provider)
-    write_report(ledger, summary, policy, Path(args.report), packet_path, args.provider)
+    write_report(ledger, summary, policy, Path(args.report), packet_path, args.provider, input_path, ledger_path, summary_path)
     return ledger, summary
 
 
@@ -458,6 +486,7 @@ def main() -> None:
     parser.add_argument("--base-url", default=os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1"))
     parser.add_argument("--selected", default="artifacts/reproduce/discovery/selected_candidates.csv")
     parser.add_argument("--replacement-scored", default="artifacts/trail/generation/feedback_guided_replacement_eval/replacement_proposals_scored.csv")
+    parser.add_argument("--preferred-replacement-source", default="")
     parser.add_argument("--strategy-feedback", default="artifacts/trail/generation_feedback_strict/strategy_feedback.csv")
     parser.add_argument("--schema", default="trail/generation/generation_record_schema.yaml")
     parser.add_argument("--target-tg-c", type=float, default=195.0)
@@ -473,6 +502,9 @@ def main() -> None:
             "docs/pievo_faithful_smp.md",
             "reports/generation_failure_feedback_strict.md",
             "reports/feedback_guided_replacement_target_sweep.md",
+            "reports/sparse_candidate_template_expansion.md",
+            "reports/candidate_source_audit_expanded.md",
+            "reports/expanded_inventory_replacement_evaluation.md",
             "trail/knowledge/smp_prior_knowledge.yaml",
         ],
     )

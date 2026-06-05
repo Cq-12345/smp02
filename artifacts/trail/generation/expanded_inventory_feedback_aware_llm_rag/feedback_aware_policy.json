@@ -1,0 +1,41 @@
+{
+  "preferred_strategies": [
+    "functional_group_replacement",
+    "llm_rag_principle_generation"
+  ],
+  "suppressed_strategies": [
+    {
+      "strategy": "llm_smiles_generation",
+      "pass_rate": 0.0,
+      "policy_weight_delta": -0.25,
+      "top_failure_reason": "prediction_missing",
+      "next_constraint": "predictor_feedback: run VAE-WVCM/GNN predictor before recommendation."
+    }
+  ],
+  "constraints": [
+    "llm_smiles_generation: predictor_feedback: run VAE-WVCM/GNN predictor before recommendation."
+  ],
+  "policy_table": [
+    {
+      "strategy": "functional_group_replacement",
+      "pass_rate": 1.0,
+      "policy_weight_delta": 0.1,
+      "top_failure_reason": "",
+      "next_constraint": "retain: keep strategy in candidate generator pool."
+    },
+    {
+      "strategy": "llm_rag_principle_generation",
+      "pass_rate": 1.0,
+      "policy_weight_delta": 0.1,
+      "top_failure_reason": "",
+      "next_constraint": "retain: keep strategy in candidate generator pool."
+    },
+    {
+      "strategy": "llm_smiles_generation",
+      "pass_rate": 0.0,
+      "policy_weight_delta": -0.25,
+      "top_failure_reason": "prediction_missing",
+      "next_constraint": "predictor_feedback: run VAE-WVCM/GNN predictor before recommendation."
+    }
+  ]
+}

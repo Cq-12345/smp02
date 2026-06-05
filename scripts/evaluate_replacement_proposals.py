@@ -179,6 +179,10 @@ def build_replacement_formulas(
                 "replace_side": side,
                 "original_smiles": original,
                 "replacement_smiles": replacement,
+                "replacement_source": proposal.get("replacement_source", ""),
+                "replacement_label": proposal.get("replacement_label", ""),
+                "replacement_template_family": proposal.get("replacement_template_family", ""),
+                "replacement_template_intended_group": proposal.get("replacement_template_intended_group", ""),
                 "replacement_tanimoto": float(proposal["tanimoto"]),
                 "shared_groups": proposal["shared_groups"],
                 "counterpart_groups": proposal.get("counterpart_groups", ""),
@@ -229,10 +233,13 @@ def write_report(scored: pd.DataFrame, rejections: pd.DataFrame, summary: dict[s
     )
     passed = scored[scored["harness_pass"]].sort_values(["target_distance_c", "ood_penalty", "predicted_tg_sigma_c"]).head(20)
     for rank, (_, row) in enumerate(passed.iterrows(), start=1):
+        source_text = ""
+        if "replacement_source" in row and str(row.get("replacement_source", "")).strip():
+            source_text = f" source={row['replacement_source']}"
         lines.append(
             f"| {rank} | {float(row['predicted_tg_mean_c']):.2f} | {float(row['target_distance_c']):.2f} | "
             f"{float(row['predicted_tg_sigma_c']):.2f} | {row['replace_side']} | {float(row['replacement_tanimoto']):.3f} | "
-            f"{str(row['compatibility_reasons']).replace('|', '; ')} |"
+            f"{str(row['compatibility_reasons']).replace('|', '; ')}{source_text} |"
         )
     lines.extend(
         [
@@ -295,7 +302,10 @@ def write_replacement_observation_ledger(scored: pd.DataFrame, out_dir: Path, ta
                 "experiment_date": "2026-06-06",
                 "operator": "smp02_replacement_eval",
                 "method": "vae_wvcm_gpr_surrogate",
-                "notes": f"VAE replacement proposal {int(row['proposal_index'])}; replace_side={row['replace_side']}; tanimoto={float(row['replacement_tanimoto']):.3f}",
+                "notes": (
+                    f"VAE replacement proposal {int(row['proposal_index'])}; replace_side={row['replace_side']}; "
+                    f"tanimoto={float(row['replacement_tanimoto']):.3f}; replacement_source={row.get('replacement_source', '')}"
+                ),
             }
         )
     pd.DataFrame(rows, columns=columns).to_csv(observation_input, index=False)
@@ -389,6 +399,12 @@ def main() -> None:
         "best_distance_c": None if scored.empty else round(float(scored["target_distance_c"].min()), 6),
         "within_1c": 0 if scored.empty else int((scored["target_distance_c"] <= 1.0).sum()),
         "within_5c": 0 if scored.empty else int((scored["target_distance_c"] <= args.target_window_c).sum()),
+        "literature_template_scored": 0
+        if scored.empty or "replacement_source" not in scored
+        else int((scored["replacement_source"].astype(str) == "literature_template").sum()),
+        "literature_template_harness_pass": 0
+        if scored.empty or "replacement_source" not in scored or "harness_pass" not in scored
+        else int(((scored["replacement_source"].astype(str) == "literature_template") & scored["harness_pass"].fillna(False).astype(bool)).sum()),
         "predictor": best_model["ML method"],
         "latent_size": latent_size,
         "replacement_observations": 0 if scored.empty else int(scored["harness_pass"].sum()),

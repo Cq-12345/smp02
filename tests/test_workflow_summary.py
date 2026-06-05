@@ -52,6 +52,23 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    expanded_replacement = tmp_path / "expanded_replacement.json"
+    expanded_replacement.write_text(
+        json.dumps(
+            {
+                "scored_formulas": 200,
+                "harness_pass": 18,
+                "literature_template_scored": 29,
+                "literature_template_harness_pass": 3,
+            }
+        ),
+        encoding="utf-8",
+    )
+    expanded_generation = tmp_path / "expanded_generation.json"
+    expanded_generation.write_text(
+        json.dumps({"input_rows": 2, "harness_pass_rows": 2, "literature_template_context_rows": 1}),
+        encoding="utf-8",
+    )
 
     result = summarize(
         candidates,
@@ -63,6 +80,8 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         pievo_summary,
         ensemble_summary,
         ensemble_guard_pievo,
+        expanded_replacement,
+        expanded_generation,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -75,3 +94,10 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["pievo_ensemble_guard_best_distance_c"] == 0.059
     assert result["pievo_ensemble_guard_all_selected_within_guard"] is True
     assert result["pievo_ensemble_guard_mean_selected_std_c"] == 16.4
+    assert result["expanded_inventory_replacement_scored"] == 200
+    assert result["expanded_inventory_replacement_harness_pass"] == 18
+    assert result["expanded_inventory_replacement_literature_template_scored"] == 29
+    assert result["expanded_inventory_replacement_literature_template_harness_pass"] == 3
+    assert result["expanded_inventory_llm_rag_rows"] == 2
+    assert result["expanded_inventory_llm_rag_harness_pass"] == 2
+    assert result["expanded_inventory_llm_rag_literature_template_context_rows"] == 1

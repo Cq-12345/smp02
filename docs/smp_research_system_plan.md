@@ -63,6 +63,8 @@
 - `trail/candidates/build_component_inventory.py` 会输出 `component_inventory.csv` 和 `functional_group_index.csv`。
 - `scripts/expand_sparse_candidate_templates.py` 已生成 `artifacts/trail/candidates_expanded/component_inventory.csv`，候选数从 694 增至 743。
 - expanded source audit 显示 `cyanate_ester/maleimide/isocyanate/anhydride/thiol` 都已达到当前 sparse coverage 阈值。
+- `trail/generation/vae_replacement_strategy.py --component-inventory artifacts/trail/candidates_expanded/component_inventory.csv` 已把 expanded inventory 接入 strict replacement，并保留 `literature_template` provenance。
+- `scripts/run_feedback_aware_llm_rag_agent.py --preferred-replacement-source literature_template` 已把 expanded replacement 的成功记录接入 LLM/RAG 上下文。
 
 ## 3. 预测模型
 
@@ -96,6 +98,7 @@
 
 - 规则模板生成：保留已知热固性结构 motif。
 - 替换生成：按官能团和 Morgan fingerprint 相似度替换单体。
+- Expanded replacement：从 expanded inventory 选择替换分子，保留 source/template provenance，并用 strict counterpart compatibility 过滤。
 - VAE latent 邻域搜索：未来可在 latent space 中扰动，再 decode。
 - LLM/RAG 生成：未来可用知识库检索约束 prompt，生成 SMILES 或候选规则。
 - Harness 控制：所有生成结果必须通过 RDKit、charset、元素、官能团、反应兼容、ratio simplex 等约束。
@@ -123,6 +126,7 @@ Agent 分工：
 
 - `trail/workflow/multi_agent_workflow.py` 是摘要级 workflow。
 - `src/smp02/pievo_faithful.py` 是更接近 PiEvo 数学的闭环实现。
+- workflow summary 已读取 expanded replacement 和 expanded LLM/RAG summary，用来确认 expanded inventory 是否真正进入生成链路，而不只是停留在 source audit。
 
 ## 6. PiEvo-faithful 要求
 

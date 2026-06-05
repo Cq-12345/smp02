@@ -27,6 +27,8 @@ strategies:
       outputs:
         - artifacts/trail/generation/feedback_guided_replacement_proposals.csv
         - artifacts/trail/generation/feedback_guided_replacement_eval/replacement_eval_summary.json
+        - artifacts/trail/generation/expanded_inventory_replacement_proposals.csv
+        - artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json
         - artifacts/pievo_faithful_feedback_replacement_195_smoke/pievo_faithful_summary.json
         - artifacts/trail/generation/feedback_guided_replacement_pievo_compare/pievo_feedback_ledger_comparison.json
         - artifacts/trail/generation/feedback_guided_replacement_target_sweep/feedback_replacement_target_sweep_summary.json
@@ -34,6 +36,17 @@ strategies:
         - reports/feedback_guided_replacement_comparison.md
         - reports/feedback_guided_replacement_pievo_comparison.md
         - reports/feedback_guided_replacement_target_sweep.md
+        - reports/expanded_inventory_replacement_evaluation.md
+      expanded_inventory_mode:
+        cli_flag: --component-inventory artifacts/trail/candidates_expanded/component_inventory.csv
+        replacement_pool: artifacts/trail/candidates_expanded/component_inventory.csv
+        provenance_fields:
+          - replacement_source
+          - replacement_label
+          - replacement_template_family
+          - replacement_template_intended_group
+        literature_template_scored: 29
+        literature_template_harness_pass: 3
   vae_latent_local_search:
     maturity: planned
     generator: future
@@ -53,14 +66,23 @@ strategies:
         - reports/generation_failure_feedback_strict.md
         - docs/pievo_faithful_smp.md
         - reports/feedback_guided_replacement_target_sweep.md
+        - reports/sparse_candidate_template_expansion.md
+        - reports/candidate_source_audit_expanded.md
+        - reports/expanded_inventory_replacement_evaluation.md
         - trail/knowledge/smp_prior_knowledge.yaml
       outputs:
         - artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv
         - artifacts/trail/generation/feedback_aware_llm_rag/feedback_aware_policy.json
         - artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv
         - artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json
+        - artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv
         - reports/feedback_aware_llm_rag_agent.md
         - reports/feedback_aware_llm_rag_pievo_feedback.md
+        - reports/expanded_inventory_feedback_aware_llm_rag_agent.md
+      expanded_inventory_context:
+        replacement_scored: artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_proposals_scored.csv
+        preferred_replacement_source: literature_template
+        literature_template_context_rows: 1
       pievo_bridge:
         importer: scripts/import_generation_ledger_observations.py
         config: configs/pievo_faithful_feedback_aware_llm_rag_195_smoke.yaml

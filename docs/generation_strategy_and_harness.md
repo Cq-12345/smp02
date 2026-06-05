@@ -25,7 +25,7 @@ h = (m_1..m_n, r_1..r_n)
 当前搜索空间：
 
 - 组分：小分子 SMILES / MoleCode 兼容候选。
-- 来源：library、generated、chembl。
+- 来源：library、generated、literature_template、chembl。
 - 组分数：1 到 4。
 - 比例：simplex，满足最小比例阈值。
 - 化学网络：必须存在官能团兼容边。
@@ -89,6 +89,9 @@ h = (m_1..m_n, r_1..r_n)
 - `artifacts/trail/generation/feedback_guided_replacement_target_sweep/*`
 - `artifacts/pievo_faithful_feedback_replacement_target_sweep/*`
 - `reports/feedback_guided_replacement_target_sweep.md`
+- `artifacts/trail/generation/expanded_inventory_replacement_proposals.csv`
+- `artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_proposals_scored.csv`
+- `reports/expanded_inventory_replacement_evaluation.md`
 
 结果：
 
@@ -105,6 +108,8 @@ h = (m_1..m_n, r_1..r_n)
 - 多目标 strict replacement + PiEvo sweep 已覆盖 190/195/200/250 C，且每个目标都重新计算 replacement target window、external ledger reward 和 PiEvo posterior。
 - 6 轮 smoke 中最佳新选择分别为 190.06、194.99、199.80、249.90 C；对应目标距离为 0.057、0.006、0.204、0.099 C，所有 selected 都通过 Harness。
 - 目标不同会改变 MAP principle：190 C 为 `reaction_a5dd26ae10ad`，195 C 为 `long_aliphatic_penalty`，200 C 为 `too_flexible_penalty`，250 C 为 `heavy_halogen_practical_risk`。这说明可变目标 Tg 已进入 posterior 层，而不是只做同一候选表重排序。
+- Expanded inventory 已进入 strict replacement 生成器：`--component-inventory artifacts/trail/candidates_expanded/component_inventory.csv` 会保留 `replacement_source/label/template_family/template_intended_group`。
+- Expanded replacement smoke 生成 200 条 strict proposals、200 条可重建并评分、18 条通过 Harness；其中 `literature_template` 被评分 29 条，3 条通过 Harness，最佳 template 候选距 195 C 目标 0.52 C。
 
 ### 3.3 VAE latent 生成
 
@@ -146,6 +151,8 @@ h = (m_1..m_n, r_1..r_n)
 - `artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv`
 - `artifacts/trail/generation_feedback_strict/strategy_feedback.csv`
 - `reports/feedback_aware_llm_rag_agent.md`
+- `artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_ledger.csv`
+- `reports/expanded_inventory_feedback_aware_llm_rag_agent.md`
 - `reports/feedback_aware_llm_rag_pievo_feedback.md`
 - `reports/generation_failure_feedback_strict.md`
 - `configs/pievo_faithful_feedback_aware_llm_rag_195_smoke.yaml`
@@ -179,6 +186,7 @@ Feedback-aware LLM/RAG agent 状态：
 - Agent smoke 生成 2 条 `llm_rag_principle_generation` records，2 条都通过 Harness；最佳距离为 0.003 C，mean generation reward 为 0.9637。
 - `scripts/import_generation_ledger_observations.py` 已把这 2 条成功 records 转成 surrogate observation ledger；失败/缺预测 records 不会被提升为 observation。
 - `configs/pievo_faithful_feedback_aware_llm_rag_195_smoke.yaml` 已把该 ledger 接入 PiEvo-faithful：6 轮 smoke 接收 2 条外部 observations、0 条拒绝，6 条 selected 全部通过 target guard，最佳 selected distance 为 0.0055 C。
+- Expanded inventory 版本的 feedback-aware LLM/RAG agent 已读取 expanded replacement scored，并优先使用 `replacement_source=literature_template` 的 cyanate ester record 作为 RAG 证据；2 条 records 都通过 Harness，`literature_template_context_rows=1`。
 
 ### 3.5 失败回流
 
