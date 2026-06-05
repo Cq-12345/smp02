@@ -1,0 +1,25 @@
+{
+  "nodes": 109,
+  "edges": 95,
+  "node_kinds": {
+    "applicability_principle": 3,
+    "candidate_source": 3,
+    "class": 12,
+    "feature": 11,
+    "functional_group": 13,
+    "hard_constraint": 6,
+    "network_type": 19,
+    "reaction_principle": 20,
+    "relation": 11,
+    "structural_principle": 10,
+    "target_property": 1
+  },
+  "edge_relations": {
+    "compatible_via": 40,
+    "constrained_by": 6,
+    "influences": 13,
+    "produces_network": 20,
+    "sourced_from": 3,
+    "supports_principle": 13
+  }
+}

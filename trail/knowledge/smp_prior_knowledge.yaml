@@ -1,37 +1,194 @@
 materials_domain: thermoset_shape_memory_polymers
+representation_scope:
+  current: single_small_molecule_smiles_or_molecode
+  deferred:
+    - commodity_grade_component_mixture
+    - polymer_repeat_unit_hypergraph
+    - complex_material_hypergraph
 target_property:
   name: glass_transition_temperature
   symbol: Tg
-  target_range_celsius: [190, 200]
+  unit: Celsius
+  note: "真实目标 Tg 不固定；闭环配置通过 target_tg_c 指定目标温度。"
+  example_targets_celsius: [190, 195, 200, 250]
+hard_constraints:
+  - id: valid_rdkit
+    description: "所有候选组分必须能被 RDKit 解析。"
+  - id: single_fragment
+    description: "当前阶段只接受单一小分子片段，不处理盐、混合物或商品级复配。"
+  - id: allowed_atom_set
+    description: "元素限制在当前 VAE/MoleCode 可覆盖的常见有机/硅/卤素元素集合内。"
+  - id: vae_charset_encodable
+    description: "SMILES 必须能被当前 VAE charset 编码。"
+  - id: ratio_simplex
+    description: "摩尔比例必须非负、满足最小比例阈值，并归一化为 1。"
+  - id: reactive_network_ok
+    description: "多组分配方必须至少存在合理官能团反应网络。"
 priors:
-  high_tg_features:
-    - aromatic_backbones
-    - imide_or_anhydride_derived_networks
-    - cyanate_ester_triazine_networks
-    - high_crosslink_density
-    - rigid_biphenyl_or_bisphenol_units
-  lower_tg_risk_features:
-    - long_aliphatic_ether_segments
-    - flexible_polyethylene_glycol_segments
-    - low_functionality_linear_monomers
-  synthesis_constraints:
-    - compatible_reactive_groups_required
-    - molar_ratios_sum_to_one
-    - prefer_commercial_or_literature_known_monomers_for_validation
+  structural_principles:
+    - id: aromatic_backbones_raise_tg
+      effect: raises_Tg
+      feature: aromatic_backbone
+      rationale: "芳香环提高链段刚性，通常提高 Tg。"
+    - id: multi_aromatic_rigidity
+      effect: raises_Tg
+      feature: rigid_multi_aromatic
+      rationale: "多芳香结构和联苯/双酚骨架提高刚性和堆积约束。"
+    - id: imide_anhydride_networks_raise_tg
+      effect: raises_Tg
+      feature: imide_or_anhydride
+      rationale: "酰亚胺/酸酐路线常形成高刚性、高热稳定性网络。"
+    - id: cyanate_ester_triazine
+      effect: raises_Tg
+      feature: cyanate_ester
+      rationale: "氰酸酯三聚生成三嗪网络，常用于高 Tg 热固性体系。"
+    - id: maleimide_rigid_network
+      effect: raises_Tg
+      feature: maleimide
+      rationale: "马来酰亚胺结构可参与刚性共聚或 Michael 加成网络。"
+    - id: high_functionality_crosslink_density
+      effect: raises_Tg
+      feature: high_functionality
+      rationale: "较高反应官能度通常提高交联密度，从而约束链段运动。"
+    - id: flexible_ether_penalty
+      effect: lowers_Tg_risk
+      feature: flexible_ether_risk
+      rationale: "长柔性醚链提高链段活动性，常降低 Tg。"
+    - id: peg_like_penalty
+      effect: lowers_Tg_risk
+      feature: peg_like_risk
+      rationale: "PEG-like 片段是低 Tg 或软段风险。"
+    - id: long_aliphatic_penalty
+      effect: lowers_Tg_risk
+      feature: long_aliphatic_risk
+      rationale: "长脂肪链降低刚性和玻璃化温度。"
+    - id: too_flexible_penalty
+      effect: lowers_Tg_risk
+      feature: too_flexible_risk
+      rationale: "可旋转键过多时，链段自由度提高。"
+  applicability_principles:
+    - id: ood_distance_penalty
+      effect: lowers_model_trust
+      feature: high_ood
+      rationale: "离训练分布越远，surrogate 预测越应保守。"
+    - id: druglike_complexity_penalty
+      effect: lowers_transferability
+      feature: druglike_hetero_complexity_risk
+      rationale: "过多 HBA/HBD 或复杂药物样结构可能不是合理热固性单体。"
+    - id: formal_charge_practical_penalty
+      effect: lowers_synthesis_priority
+      feature: formal_charge_practical_risk
+      rationale: "带形式电荷的小分子常有配方和工艺不确定性。"
 reaction_principles:
-  epoxy_amine:
+  epoxy_primary_amine:
     groups: [epoxy, primary_amine]
     expected_network: crosslinked_epoxy
-  anhydride_amine:
+    mechanism: nucleophilic_ring_opening
+    confidence: high
+    notes: "经典环氧-胺固化，适合作为硬约束兼软先验。"
+  epoxy_secondary_amine:
+    groups: [epoxy, secondary_amine]
+    expected_network: crosslinked_epoxy
+    mechanism: nucleophilic_ring_opening
+    confidence: high
+  epoxy_anhydride:
+    groups: [epoxy, anhydride]
+    expected_network: epoxy_ester_network
+    mechanism: catalyzed_ring_opening_esterification
+    confidence: medium
+    notes: "通常需要催化剂；应作为兼容但工艺条件敏感的反应。"
+  epoxy_carboxylic_acid:
+    groups: [epoxy, carboxylic_acid]
+    expected_network: beta_hydroxy_ester_network
+    mechanism: ring_opening_esterification
+    confidence: medium
+  epoxy_hydroxyl:
+    groups: [epoxy, hydroxyl]
+    expected_network: etherified_epoxy_network
+    mechanism: catalyzed_etherification
+    confidence: medium_low
+  anhydride_primary_amine:
     groups: [anhydride, primary_amine]
-    expected_network: polyimide_or_polyamic_acid_precursor
+    expected_network: polyamic_acid_or_polyimide_precursor
+    mechanism: anhydride_opening_amidation
+    confidence: high
+  anhydride_secondary_amine:
+    groups: [anhydride, secondary_amine]
+    expected_network: amic_acid_or_imide_related_network
+    mechanism: anhydride_opening_amidation
+    confidence: medium
+  anhydride_hydroxyl:
+    groups: [anhydride, hydroxyl]
+    expected_network: polyester_or_half_ester_network
+    mechanism: esterification
+    confidence: medium
   isocyanate_hydroxyl:
     groups: [isocyanate, hydroxyl]
     expected_network: polyurethane
-  cyanate_ester_self:
-    groups: [cyanate_ester, cyanate_ester]
-    expected_network: triazine
-  acrylate_radical:
+    mechanism: urethane_formation
+    confidence: high
+  isocyanate_primary_amine:
+    groups: [isocyanate, primary_amine]
+    expected_network: polyurea
+    mechanism: urea_formation
+    confidence: high
+  isocyanate_secondary_amine:
+    groups: [isocyanate, secondary_amine]
+    expected_network: substituted_urea_network
+    mechanism: urea_formation
+    confidence: high
+  acrylate_vinyl_radical:
     groups: [acrylate_or_methacrylate, vinyl]
     expected_network: radical_crosslinked
-
+    mechanism: free_radical_copolymerization
+    confidence: medium
+  thiol_ene:
+    groups: [thiol, vinyl]
+    expected_network: thioether_network
+    mechanism: thiol_ene_click
+    confidence: high
+  thiol_acrylate:
+    groups: [thiol, acrylate_or_methacrylate]
+    expected_network: thioether_ester_network
+    mechanism: thiol_michael_or_radical_addition
+    confidence: high
+  cyanate_ester_self:
+    groups: [cyanate_ester, cyanate_ester]
+    expected_network: triazine_network
+    mechanism: cyclotrimerization
+    confidence: high
+  cyanate_ester_phenol:
+    groups: [cyanate_ester, phenol]
+    expected_network: co_cured_cyanate_network
+    mechanism: catalyzed_trimerization_or_cocure
+    confidence: medium
+  cyanate_ester_amine:
+    groups: [cyanate_ester, primary_amine]
+    expected_network: cyanate_amine_cocured_network
+    mechanism: addition_or_cocure
+    confidence: medium_low
+  maleimide_vinyl:
+    groups: [maleimide, vinyl]
+    expected_network: maleimide_copolymer_network
+    mechanism: copolymerization_or_addition
+    confidence: medium
+  maleimide_thiol:
+    groups: [maleimide, thiol]
+    expected_network: thiosuccinimide_network
+    mechanism: michael_addition
+    confidence: high
+  maleimide_amine:
+    groups: [maleimide, primary_amine]
+    expected_network: amino_succinimide_network
+    mechanism: aza_michael_addition
+    confidence: medium
+candidate_sources:
+  library:
+    description: "SMP_Dataset.xlsx 中已经出现的单体。"
+    trust_level: high
+  generated:
+    description: "由热固性结构模板生成的小分子候选。"
+    trust_level: medium
+  chembl:
+    description: "ChEMBL 化合物经 RDKit、元素、charset、官能团和适用域筛选后进入候选池。"
+    trust_level: low_to_medium

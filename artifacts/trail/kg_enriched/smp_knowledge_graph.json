@@ -1,0 +1,1182 @@
+{
+  "directed": true,
+  "multigraph": true,
+  "graph": {},
+  "nodes": [
+    {
+      "kind": "target_property",
+      "symbol": "Tg",
+      "unit": "Celsius",
+      "id": "glass_transition_temperature"
+    },
+    {
+      "kind": "class",
+      "description": "Small molecule reactant represented by SMILES or MoleCode-compatible notation.",
+      "id": "Monomer"
+    },
+    {
+      "kind": "class",
+      "description": "Reactive or structural group detected by SMARTS.",
+      "id": "FunctionalGroup"
+    },
+    {
+      "kind": "class",
+      "description": "Rule linking compatible functional groups to a plausible thermoset network.",
+      "id": "ReactionPrinciple"
+    },
+    {
+      "kind": "class",
+      "description": "Tg-relevant structural prior such as aromatic rigidity or flexible ether penalty.",
+      "id": "StructuralPrinciple"
+    },
+    {
+      "kind": "class",
+      "description": "Prior that controls model trust, synthetic practicality, or transferability.",
+      "id": "ApplicabilityPrinciple"
+    },
+    {
+      "kind": "class",
+      "description": "Deterministic validator that must not be weakened by principle learning.",
+      "id": "HardConstraint"
+    },
+    {
+      "kind": "class",
+      "description": "Provenance class for library, generated, and database-derived components.",
+      "id": "CandidateSource"
+    },
+    {
+      "kind": "class",
+      "description": "Candidate shape memory polymer formulation with molar ratios.",
+      "id": "SMPRecipe"
+    },
+    {
+      "kind": "class",
+      "description": "Tg predictor trained on WVCM latent vectors or molecule graph features.",
+      "id": "PredictionModel"
+    },
+    {
+      "kind": "class",
+      "description": "Surrogate or real experiment environment returning Tg/reward observations.",
+      "id": "ExperimentEnvironment"
+    },
+    {
+      "kind": "class",
+      "description": "Posterior belief state over active principles.",
+      "id": "PiEvoPrinciplePosterior"
+    },
+    {
+      "kind": "class",
+      "description": "Method that proposes candidate hypotheses under constraints.",
+      "id": "GenerationStrategy"
+    },
+    {
+      "kind": "relation",
+      "domain": "Monomer",
+      "range": "FunctionalGroup",
+      "id": "has_functional_group"
+    },
+    {
+      "kind": "relation",
+      "domain": "FunctionalGroup",
+      "range": "ReactionPrinciple",
+      "id": "compatible_via"
+    },
+    {
+      "kind": "relation",
+      "domain": "ReactionPrinciple",
+      "range": "SMPRecipe",
+      "id": "produces_network"
+    },
+    {
+      "kind": "relation",
+      "domain": "SMPRecipe",
+      "range": "Monomer",
+      "id": "uses_monomer"
+    },
+    {
+      "kind": "relation",
+      "domain": "SMPRecipe",
+      "range": "PredictionModel",
+      "id": "predicted_by"
+    },
+    {
+      "kind": "relation",
+      "domain": "PredictionModel",
+      "range": "glass_transition_temperature",
+      "id": "optimizes_property"
+    },
+    {
+      "kind": "relation",
+      "domain": "SMPRecipe",
+      "range": "HardConstraint",
+      "id": "constrained_by"
+    },
+    {
+      "kind": "relation",
+      "domain": "Monomer",
+      "range": "CandidateSource",
+      "id": "sourced_from"
+    },
+    {
+      "kind": "relation",
+      "domain": "ExperimentEnvironment",
+      "range": "PiEvoPrinciplePosterior",
+      "id": "updates_posterior"
+    },
+    {
+      "kind": "relation",
+      "domain": "GenerationStrategy",
+      "range": "SMPRecipe",
+      "id": "proposes_hypothesis"
+    },
+    {
+      "kind": "relation",
+      "domain": "FunctionalGroup",
+      "range": "StructuralPrinciple",
+      "id": "supports_principle"
+    },
+    {
+      "kind": "hard_constraint",
+      "description": "所有候选组分必须能被 RDKit 解析。",
+      "id": "valid_rdkit"
+    },
+    {
+      "kind": "hard_constraint",
+      "description": "当前阶段只接受单一小分子片段，不处理盐、混合物或商品级复配。",
+      "id": "single_fragment"
+    },
+    {
+      "kind": "hard_constraint",
+      "description": "元素限制在当前 VAE/MoleCode 可覆盖的常见有机/硅/卤素元素集合内。",
+      "id": "allowed_atom_set"
+    },
+    {
+      "kind": "hard_constraint",
+      "description": "SMILES 必须能被当前 VAE charset 编码。",
+      "id": "vae_charset_encodable"
+    },
+    {
+      "kind": "hard_constraint",
+      "description": "摩尔比例必须非负、满足最小比例阈值，并归一化为 1。",
+      "id": "ratio_simplex"
+    },
+    {
+      "kind": "hard_constraint",
+      "description": "多组分配方必须至少存在合理官能团反应网络。",
+      "id": "reactive_network_ok"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "raises_Tg",
+      "feature": "aromatic_backbone",
+      "rationale": "芳香环提高链段刚性，通常提高 Tg。",
+      "id": "aromatic_backbones_raise_tg"
+    },
+    {
+      "kind": "feature",
+      "id": "aromatic_backbone"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "raises_Tg",
+      "feature": "rigid_multi_aromatic",
+      "rationale": "多芳香结构和联苯/双酚骨架提高刚性和堆积约束。",
+      "id": "multi_aromatic_rigidity"
+    },
+    {
+      "kind": "feature",
+      "id": "rigid_multi_aromatic"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "raises_Tg",
+      "feature": "imide_or_anhydride",
+      "rationale": "酰亚胺/酸酐路线常形成高刚性、高热稳定性网络。",
+      "id": "imide_anhydride_networks_raise_tg"
+    },
+    {
+      "kind": "feature",
+      "id": "imide_or_anhydride"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "raises_Tg",
+      "feature": "cyanate_ester",
+      "rationale": "氰酸酯三聚生成三嗪网络，常用于高 Tg 热固性体系。",
+      "id": "cyanate_ester_triazine"
+    },
+    {
+      "kind": "functional_group",
+      "id": "cyanate_ester"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "raises_Tg",
+      "feature": "maleimide",
+      "rationale": "马来酰亚胺结构可参与刚性共聚或 Michael 加成网络。",
+      "id": "maleimide_rigid_network"
+    },
+    {
+      "kind": "functional_group",
+      "id": "maleimide"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "raises_Tg",
+      "feature": "high_functionality",
+      "rationale": "较高反应官能度通常提高交联密度，从而约束链段运动。",
+      "id": "high_functionality_crosslink_density"
+    },
+    {
+      "kind": "feature",
+      "id": "high_functionality"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "lowers_Tg_risk",
+      "feature": "flexible_ether_risk",
+      "rationale": "长柔性醚链提高链段活动性，常降低 Tg。",
+      "id": "flexible_ether_penalty"
+    },
+    {
+      "kind": "feature",
+      "id": "flexible_ether_risk"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "lowers_Tg_risk",
+      "feature": "peg_like_risk",
+      "rationale": "PEG-like 片段是低 Tg 或软段风险。",
+      "id": "peg_like_penalty"
+    },
+    {
+      "kind": "feature",
+      "id": "peg_like_risk"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "lowers_Tg_risk",
+      "feature": "long_aliphatic_risk",
+      "rationale": "长脂肪链降低刚性和玻璃化温度。",
+      "id": "long_aliphatic_penalty"
+    },
+    {
+      "kind": "feature",
+      "id": "long_aliphatic_risk"
+    },
+    {
+      "kind": "structural_principle",
+      "effect": "lowers_Tg_risk",
+      "feature": "too_flexible_risk",
+      "rationale": "可旋转键过多时，链段自由度提高。",
+      "id": "too_flexible_penalty"
+    },
+    {
+      "kind": "feature",
+      "id": "too_flexible_risk"
+    },
+    {
+      "kind": "applicability_principle",
+      "effect": "lowers_model_trust",
+      "feature": "high_ood",
+      "rationale": "离训练分布越远，surrogate 预测越应保守。",
+      "id": "ood_distance_penalty"
+    },
+    {
+      "kind": "feature",
+      "id": "high_ood"
+    },
+    {
+      "kind": "applicability_principle",
+      "effect": "lowers_transferability",
+      "feature": "druglike_hetero_complexity_risk",
+      "rationale": "过多 HBA/HBD 或复杂药物样结构可能不是合理热固性单体。",
+      "id": "druglike_complexity_penalty"
+    },
+    {
+      "kind": "feature",
+      "id": "druglike_hetero_complexity_risk"
+    },
+    {
+      "kind": "applicability_principle",
+      "effect": "lowers_synthesis_priority",
+      "feature": "formal_charge_practical_risk",
+      "rationale": "带形式电荷的小分子常有配方和工艺不确定性。",
+      "id": "formal_charge_practical_penalty"
+    },
+    {
+      "kind": "feature",
+      "id": "formal_charge_practical_risk"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "crosslinked_epoxy",
+      "mechanism": "nucleophilic_ring_opening",
+      "confidence": "high",
+      "notes": "经典环氧-胺固化，适合作为硬约束兼软先验。",
+      "id": "epoxy_primary_amine"
+    },
+    {
+      "kind": "functional_group",
+      "id": "epoxy"
+    },
+    {
+      "kind": "functional_group",
+      "id": "primary_amine"
+    },
+    {
+      "kind": "network_type",
+      "id": "crosslinked_epoxy"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "crosslinked_epoxy",
+      "mechanism": "nucleophilic_ring_opening",
+      "confidence": "high",
+      "notes": "",
+      "id": "epoxy_secondary_amine"
+    },
+    {
+      "kind": "functional_group",
+      "id": "secondary_amine"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "epoxy_ester_network",
+      "mechanism": "catalyzed_ring_opening_esterification",
+      "confidence": "medium",
+      "notes": "通常需要催化剂；应作为兼容但工艺条件敏感的反应。",
+      "id": "epoxy_anhydride"
+    },
+    {
+      "kind": "functional_group",
+      "id": "anhydride"
+    },
+    {
+      "kind": "network_type",
+      "id": "epoxy_ester_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "beta_hydroxy_ester_network",
+      "mechanism": "ring_opening_esterification",
+      "confidence": "medium",
+      "notes": "",
+      "id": "epoxy_carboxylic_acid"
+    },
+    {
+      "kind": "functional_group",
+      "id": "carboxylic_acid"
+    },
+    {
+      "kind": "network_type",
+      "id": "beta_hydroxy_ester_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "etherified_epoxy_network",
+      "mechanism": "catalyzed_etherification",
+      "confidence": "medium_low",
+      "notes": "",
+      "id": "epoxy_hydroxyl"
+    },
+    {
+      "kind": "functional_group",
+      "id": "hydroxyl"
+    },
+    {
+      "kind": "network_type",
+      "id": "etherified_epoxy_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "polyamic_acid_or_polyimide_precursor",
+      "mechanism": "anhydride_opening_amidation",
+      "confidence": "high",
+      "notes": "",
+      "id": "anhydride_primary_amine"
+    },
+    {
+      "kind": "network_type",
+      "id": "polyamic_acid_or_polyimide_precursor"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "amic_acid_or_imide_related_network",
+      "mechanism": "anhydride_opening_amidation",
+      "confidence": "medium",
+      "notes": "",
+      "id": "anhydride_secondary_amine"
+    },
+    {
+      "kind": "network_type",
+      "id": "amic_acid_or_imide_related_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "polyester_or_half_ester_network",
+      "mechanism": "esterification",
+      "confidence": "medium",
+      "notes": "",
+      "id": "anhydride_hydroxyl"
+    },
+    {
+      "kind": "network_type",
+      "id": "polyester_or_half_ester_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "polyurethane",
+      "mechanism": "urethane_formation",
+      "confidence": "high",
+      "notes": "",
+      "id": "isocyanate_hydroxyl"
+    },
+    {
+      "kind": "functional_group",
+      "id": "isocyanate"
+    },
+    {
+      "kind": "network_type",
+      "id": "polyurethane"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "polyurea",
+      "mechanism": "urea_formation",
+      "confidence": "high",
+      "notes": "",
+      "id": "isocyanate_primary_amine"
+    },
+    {
+      "kind": "network_type",
+      "id": "polyurea"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "substituted_urea_network",
+      "mechanism": "urea_formation",
+      "confidence": "high",
+      "notes": "",
+      "id": "isocyanate_secondary_amine"
+    },
+    {
+      "kind": "network_type",
+      "id": "substituted_urea_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "radical_crosslinked",
+      "mechanism": "free_radical_copolymerization",
+      "confidence": "medium",
+      "notes": "",
+      "id": "acrylate_vinyl_radical"
+    },
+    {
+      "kind": "functional_group",
+      "id": "acrylate_or_methacrylate"
+    },
+    {
+      "kind": "functional_group",
+      "id": "vinyl"
+    },
+    {
+      "kind": "network_type",
+      "id": "radical_crosslinked"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "thioether_network",
+      "mechanism": "thiol_ene_click",
+      "confidence": "high",
+      "notes": "",
+      "id": "thiol_ene"
+    },
+    {
+      "kind": "functional_group",
+      "id": "thiol"
+    },
+    {
+      "kind": "network_type",
+      "id": "thioether_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "thioether_ester_network",
+      "mechanism": "thiol_michael_or_radical_addition",
+      "confidence": "high",
+      "notes": "",
+      "id": "thiol_acrylate"
+    },
+    {
+      "kind": "network_type",
+      "id": "thioether_ester_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "triazine_network",
+      "mechanism": "cyclotrimerization",
+      "confidence": "high",
+      "notes": "",
+      "id": "cyanate_ester_self"
+    },
+    {
+      "kind": "network_type",
+      "id": "triazine_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "co_cured_cyanate_network",
+      "mechanism": "catalyzed_trimerization_or_cocure",
+      "confidence": "medium",
+      "notes": "",
+      "id": "cyanate_ester_phenol"
+    },
+    {
+      "kind": "functional_group",
+      "id": "phenol"
+    },
+    {
+      "kind": "network_type",
+      "id": "co_cured_cyanate_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "cyanate_amine_cocured_network",
+      "mechanism": "addition_or_cocure",
+      "confidence": "medium_low",
+      "notes": "",
+      "id": "cyanate_ester_amine"
+    },
+    {
+      "kind": "network_type",
+      "id": "cyanate_amine_cocured_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "maleimide_copolymer_network",
+      "mechanism": "copolymerization_or_addition",
+      "confidence": "medium",
+      "notes": "",
+      "id": "maleimide_vinyl"
+    },
+    {
+      "kind": "network_type",
+      "id": "maleimide_copolymer_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "thiosuccinimide_network",
+      "mechanism": "michael_addition",
+      "confidence": "high",
+      "notes": "",
+      "id": "maleimide_thiol"
+    },
+    {
+      "kind": "network_type",
+      "id": "thiosuccinimide_network"
+    },
+    {
+      "kind": "reaction_principle",
+      "expected_network": "amino_succinimide_network",
+      "mechanism": "aza_michael_addition",
+      "confidence": "medium",
+      "notes": "",
+      "id": "maleimide_amine"
+    },
+    {
+      "kind": "network_type",
+      "id": "amino_succinimide_network"
+    },
+    {
+      "kind": "candidate_source",
+      "description": "SMP_Dataset.xlsx 中已经出现的单体。",
+      "trust_level": "high",
+      "id": "library"
+    },
+    {
+      "kind": "candidate_source",
+      "description": "由热固性结构模板生成的小分子候选。",
+      "trust_level": "medium",
+      "id": "generated"
+    },
+    {
+      "kind": "candidate_source",
+      "description": "ChEMBL 化合物经 RDKit、元素、charset、官能团和适用域筛选后进入候选池。",
+      "trust_level": "low_to_medium",
+      "id": "chembl"
+    }
+  ],
+  "edges": [
+    {
+      "relation": "sourced_from",
+      "source": "Monomer",
+      "target": "library",
+      "key": 0
+    },
+    {
+      "relation": "sourced_from",
+      "source": "Monomer",
+      "target": "generated",
+      "key": 0
+    },
+    {
+      "relation": "sourced_from",
+      "source": "Monomer",
+      "target": "chembl",
+      "key": 0
+    },
+    {
+      "relation": "constrained_by",
+      "source": "SMPRecipe",
+      "target": "valid_rdkit",
+      "key": 0
+    },
+    {
+      "relation": "constrained_by",
+      "source": "SMPRecipe",
+      "target": "single_fragment",
+      "key": 0
+    },
+    {
+      "relation": "constrained_by",
+      "source": "SMPRecipe",
+      "target": "allowed_atom_set",
+      "key": 0
+    },
+    {
+      "relation": "constrained_by",
+      "source": "SMPRecipe",
+      "target": "vae_charset_encodable",
+      "key": 0
+    },
+    {
+      "relation": "constrained_by",
+      "source": "SMPRecipe",
+      "target": "ratio_simplex",
+      "key": 0
+    },
+    {
+      "relation": "constrained_by",
+      "source": "SMPRecipe",
+      "target": "reactive_network_ok",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "aromatic_backbones_raise_tg",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "aromatic_backbone",
+      "target": "aromatic_backbones_raise_tg",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "multi_aromatic_rigidity",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "rigid_multi_aromatic",
+      "target": "multi_aromatic_rigidity",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "imide_anhydride_networks_raise_tg",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "imide_or_anhydride",
+      "target": "imide_anhydride_networks_raise_tg",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "cyanate_ester_triazine",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "cyanate_ester",
+      "target": "cyanate_ester_triazine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "cyanate_ester",
+      "target": "cyanate_ester_self",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "cyanate_ester",
+      "target": "cyanate_ester_self",
+      "key": 1
+    },
+    {
+      "relation": "compatible_via",
+      "source": "cyanate_ester",
+      "target": "cyanate_ester_phenol",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "cyanate_ester",
+      "target": "cyanate_ester_amine",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "maleimide_rigid_network",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "maleimide",
+      "target": "maleimide_rigid_network",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "maleimide",
+      "target": "maleimide_vinyl",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "maleimide",
+      "target": "maleimide_thiol",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "maleimide",
+      "target": "maleimide_amine",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "high_functionality_crosslink_density",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "high_functionality",
+      "target": "high_functionality_crosslink_density",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "flexible_ether_penalty",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "flexible_ether_risk",
+      "target": "flexible_ether_penalty",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "peg_like_penalty",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "peg_like_risk",
+      "target": "peg_like_penalty",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "long_aliphatic_penalty",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "long_aliphatic_risk",
+      "target": "long_aliphatic_penalty",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "too_flexible_penalty",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "too_flexible_risk",
+      "target": "too_flexible_penalty",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "ood_distance_penalty",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "high_ood",
+      "target": "ood_distance_penalty",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "druglike_complexity_penalty",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "druglike_hetero_complexity_risk",
+      "target": "druglike_complexity_penalty",
+      "key": 0
+    },
+    {
+      "relation": "influences",
+      "source": "formal_charge_practical_penalty",
+      "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supports_principle",
+      "source": "formal_charge_practical_risk",
+      "target": "formal_charge_practical_penalty",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "epoxy_primary_amine",
+      "target": "crosslinked_epoxy",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "epoxy",
+      "target": "epoxy_primary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "epoxy",
+      "target": "epoxy_secondary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "epoxy",
+      "target": "epoxy_anhydride",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "epoxy",
+      "target": "epoxy_carboxylic_acid",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "epoxy",
+      "target": "epoxy_hydroxyl",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "primary_amine",
+      "target": "epoxy_primary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "primary_amine",
+      "target": "anhydride_primary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "primary_amine",
+      "target": "isocyanate_primary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "primary_amine",
+      "target": "cyanate_ester_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "primary_amine",
+      "target": "maleimide_amine",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "epoxy_secondary_amine",
+      "target": "crosslinked_epoxy",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "secondary_amine",
+      "target": "epoxy_secondary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "secondary_amine",
+      "target": "anhydride_secondary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "secondary_amine",
+      "target": "isocyanate_secondary_amine",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "epoxy_anhydride",
+      "target": "epoxy_ester_network",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "anhydride",
+      "target": "epoxy_anhydride",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "anhydride",
+      "target": "anhydride_primary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "anhydride",
+      "target": "anhydride_secondary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "anhydride",
+      "target": "anhydride_hydroxyl",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "epoxy_carboxylic_acid",
+      "target": "beta_hydroxy_ester_network",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "carboxylic_acid",
+      "target": "epoxy_carboxylic_acid",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "epoxy_hydroxyl",
+      "target": "etherified_epoxy_network",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "hydroxyl",
+      "target": "epoxy_hydroxyl",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "hydroxyl",
+      "target": "anhydride_hydroxyl",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "hydroxyl",
+      "target": "isocyanate_hydroxyl",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "anhydride_primary_amine",
+      "target": "polyamic_acid_or_polyimide_precursor",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "anhydride_secondary_amine",
+      "target": "amic_acid_or_imide_related_network",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "anhydride_hydroxyl",
+      "target": "polyester_or_half_ester_network",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "isocyanate_hydroxyl",
+      "target": "polyurethane",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "isocyanate",
+      "target": "isocyanate_hydroxyl",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "isocyanate",
+      "target": "isocyanate_primary_amine",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "isocyanate",
+      "target": "isocyanate_secondary_amine",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "isocyanate_primary_amine",
+      "target": "polyurea",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "isocyanate_secondary_amine",
+      "target": "substituted_urea_network",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "acrylate_vinyl_radical",
+      "target": "radical_crosslinked",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "acrylate_or_methacrylate",
+      "target": "acrylate_vinyl_radical",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "acrylate_or_methacrylate",
+      "target": "thiol_acrylate",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "vinyl",
+      "target": "acrylate_vinyl_radical",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "vinyl",
+      "target": "thiol_ene",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "vinyl",
+      "target": "maleimide_vinyl",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "thiol_ene",
+      "target": "thioether_network",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "thiol",
+      "target": "thiol_ene",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "thiol",
+      "target": "thiol_acrylate",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "thiol",
+      "target": "maleimide_thiol",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "thiol_acrylate",
+      "target": "thioether_ester_network",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "cyanate_ester_self",
+      "target": "triazine_network",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "cyanate_ester_phenol",
+      "target": "co_cured_cyanate_network",
+      "key": 0
+    },
+    {
+      "relation": "compatible_via",
+      "source": "phenol",
+      "target": "cyanate_ester_phenol",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "cyanate_ester_amine",
+      "target": "cyanate_amine_cocured_network",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "maleimide_vinyl",
+      "target": "maleimide_copolymer_network",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "maleimide_thiol",
+      "target": "thiosuccinimide_network",
+      "key": 0
+    },
+    {
+      "relation": "produces_network",
+      "source": "maleimide_amine",
+      "target": "amino_succinimide_network",
+      "key": 0
+    }
+  ]
+}

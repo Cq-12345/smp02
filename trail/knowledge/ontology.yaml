@@ -1,14 +1,28 @@
 classes:
   Monomer:
-    description: Small molecule reactant represented by SMILES.
+    description: Small molecule reactant represented by SMILES or MoleCode-compatible notation.
   FunctionalGroup:
     description: Reactive or structural group detected by SMARTS.
   ReactionPrinciple:
     description: Rule linking compatible functional groups to a plausible thermoset network.
+  StructuralPrinciple:
+    description: Tg-relevant structural prior such as aromatic rigidity or flexible ether penalty.
+  ApplicabilityPrinciple:
+    description: Prior that controls model trust, synthetic practicality, or transferability.
+  HardConstraint:
+    description: Deterministic validator that must not be weakened by principle learning.
+  CandidateSource:
+    description: Provenance class for library, generated, and database-derived components.
   SMPRecipe:
     description: Candidate shape memory polymer formulation with molar ratios.
   PredictionModel:
-    description: Tg predictor trained on WVCM latent vectors.
+    description: Tg predictor trained on WVCM latent vectors or molecule graph features.
+  ExperimentEnvironment:
+    description: Surrogate or real experiment environment returning Tg/reward observations.
+  PiEvoPrinciplePosterior:
+    description: Posterior belief state over active principles.
+  GenerationStrategy:
+    description: Method that proposes candidate hypotheses under constraints.
 relations:
   has_functional_group:
     domain: Monomer
@@ -16,6 +30,9 @@ relations:
   compatible_via:
     domain: FunctionalGroup
     range: ReactionPrinciple
+  produces_network:
+    domain: ReactionPrinciple
+    range: SMPRecipe
   uses_monomer:
     domain: SMPRecipe
     range: Monomer
@@ -25,4 +42,18 @@ relations:
   optimizes_property:
     domain: PredictionModel
     range: glass_transition_temperature
-
+  constrained_by:
+    domain: SMPRecipe
+    range: HardConstraint
+  sourced_from:
+    domain: Monomer
+    range: CandidateSource
+  updates_posterior:
+    domain: ExperimentEnvironment
+    range: PiEvoPrinciplePosterior
+  proposes_hypothesis:
+    domain: GenerationStrategy
+    range: SMPRecipe
+  supports_principle:
+    domain: FunctionalGroup
+    range: StructuralPrinciple

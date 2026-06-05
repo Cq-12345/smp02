@@ -1,0 +1,796 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d14" for="edge" attr.name="relation" attr.type="string"/>
+<key id="d13" for="node" attr.name="trust_level" attr.type="string"/>
+<key id="d12" for="node" attr.name="notes" attr.type="string"/>
+<key id="d11" for="node" attr.name="confidence" attr.type="string"/>
+<key id="d10" for="node" attr.name="mechanism" attr.type="string"/>
+<key id="d9" for="node" attr.name="expected_network" attr.type="string"/>
+<key id="d8" for="node" attr.name="rationale" attr.type="string"/>
+<key id="d7" for="node" attr.name="feature" attr.type="string"/>
+<key id="d6" for="node" attr.name="effect" attr.type="string"/>
+<key id="d5" for="node" attr.name="range" attr.type="string"/>
+<key id="d4" for="node" attr.name="domain" attr.type="string"/>
+<key id="d3" for="node" attr.name="description" attr.type="string"/>
+<key id="d2" for="node" attr.name="unit" attr.type="string"/>
+<key id="d1" for="node" attr.name="symbol" attr.type="string"/>
+<key id="d0" for="node" attr.name="kind" attr.type="string"/>
+<graph edgedefault="directed"><node id="glass_transition_temperature">
+  <data key="d0">target_property</data>
+  <data key="d1">Tg</data>
+  <data key="d2">Celsius</data>
+</node>
+<node id="Monomer">
+  <data key="d0">class</data>
+  <data key="d3">Small molecule reactant represented by SMILES or MoleCode-compatible notation.</data>
+</node>
+<node id="FunctionalGroup">
+  <data key="d0">class</data>
+  <data key="d3">Reactive or structural group detected by SMARTS.</data>
+</node>
+<node id="ReactionPrinciple">
+  <data key="d0">class</data>
+  <data key="d3">Rule linking compatible functional groups to a plausible thermoset network.</data>
+</node>
+<node id="StructuralPrinciple">
+  <data key="d0">class</data>
+  <data key="d3">Tg-relevant structural prior such as aromatic rigidity or flexible ether penalty.</data>
+</node>
+<node id="ApplicabilityPrinciple">
+  <data key="d0">class</data>
+  <data key="d3">Prior that controls model trust, synthetic practicality, or transferability.</data>
+</node>
+<node id="HardConstraint">
+  <data key="d0">class</data>
+  <data key="d3">Deterministic validator that must not be weakened by principle learning.</data>
+</node>
+<node id="CandidateSource">
+  <data key="d0">class</data>
+  <data key="d3">Provenance class for library, generated, and database-derived components.</data>
+</node>
+<node id="SMPRecipe">
+  <data key="d0">class</data>
+  <data key="d3">Candidate shape memory polymer formulation with molar ratios.</data>
+</node>
+<node id="PredictionModel">
+  <data key="d0">class</data>
+  <data key="d3">Tg predictor trained on WVCM latent vectors or molecule graph features.</data>
+</node>
+<node id="ExperimentEnvironment">
+  <data key="d0">class</data>
+  <data key="d3">Surrogate or real experiment environment returning Tg/reward observations.</data>
+</node>
+<node id="PiEvoPrinciplePosterior">
+  <data key="d0">class</data>
+  <data key="d3">Posterior belief state over active principles.</data>
+</node>
+<node id="GenerationStrategy">
+  <data key="d0">class</data>
+  <data key="d3">Method that proposes candidate hypotheses under constraints.</data>
+</node>
+<node id="has_functional_group">
+  <data key="d0">relation</data>
+  <data key="d4">Monomer</data>
+  <data key="d5">FunctionalGroup</data>
+</node>
+<node id="compatible_via">
+  <data key="d0">relation</data>
+  <data key="d4">FunctionalGroup</data>
+  <data key="d5">ReactionPrinciple</data>
+</node>
+<node id="produces_network">
+  <data key="d0">relation</data>
+  <data key="d4">ReactionPrinciple</data>
+  <data key="d5">SMPRecipe</data>
+</node>
+<node id="uses_monomer">
+  <data key="d0">relation</data>
+  <data key="d4">SMPRecipe</data>
+  <data key="d5">Monomer</data>
+</node>
+<node id="predicted_by">
+  <data key="d0">relation</data>
+  <data key="d4">SMPRecipe</data>
+  <data key="d5">PredictionModel</data>
+</node>
+<node id="optimizes_property">
+  <data key="d0">relation</data>
+  <data key="d4">PredictionModel</data>
+  <data key="d5">glass_transition_temperature</data>
+</node>
+<node id="constrained_by">
+  <data key="d0">relation</data>
+  <data key="d4">SMPRecipe</data>
+  <data key="d5">HardConstraint</data>
+</node>
+<node id="sourced_from">
+  <data key="d0">relation</data>
+  <data key="d4">Monomer</data>
+  <data key="d5">CandidateSource</data>
+</node>
+<node id="updates_posterior">
+  <data key="d0">relation</data>
+  <data key="d4">ExperimentEnvironment</data>
+  <data key="d5">PiEvoPrinciplePosterior</data>
+</node>
+<node id="proposes_hypothesis">
+  <data key="d0">relation</data>
+  <data key="d4">GenerationStrategy</data>
+  <data key="d5">SMPRecipe</data>
+</node>
+<node id="supports_principle">
+  <data key="d0">relation</data>
+  <data key="d4">FunctionalGroup</data>
+  <data key="d5">StructuralPrinciple</data>
+</node>
+<node id="valid_rdkit">
+  <data key="d0">hard_constraint</data>
+  <data key="d3">所有候选组分必须能被 RDKit 解析。</data>
+</node>
+<node id="single_fragment">
+  <data key="d0">hard_constraint</data>
+  <data key="d3">当前阶段只接受单一小分子片段，不处理盐、混合物或商品级复配。</data>
+</node>
+<node id="allowed_atom_set">
+  <data key="d0">hard_constraint</data>
+  <data key="d3">元素限制在当前 VAE/MoleCode 可覆盖的常见有机/硅/卤素元素集合内。</data>
+</node>
+<node id="vae_charset_encodable">
+  <data key="d0">hard_constraint</data>
+  <data key="d3">SMILES 必须能被当前 VAE charset 编码。</data>
+</node>
+<node id="ratio_simplex">
+  <data key="d0">hard_constraint</data>
+  <data key="d3">摩尔比例必须非负、满足最小比例阈值，并归一化为 1。</data>
+</node>
+<node id="reactive_network_ok">
+  <data key="d0">hard_constraint</data>
+  <data key="d3">多组分配方必须至少存在合理官能团反应网络。</data>
+</node>
+<node id="aromatic_backbones_raise_tg">
+  <data key="d0">structural_principle</data>
+  <data key="d6">raises_Tg</data>
+  <data key="d7">aromatic_backbone</data>
+  <data key="d8">芳香环提高链段刚性，通常提高 Tg。</data>
+</node>
+<node id="aromatic_backbone">
+  <data key="d0">feature</data>
+</node>
+<node id="multi_aromatic_rigidity">
+  <data key="d0">structural_principle</data>
+  <data key="d6">raises_Tg</data>
+  <data key="d7">rigid_multi_aromatic</data>
+  <data key="d8">多芳香结构和联苯/双酚骨架提高刚性和堆积约束。</data>
+</node>
+<node id="rigid_multi_aromatic">
+  <data key="d0">feature</data>
+</node>
+<node id="imide_anhydride_networks_raise_tg">
+  <data key="d0">structural_principle</data>
+  <data key="d6">raises_Tg</data>
+  <data key="d7">imide_or_anhydride</data>
+  <data key="d8">酰亚胺/酸酐路线常形成高刚性、高热稳定性网络。</data>
+</node>
+<node id="imide_or_anhydride">
+  <data key="d0">feature</data>
+</node>
+<node id="cyanate_ester_triazine">
+  <data key="d0">structural_principle</data>
+  <data key="d6">raises_Tg</data>
+  <data key="d7">cyanate_ester</data>
+  <data key="d8">氰酸酯三聚生成三嗪网络，常用于高 Tg 热固性体系。</data>
+</node>
+<node id="cyanate_ester">
+  <data key="d0">functional_group</data>
+</node>
+<node id="maleimide_rigid_network">
+  <data key="d0">structural_principle</data>
+  <data key="d6">raises_Tg</data>
+  <data key="d7">maleimide</data>
+  <data key="d8">马来酰亚胺结构可参与刚性共聚或 Michael 加成网络。</data>
+</node>
+<node id="maleimide">
+  <data key="d0">functional_group</data>
+</node>
+<node id="high_functionality_crosslink_density">
+  <data key="d0">structural_principle</data>
+  <data key="d6">raises_Tg</data>
+  <data key="d7">high_functionality</data>
+  <data key="d8">较高反应官能度通常提高交联密度，从而约束链段运动。</data>
+</node>
+<node id="high_functionality">
+  <data key="d0">feature</data>
+</node>
+<node id="flexible_ether_penalty">
+  <data key="d0">structural_principle</data>
+  <data key="d6">lowers_Tg_risk</data>
+  <data key="d7">flexible_ether_risk</data>
+  <data key="d8">长柔性醚链提高链段活动性，常降低 Tg。</data>
+</node>
+<node id="flexible_ether_risk">
+  <data key="d0">feature</data>
+</node>
+<node id="peg_like_penalty">
+  <data key="d0">structural_principle</data>
+  <data key="d6">lowers_Tg_risk</data>
+  <data key="d7">peg_like_risk</data>
+  <data key="d8">PEG-like 片段是低 Tg 或软段风险。</data>
+</node>
+<node id="peg_like_risk">
+  <data key="d0">feature</data>
+</node>
+<node id="long_aliphatic_penalty">
+  <data key="d0">structural_principle</data>
+  <data key="d6">lowers_Tg_risk</data>
+  <data key="d7">long_aliphatic_risk</data>
+  <data key="d8">长脂肪链降低刚性和玻璃化温度。</data>
+</node>
+<node id="long_aliphatic_risk">
+  <data key="d0">feature</data>
+</node>
+<node id="too_flexible_penalty">
+  <data key="d0">structural_principle</data>
+  <data key="d6">lowers_Tg_risk</data>
+  <data key="d7">too_flexible_risk</data>
+  <data key="d8">可旋转键过多时，链段自由度提高。</data>
+</node>
+<node id="too_flexible_risk">
+  <data key="d0">feature</data>
+</node>
+<node id="ood_distance_penalty">
+  <data key="d0">applicability_principle</data>
+  <data key="d6">lowers_model_trust</data>
+  <data key="d7">high_ood</data>
+  <data key="d8">离训练分布越远，surrogate 预测越应保守。</data>
+</node>
+<node id="high_ood">
+  <data key="d0">feature</data>
+</node>
+<node id="druglike_complexity_penalty">
+  <data key="d0">applicability_principle</data>
+  <data key="d6">lowers_transferability</data>
+  <data key="d7">druglike_hetero_complexity_risk</data>
+  <data key="d8">过多 HBA/HBD 或复杂药物样结构可能不是合理热固性单体。</data>
+</node>
+<node id="druglike_hetero_complexity_risk">
+  <data key="d0">feature</data>
+</node>
+<node id="formal_charge_practical_penalty">
+  <data key="d0">applicability_principle</data>
+  <data key="d6">lowers_synthesis_priority</data>
+  <data key="d7">formal_charge_practical_risk</data>
+  <data key="d8">带形式电荷的小分子常有配方和工艺不确定性。</data>
+</node>
+<node id="formal_charge_practical_risk">
+  <data key="d0">feature</data>
+</node>
+<node id="epoxy_primary_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">crosslinked_epoxy</data>
+  <data key="d10">nucleophilic_ring_opening</data>
+  <data key="d11">high</data>
+  <data key="d12">经典环氧-胺固化，适合作为硬约束兼软先验。</data>
+</node>
+<node id="epoxy">
+  <data key="d0">functional_group</data>
+</node>
+<node id="primary_amine">
+  <data key="d0">functional_group</data>
+</node>
+<node id="crosslinked_epoxy">
+  <data key="d0">network_type</data>
+</node>
+<node id="epoxy_secondary_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">crosslinked_epoxy</data>
+  <data key="d10">nucleophilic_ring_opening</data>
+  <data key="d11">high</data>
+  <data key="d12"></data>
+</node>
+<node id="secondary_amine">
+  <data key="d0">functional_group</data>
+</node>
+<node id="epoxy_anhydride">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">epoxy_ester_network</data>
+  <data key="d10">catalyzed_ring_opening_esterification</data>
+  <data key="d11">medium</data>
+  <data key="d12">通常需要催化剂；应作为兼容但工艺条件敏感的反应。</data>
+</node>
+<node id="anhydride">
+  <data key="d0">functional_group</data>
+</node>
+<node id="epoxy_ester_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="epoxy_carboxylic_acid">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">beta_hydroxy_ester_network</data>
+  <data key="d10">ring_opening_esterification</data>
+  <data key="d11">medium</data>
+  <data key="d12"></data>
+</node>
+<node id="carboxylic_acid">
+  <data key="d0">functional_group</data>
+</node>
+<node id="beta_hydroxy_ester_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="epoxy_hydroxyl">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">etherified_epoxy_network</data>
+  <data key="d10">catalyzed_etherification</data>
+  <data key="d11">medium_low</data>
+  <data key="d12"></data>
+</node>
+<node id="hydroxyl">
+  <data key="d0">functional_group</data>
+</node>
+<node id="etherified_epoxy_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="anhydride_primary_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">polyamic_acid_or_polyimide_precursor</data>
+  <data key="d10">anhydride_opening_amidation</data>
+  <data key="d11">high</data>
+  <data key="d12"></data>
+</node>
+<node id="polyamic_acid_or_polyimide_precursor">
+  <data key="d0">network_type</data>
+</node>
+<node id="anhydride_secondary_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">amic_acid_or_imide_related_network</data>
+  <data key="d10">anhydride_opening_amidation</data>
+  <data key="d11">medium</data>
+  <data key="d12"></data>
+</node>
+<node id="amic_acid_or_imide_related_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="anhydride_hydroxyl">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">polyester_or_half_ester_network</data>
+  <data key="d10">esterification</data>
+  <data key="d11">medium</data>
+  <data key="d12"></data>
+</node>
+<node id="polyester_or_half_ester_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="isocyanate_hydroxyl">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">polyurethane</data>
+  <data key="d10">urethane_formation</data>
+  <data key="d11">high</data>
+  <data key="d12"></data>
+</node>
+<node id="isocyanate">
+  <data key="d0">functional_group</data>
+</node>
+<node id="polyurethane">
+  <data key="d0">network_type</data>
+</node>
+<node id="isocyanate_primary_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">polyurea</data>
+  <data key="d10">urea_formation</data>
+  <data key="d11">high</data>
+  <data key="d12"></data>
+</node>
+<node id="polyurea">
+  <data key="d0">network_type</data>
+</node>
+<node id="isocyanate_secondary_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">substituted_urea_network</data>
+  <data key="d10">urea_formation</data>
+  <data key="d11">high</data>
+  <data key="d12"></data>
+</node>
+<node id="substituted_urea_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="acrylate_vinyl_radical">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">radical_crosslinked</data>
+  <data key="d10">free_radical_copolymerization</data>
+  <data key="d11">medium</data>
+  <data key="d12"></data>
+</node>
+<node id="acrylate_or_methacrylate">
+  <data key="d0">functional_group</data>
+</node>
+<node id="vinyl">
+  <data key="d0">functional_group</data>
+</node>
+<node id="radical_crosslinked">
+  <data key="d0">network_type</data>
+</node>
+<node id="thiol_ene">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">thioether_network</data>
+  <data key="d10">thiol_ene_click</data>
+  <data key="d11">high</data>
+  <data key="d12"></data>
+</node>
+<node id="thiol">
+  <data key="d0">functional_group</data>
+</node>
+<node id="thioether_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="thiol_acrylate">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">thioether_ester_network</data>
+  <data key="d10">thiol_michael_or_radical_addition</data>
+  <data key="d11">high</data>
+  <data key="d12"></data>
+</node>
+<node id="thioether_ester_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="cyanate_ester_self">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">triazine_network</data>
+  <data key="d10">cyclotrimerization</data>
+  <data key="d11">high</data>
+  <data key="d12"></data>
+</node>
+<node id="triazine_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="cyanate_ester_phenol">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">co_cured_cyanate_network</data>
+  <data key="d10">catalyzed_trimerization_or_cocure</data>
+  <data key="d11">medium</data>
+  <data key="d12"></data>
+</node>
+<node id="phenol">
+  <data key="d0">functional_group</data>
+</node>
+<node id="co_cured_cyanate_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="cyanate_ester_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">cyanate_amine_cocured_network</data>
+  <data key="d10">addition_or_cocure</data>
+  <data key="d11">medium_low</data>
+  <data key="d12"></data>
+</node>
+<node id="cyanate_amine_cocured_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="maleimide_vinyl">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">maleimide_copolymer_network</data>
+  <data key="d10">copolymerization_or_addition</data>
+  <data key="d11">medium</data>
+  <data key="d12"></data>
+</node>
+<node id="maleimide_copolymer_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="maleimide_thiol">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">thiosuccinimide_network</data>
+  <data key="d10">michael_addition</data>
+  <data key="d11">high</data>
+  <data key="d12"></data>
+</node>
+<node id="thiosuccinimide_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="maleimide_amine">
+  <data key="d0">reaction_principle</data>
+  <data key="d9">amino_succinimide_network</data>
+  <data key="d10">aza_michael_addition</data>
+  <data key="d11">medium</data>
+  <data key="d12"></data>
+</node>
+<node id="amino_succinimide_network">
+  <data key="d0">network_type</data>
+</node>
+<node id="library">
+  <data key="d0">candidate_source</data>
+  <data key="d3">SMP_Dataset.xlsx 中已经出现的单体。</data>
+  <data key="d13">high</data>
+</node>
+<node id="generated">
+  <data key="d0">candidate_source</data>
+  <data key="d3">由热固性结构模板生成的小分子候选。</data>
+  <data key="d13">medium</data>
+</node>
+<node id="chembl">
+  <data key="d0">candidate_source</data>
+  <data key="d3">ChEMBL 化合物经 RDKit、元素、charset、官能团和适用域筛选后进入候选池。</data>
+  <data key="d13">low_to_medium</data>
+</node>
+<edge source="Monomer" target="library" id="0">
+  <data key="d14">sourced_from</data>
+</edge>
+<edge source="Monomer" target="generated" id="0">
+  <data key="d14">sourced_from</data>
+</edge>
+<edge source="Monomer" target="chembl" id="0">
+  <data key="d14">sourced_from</data>
+</edge>
+<edge source="SMPRecipe" target="valid_rdkit" id="0">
+  <data key="d14">constrained_by</data>
+</edge>
+<edge source="SMPRecipe" target="single_fragment" id="0">
+  <data key="d14">constrained_by</data>
+</edge>
+<edge source="SMPRecipe" target="allowed_atom_set" id="0">
+  <data key="d14">constrained_by</data>
+</edge>
+<edge source="SMPRecipe" target="vae_charset_encodable" id="0">
+  <data key="d14">constrained_by</data>
+</edge>
+<edge source="SMPRecipe" target="ratio_simplex" id="0">
+  <data key="d14">constrained_by</data>
+</edge>
+<edge source="SMPRecipe" target="reactive_network_ok" id="0">
+  <data key="d14">constrained_by</data>
+</edge>
+<edge source="aromatic_backbones_raise_tg" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="aromatic_backbone" target="aromatic_backbones_raise_tg" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="multi_aromatic_rigidity" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="rigid_multi_aromatic" target="multi_aromatic_rigidity" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="imide_anhydride_networks_raise_tg" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="imide_or_anhydride" target="imide_anhydride_networks_raise_tg" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="cyanate_ester_triazine" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="cyanate_ester" target="cyanate_ester_triazine" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="cyanate_ester" target="cyanate_ester_self" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="cyanate_ester" target="cyanate_ester_self" id="1">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="cyanate_ester" target="cyanate_ester_phenol" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="cyanate_ester" target="cyanate_ester_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="maleimide_rigid_network" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="maleimide" target="maleimide_rigid_network" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="maleimide" target="maleimide_vinyl" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="maleimide" target="maleimide_thiol" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="maleimide" target="maleimide_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="high_functionality_crosslink_density" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="high_functionality" target="high_functionality_crosslink_density" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="flexible_ether_penalty" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="flexible_ether_risk" target="flexible_ether_penalty" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="peg_like_penalty" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="peg_like_risk" target="peg_like_penalty" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="long_aliphatic_penalty" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="long_aliphatic_risk" target="long_aliphatic_penalty" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="too_flexible_penalty" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="too_flexible_risk" target="too_flexible_penalty" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="ood_distance_penalty" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="high_ood" target="ood_distance_penalty" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="druglike_complexity_penalty" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="druglike_hetero_complexity_risk" target="druglike_complexity_penalty" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="formal_charge_practical_penalty" target="glass_transition_temperature" id="0">
+  <data key="d14">influences</data>
+</edge>
+<edge source="formal_charge_practical_risk" target="formal_charge_practical_penalty" id="0">
+  <data key="d14">supports_principle</data>
+</edge>
+<edge source="epoxy_primary_amine" target="crosslinked_epoxy" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="epoxy" target="epoxy_primary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="epoxy" target="epoxy_secondary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="epoxy" target="epoxy_anhydride" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="epoxy" target="epoxy_carboxylic_acid" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="epoxy" target="epoxy_hydroxyl" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="primary_amine" target="epoxy_primary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="primary_amine" target="anhydride_primary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="primary_amine" target="isocyanate_primary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="primary_amine" target="cyanate_ester_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="primary_amine" target="maleimide_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="epoxy_secondary_amine" target="crosslinked_epoxy" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="secondary_amine" target="epoxy_secondary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="secondary_amine" target="anhydride_secondary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="secondary_amine" target="isocyanate_secondary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="epoxy_anhydride" target="epoxy_ester_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="anhydride" target="epoxy_anhydride" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="anhydride" target="anhydride_primary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="anhydride" target="anhydride_secondary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="anhydride" target="anhydride_hydroxyl" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="epoxy_carboxylic_acid" target="beta_hydroxy_ester_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="carboxylic_acid" target="epoxy_carboxylic_acid" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="epoxy_hydroxyl" target="etherified_epoxy_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="hydroxyl" target="epoxy_hydroxyl" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="hydroxyl" target="anhydride_hydroxyl" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="hydroxyl" target="isocyanate_hydroxyl" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="anhydride_primary_amine" target="polyamic_acid_or_polyimide_precursor" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="anhydride_secondary_amine" target="amic_acid_or_imide_related_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="anhydride_hydroxyl" target="polyester_or_half_ester_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="isocyanate_hydroxyl" target="polyurethane" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="isocyanate" target="isocyanate_hydroxyl" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="isocyanate" target="isocyanate_primary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="isocyanate" target="isocyanate_secondary_amine" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="isocyanate_primary_amine" target="polyurea" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="isocyanate_secondary_amine" target="substituted_urea_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="acrylate_vinyl_radical" target="radical_crosslinked" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="acrylate_or_methacrylate" target="acrylate_vinyl_radical" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="acrylate_or_methacrylate" target="thiol_acrylate" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="vinyl" target="acrylate_vinyl_radical" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="vinyl" target="thiol_ene" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="vinyl" target="maleimide_vinyl" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="thiol_ene" target="thioether_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="thiol" target="thiol_ene" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="thiol" target="thiol_acrylate" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="thiol" target="maleimide_thiol" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="thiol_acrylate" target="thioether_ester_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="cyanate_ester_self" target="triazine_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="cyanate_ester_phenol" target="co_cured_cyanate_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="phenol" target="cyanate_ester_phenol" id="0">
+  <data key="d14">compatible_via</data>
+</edge>
+<edge source="cyanate_ester_amine" target="cyanate_amine_cocured_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="maleimide_vinyl" target="maleimide_copolymer_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="maleimide_thiol" target="thiosuccinimide_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+<edge source="maleimide_amine" target="amino_succinimide_network" id="0">
+  <data key="d14">produces_network</data>
+</edge>
+</graph></graphml>
