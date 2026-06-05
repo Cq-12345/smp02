@@ -148,6 +148,20 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    sft_candidate_generation = tmp_path / "sft_candidate_generation.json"
+    sft_candidate_generation.write_text(
+        json.dumps(
+            {
+                "input_rows": 25,
+                "harness_pass_rows": 25,
+                "best_distance_c": 0.003,
+                "generator_mode": "prototype_replay_not_weight_update",
+                "heldout_eval_rows": 12,
+                "heldout_exact_candidate_matches": 3,
+            }
+        ),
+        encoding="utf-8",
+    )
 
     result = summarize(
         candidates,
@@ -168,6 +182,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         human_review,
         gnn_global,
         generative_training,
+        sft_candidate_generation,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -216,3 +231,9 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["generative_training_diffusion_flow_ready"] is False
     assert result["generative_training_next_sft_needed"] == 13
     assert result["generative_training_next_diffusion_flow_needed"] == 93
+    assert result["sft_candidate_generator_rows"] == 25
+    assert result["sft_candidate_generator_harness_pass"] == 25
+    assert result["sft_candidate_generator_best_distance_c"] == 0.003
+    assert result["sft_candidate_generator_mode"] == "prototype_replay_not_weight_update"
+    assert result["sft_candidate_generator_heldout_eval_rows"] == 12
+    assert result["sft_candidate_generator_heldout_exact_candidate_matches"] == 3

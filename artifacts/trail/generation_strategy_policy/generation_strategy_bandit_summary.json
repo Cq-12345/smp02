@@ -1,7 +1,7 @@
 {
   "strategies": 6,
   "eligible_active_strategies": 4,
-  "total_attempts": 531,
+  "total_attempts": 492,
   "total_budget": 100,
   "top_strategy": "llm_rag_principle_generation",
   "suppressed_strategies": 1,

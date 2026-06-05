@@ -149,20 +149,43 @@ def arm_from_training_readiness(strategy: str, summary: dict[str, Any]) -> dict[
     }
 
 
+def arm_from_sft_generation_or_training(
+    sft_generation_summary: dict[str, Any],
+    training_summary: dict[str, Any],
+    feedback: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    if int(sft_generation_summary.get("input_rows", 0) or 0) <= 0:
+        return arm_from_training_readiness("sft_candidate_generator", training_summary)
+    arm = arm_from_generation_summary("sft_candidate_generator", sft_generation_summary, feedback)
+    arm["evidence_source"] = "sft_dry_run_generation_record_summary"
+    if not bool(training_summary.get("sft_ready", False)):
+        arm["status"] = "data_collection_only"
+        arm["readiness_gate"] = False
+        arm["readiness_reason"] = "SFT dry-run exists, but SFT corpus readiness gate is not currently satisfied."
+        arm["next_constraint"] = "collect more Harness-passing, prediction-backed generation records before training."
+        return arm
+    arm["readiness_gate"] = True
+    arm["readiness_reason"] = "SFT dry-run generated auditable records; replace dry-run with trained SFT only behind the same gates."
+    arm["next_constraint"] = "replace prototype dry-run with neural SFT or keep collecting validated records; always evaluate behind predictor/Harness/PiEvo gates."
+    return arm
+
+
 def collect_arms(
     strategy_feedback: pd.DataFrame,
     expanded_replacement: dict[str, Any],
     latent_local_search_eval: dict[str, Any],
     expanded_generation: dict[str, Any],
     training_summary: dict[str, Any],
+    sft_generation_summary: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     feedback = feedback_lookup(strategy_feedback)
+    sft_generation_summary = sft_generation_summary or {}
     arms = [
         arm_from_eval_summary("vae_latent_local_search", latent_local_search_eval, feedback),
         arm_from_eval_summary("functional_group_replacement", expanded_replacement, feedback),
         arm_from_generation_summary("llm_rag_principle_generation", expanded_generation, feedback),
         arm_from_feedback_only("llm_smiles_generation", feedback),
-        arm_from_training_readiness("sft_candidate_generator", training_summary),
+        arm_from_sft_generation_or_training(sft_generation_summary, training_summary, feedback),
         arm_from_training_readiness("diffusion_or_flow_matching", training_summary),
     ]
     return pd.DataFrame(arms)
@@ -309,6 +332,7 @@ def run_policy(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[str, Any]]:
         read_json(Path(args.vae_latent_local_search_eval_summary)),
         read_json(Path(args.expanded_generation_summary)),
         read_json(Path(args.generative_training_summary)),
+        read_json(Path(getattr(args, "sft_generation_summary", "artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json"))),
     )
     policy, summary = score_policy(
         arms,
@@ -331,6 +355,7 @@ def main() -> None:
     parser.add_argument("--vae-latent-local-search-eval-summary", default="artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json")
     parser.add_argument("--expanded-generation-summary", default="artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json")
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
+    parser.add_argument("--sft-generation-summary", default="artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json")
     parser.add_argument("--exploration-c", type=float, default=0.25)
     parser.add_argument("--softmax-temperature", type=float, default=0.25)
     parser.add_argument("--total-budget", type=int, default=100)

@@ -169,6 +169,11 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_genera
   --out-dir artifacts/trail/generation/generative_training_sets \
   --report reports/generative_training_set_readiness.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_sft_candidate_generator_dry_run.py \
+  --max-records 25 \
+  --out-dir artifacts/trail/generation/sft_candidate_dry_run \
+  --report reports/sft_candidate_generator_dry_run.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/update_generation_strategy_policy.py \
   --out-dir artifacts/trail/generation_strategy_policy \
   --report reports/generation_strategy_bandit_policy.md
@@ -194,6 +199,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --human-review-queue-summary artifacts/trail/human_review/human_experiment_review_queue_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
+  --sft-candidate-generation-summary artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
 ```
 
@@ -268,13 +274,22 @@ SFT / diffusion / flow readiness 已补充：
 - diffusion/flow seed table 为 52 条 train、12 条 eval，`diffusion_flow_ready=false`；当前门槛 100 条，还缺 36 条。
 - 这一步仍不直接推荐 SFT/flow 输出；训练后生成的候选必须重新写入 ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
+SFT candidate generator dry-run 已补充：
+
+- `scripts/run_sft_candidate_generator_dry_run.py` 用 SFT train split 中的 validated prototypes 生成 `sft_candidate_generator` records。
+- 当前 dry-run 生成 25 条 records，25 条全部通过 generation record/Harness；最佳 target distance 为 0.003 C。
+- heldout eval 有 12 条，其中 3 条和 dry-run prototypes 完全同候选。
+- dry-run mode 是 `prototype_replay_not_weight_update`，即链路验证和策略激活，不冒充神经权重微调完成。
+- Workflow summary 已读取 SFT dry-run summary，记录 rows、Harness pass、best distance、heldout eval rows 和 exact candidate matches。
+
 Generation strategy bandit policy 已补充：
 
 - `scripts/update_generation_strategy_policy.py` 把 strategy feedback、replacement/latent eval、LLM/RAG summary 和生成模型 readiness 汇总为 strategy-level contextual bandit。
 - 当前 arm 包括 `vae_latent_local_search`、`functional_group_replacement`、`llm_rag_principle_generation`、`llm_smiles_generation`、`sft_candidate_generator`、`diffusion_or_flow_matching`。
 - 输出的 `allocation_per_100` 是下一轮 proposal 预算建议，不是最终配方推荐；所有候选仍必须经过 predictor、Harness、PiEvo 和人工审核。
 - 当前 6 个策略中 4 个 eligible active，1 个 suppressed，1 个 data_collection_only；top strategy 为 `llm_rag_principle_generation`。
-- `sft_candidate_generator` 已因 64 条 SFT 样本通过 readiness gate 成为 active arm，并获得 25/100 proposal budget 建议；`diffusion_or_flow_matching` 仍因 seed rows 不足保持 data_collection_only。
+- `sft_candidate_generator` 已因 64 条 SFT 样本通过 readiness gate 成为 active arm；当前 policy 优先读取 SFT dry-run summary，SFT 获得 21/100 proposal budget 建议。
+- `diffusion_or_flow_matching` 仍因 seed rows 不足保持 data_collection_only。
 - `llm_smiles_generation` 因缺 predictor/chemistry evidence 继续 suppressed。
 - Workflow summary 已读取 `generation_strategy_bandit_summary.json`，让“RL/策略优化”进入总览链路。
 

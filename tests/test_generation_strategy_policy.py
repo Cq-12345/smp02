@@ -82,6 +82,37 @@ def test_bandit_policy_activates_ready_sft_without_unbounded_rate() -> None:
     assert by_strategy["diffusion_or_flow_matching"]["status"] == "data_collection_only"
 
 
+def test_bandit_policy_prefers_sft_dry_run_summary_when_available() -> None:
+    arms = collect_arms(
+        pd.DataFrame(),
+        expanded_replacement={"input_proposals": 200, "harness_pass": 18, "best_distance_c": 0.2, "replacement_observations": 18},
+        latent_local_search_eval={"input_proposals": 200, "harness_pass": 42, "best_distance_c": 0.2, "replacement_observations": 42},
+        expanded_generation={"input_rows": 2, "harness_pass_rows": 2, "best_distance_c": 0.01, "mean_generation_reward": 0.95},
+        training_summary={
+            "sft_examples": 64,
+            "sft_ready": True,
+            "next_data_needed_for_sft": 0,
+            "sft_min_examples": 20,
+            "diffusion_flow_seed_rows": 64,
+            "diffusion_flow_ready": False,
+            "next_data_needed_for_diffusion_flow": 36,
+            "diffusion_flow_min_examples": 100,
+        },
+        sft_generation_summary={
+            "input_rows": 25,
+            "harness_pass_rows": 25,
+            "best_distance_c": 0.003,
+            "mean_generation_reward": 0.78,
+        },
+    )
+
+    by_strategy = {row["strategy"]: row for _, row in arms.iterrows()}
+    assert by_strategy["sft_candidate_generator"]["evidence_source"] == "sft_dry_run_generation_record_summary"
+    assert by_strategy["sft_candidate_generator"]["attempts"] == 25
+    assert by_strategy["sft_candidate_generator"]["successes"] == 25
+    assert by_strategy["sft_candidate_generator"]["status"] == "active"
+
+
 def test_run_policy_writes_outputs(tmp_path: Path) -> None:
     feedback = tmp_path / "strategy_feedback.csv"
     pd.DataFrame(
@@ -118,6 +149,8 @@ def test_run_policy_writes_outputs(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
+    sft_generation = tmp_path / "sft_generation.json"
+    sft_generation.write_text(json.dumps({"input_rows": 0}), encoding="utf-8")
     out_dir = tmp_path / "out"
     report = tmp_path / "report.md"
 
@@ -128,6 +161,7 @@ def test_run_policy_writes_outputs(tmp_path: Path) -> None:
             vae_latent_local_search_eval_summary=str(latent),
             expanded_generation_summary=str(generation),
             generative_training_summary=str(training),
+            sft_generation_summary=str(sft_generation),
             exploration_c=0.25,
             softmax_temperature=0.25,
             total_budget=100,

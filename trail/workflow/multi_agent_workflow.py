@@ -9,7 +9,7 @@ import pandas as pd
 
 AGENTS = {
     "space_agent": "界定搜索空间：官能团、反应兼容性、摩尔比网格。",
-    "generator_agent": "生成候选假设：模板、VAE replacement、prompt/RAG、未来 SFT/扩散/流匹配。",
+    "generator_agent": "生成候选假设：模板、VAE replacement、prompt/RAG、SFT dry-run，以及未来扩散/流匹配。",
     "rag_generator_agent": "读取 RAG 上下文和 strict strategy feedback，生成 auditable generation records。",
     "predictor_agent": "评估假设：VAE-WVCM model zoo、GNN、ensemble disagreement、uncertainty/OOD。",
     "harness_agent": "硬约束过滤：RDKit、比例、目标窗口、官能团反应兼容性。",
@@ -42,6 +42,7 @@ def summarize(
     human_review_queue_summary: Path,
     gnn_global_feature_summary: Path,
     generative_training_summary: Path,
+    sft_candidate_generation_summary: Path,
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -61,6 +62,7 @@ def summarize(
     human_review = read_json(human_review_queue_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
     generative_training = read_json(generative_training_summary, {})
+    sft_candidate_generation = read_json(sft_candidate_generation_summary, {})
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
@@ -130,6 +132,12 @@ def summarize(
         "generative_training_diffusion_flow_ready": generative_training.get("diffusion_flow_ready", False),
         "generative_training_next_sft_needed": generative_training.get("next_data_needed_for_sft", 0),
         "generative_training_next_diffusion_flow_needed": generative_training.get("next_data_needed_for_diffusion_flow", 0),
+        "sft_candidate_generator_rows": sft_candidate_generation.get("input_rows", 0),
+        "sft_candidate_generator_harness_pass": sft_candidate_generation.get("harness_pass_rows", 0),
+        "sft_candidate_generator_best_distance_c": sft_candidate_generation.get("best_distance_c"),
+        "sft_candidate_generator_mode": sft_candidate_generation.get("generator_mode", ""),
+        "sft_candidate_generator_heldout_eval_rows": sft_candidate_generation.get("heldout_eval_rows", 0),
+        "sft_candidate_generator_heldout_exact_candidate_matches": sft_candidate_generation.get("heldout_exact_candidate_matches", 0),
         "generation_feedback": feedback,
     }
 
@@ -154,6 +162,7 @@ def main() -> None:
     parser.add_argument("--human-review-queue-summary", default="artifacts/trail/human_review/human_experiment_review_queue_summary.json")
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
+    parser.add_argument("--sft-candidate-generation-summary", default="artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
     result = summarize(
@@ -175,6 +184,7 @@ def main() -> None:
         Path(args.human_review_queue_summary),
         Path(args.gnn_global_feature_summary),
         Path(args.generative_training_summary),
+        Path(args.sft_candidate_generation_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

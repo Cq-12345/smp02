@@ -1,0 +1,26 @@
+{
+  "input_rows": 25,
+  "record_pass_rows": 25,
+  "ready_for_prediction_rows": 0,
+  "harness_pass_rows": 25,
+  "harness_fail_rows": 0,
+  "strategy_counts": {
+    "sft_candidate_generator": 25
+  },
+  "stage_counts": {
+    "harnessed": 25
+  },
+  "best_distance_c": 0.0031802513673540034,
+  "mean_generation_reward": 0.7778092820404912,
+  "reward_temperature_c": 5.0,
+  "generator_mode": "prototype_replay_not_weight_update",
+  "sft_jsonl": "artifacts/trail/generation/generative_training_sets/sft_generation_records.jsonl",
+  "train_examples": 52,
+  "eval_examples": 12,
+  "generated_records": 25,
+  "heldout_exact_candidate_matches": 3,
+  "heldout_eval_rows": 12,
+  "input_records_path": "artifacts/trail/generation/sft_candidate_dry_run/sft_candidate_records_input.csv",
+  "generation_record_ledger_path": "artifacts/trail/generation/sft_candidate_dry_run/generation_record_ledger.csv",
+  "heldout_eval_retrieval_path": "artifacts/trail/generation/sft_candidate_dry_run/heldout_eval_retrieval.csv"
+}
