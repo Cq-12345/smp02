@@ -39,6 +39,7 @@ def summarize(
     vae_latent_local_search_eval_summary: Path,
     vae_latent_local_search_pievo_summary: Path,
     generation_strategy_policy_summary: Path,
+    human_review_queue_summary: Path,
     gnn_global_feature_summary: Path,
     generative_training_summary: Path,
 ) -> dict:
@@ -57,6 +58,7 @@ def summarize(
     latent_local_search_eval = read_json(vae_latent_local_search_eval_summary, {})
     latent_local_search_pievo = read_json(vae_latent_local_search_pievo_summary, {})
     strategy_policy = read_json(generation_strategy_policy_summary, {})
+    human_review = read_json(human_review_queue_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
     generative_training = read_json(generative_training_summary, {})
     return {
@@ -110,6 +112,12 @@ def summarize(
         "generation_strategy_policy_suppressed_strategies": strategy_policy.get("suppressed_strategies", 0),
         "generation_strategy_policy_data_collection_only_strategies": strategy_policy.get("data_collection_only_strategies", 0),
         "generation_strategy_policy_total_budget": strategy_policy.get("total_budget", 0),
+        "human_review_queue_rows": human_review.get("queue_rows", 0),
+        "human_review_ready_for_active_ledger_rows": human_review.get("ready_for_active_ledger_rows", 0),
+        "human_review_draft_ready_for_active_ledger_rows": human_review.get("draft_ready_for_active_ledger_rows", 0),
+        "human_review_best_target_distance_c": human_review.get("best_target_distance_c"),
+        "human_review_process_design_for_dsc_rows": human_review.get("review_priorities", {}).get("process_design_for_dsc", 0),
+        "human_review_high_fidelity_before_dsc_rows": human_review.get("review_priorities", {}).get("high_fidelity_before_dsc", 0),
         "gnn_global_feature_architecture": gnn_global.get("architecture"),
         "gnn_global_feature_best_case": gnn_global.get("best_case"),
         "gnn_global_feature_baseline_mapek_test_pct": gnn_global.get("baseline_mapek_test_pct"),
@@ -143,6 +151,7 @@ def main() -> None:
     parser.add_argument("--vae-latent-local-search-eval-summary", default="artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json")
     parser.add_argument("--vae-latent-local-search-pievo-summary", default="artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--generation-strategy-policy-summary", default="artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json")
+    parser.add_argument("--human-review-queue-summary", default="artifacts/trail/human_review/human_experiment_review_queue_summary.json")
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
@@ -163,6 +172,7 @@ def main() -> None:
         Path(args.vae_latent_local_search_eval_summary),
         Path(args.vae_latent_local_search_pievo_summary),
         Path(args.generation_strategy_policy_summary),
+        Path(args.human_review_queue_summary),
         Path(args.gnn_global_feature_summary),
         Path(args.generative_training_summary),
     )

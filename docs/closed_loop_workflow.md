@@ -157,6 +157,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/update_gener
   --out-dir artifacts/trail/generation_strategy_policy \
   --report reports/generation_strategy_bandit_policy.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_human_experiment_review_queue.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/human_experiment_review_queue.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
@@ -171,6 +175,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --vae-latent-local-search-eval-summary artifacts/trail/generation/vae_latent_local_search_eval/replacement_eval_summary.json \
   --vae-latent-local-search-pievo-summary artifacts/pievo_faithful_vae_latent_local_search_195_smoke/pievo_faithful_summary.json \
   --generation-strategy-policy-summary artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json \
+  --human-review-queue-summary artifacts/trail/human_review/human_experiment_review_queue_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
@@ -254,5 +259,14 @@ Generation strategy bandit policy 已补充：
 - 当前 6 个策略中 3 个 eligible active，1 个 suppressed，2 个 data_collection_only；top strategy 为 `llm_rag_principle_generation`。
 - `llm_smiles_generation` 因缺 predictor/chemistry evidence 继续 suppressed；SFT 和 diffusion/flow 因 readiness gate 未通过，不获得训练/生成预算，只获得继续收集 validated records 的建议。
 - Workflow summary 已读取 `generation_strategy_bandit_summary.json`，让“RL/策略优化”进入总览链路。
+
+Human experiment review queue 已补充：
+
+- `scripts/build_human_experiment_review_queue.py` 会读取当前通过 Harness/PiEvo 的 surrogate 候选，推断 reaction principle、process template 和缺失工艺字段。
+- 当前队列输入 58 条候选，去重后 43 条，输出 30 条人工复核候选。
+- draft process records 30 条基础格式都通过，但 `ready_for_active_ledger=0`，因为仍缺固化温度、后固化、催化剂、NCO 指数、酰亚胺化条件等字段。
+- 队列中 13 条是 `process_design_for_dsc`，11 条建议先做 `high_fidelity_before_dsc`。
+- 最佳队列候选距 195 C 目标 0.059 C，但仍只是 surrogate evidence；必须由人工补齐工艺并显式批准，才能进入真实/高权重 observation ledger。
+- Workflow summary 已读取 `human_experiment_review_queue_summary.json`，让人工闭环不再只是 schema 和说明文档。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

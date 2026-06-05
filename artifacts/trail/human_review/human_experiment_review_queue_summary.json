@@ -1,0 +1,26 @@
+{
+  "input_candidates": 58,
+  "deduplicated_candidates": 43,
+  "queue_rows": 30,
+  "ready_for_active_ledger_rows": 0,
+  "process_templates": {
+    "epoxy_amine_thermal_cure": 10,
+    "cyanate_ester_triazine_cure": 6,
+    "anhydride_amine_imidization": 4,
+    "maleimide_addition_or_copolymerization": 4,
+    "epoxy_anhydride_catalyzed_cure": 3,
+    "isocyanate_urethane_urea": 3
+  },
+  "review_priorities": {
+    "process_design_for_dsc": 13,
+    "high_fidelity_before_dsc": 11,
+    "standard_process_review": 6
+  },
+  "mean_target_distance_c": 1.4210625575319018,
+  "best_target_distance_c": 0.0590323055353962,
+  "draft_process_record_pass_rows": 30,
+  "draft_ready_for_active_ledger_rows": 0,
+  "queue_path": "artifacts/trail/human_review/human_experiment_review_queue.csv",
+  "draft_process_records_path": "artifacts/trail/human_review/draft_process_records.csv",
+  "draft_process_record_ledger_path": "artifacts/trail/human_review/draft_process_record_ledger.csv"
+}

@@ -79,6 +79,21 @@ PYTHONPATH=src python trail/experiments/import_process_records.py \
 - `process_record_ledger.csv`
 - `process_record_summary.json`
 
+候选复核队列：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_human_experiment_review_queue.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/human_experiment_review_queue.md
+```
+
+输出：
+
+- `human_experiment_review_queue.csv`
+- `draft_process_records.csv`
+- `draft_process_record_ledger.csv`
+- `human_experiment_review_queue_summary.json`
+
 ## 5. 与 PiEvo 的连接
 
 当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
@@ -142,3 +157,11 @@ Smoke 结果：
 这意味着：即使已有文献 Tg 或 surrogate Tg，也不能绕过工艺完整性审核直接作为高权重真实证据进入 PiEvo posterior。
 
 人工审核不是替代模型，而是控制数据质量，避免错误实验记录污染 posterior。
+
+当前 human experiment review queue：
+
+- 输入 58 条 surrogate/Harness/PiEvo 候选，去重后 43 条，输出 30 条人工复核候选。
+- 队列最佳 target distance 为 0.059 C。
+- 13 条为 `process_design_for_dsc`，适合先补工艺字段再决定是否排真实实验。
+- 11 条为 `high_fidelity_before_dsc`，通常是预测 sigma 较高或 surrogate 风险较高，建议先做高保真/集成复核。
+- 30 条 draft process records 基础格式全部通过，但 `ready_for_active_ledger_rows=0`；这正是预期门禁，防止 surrogate 候选未经人工和工艺细节直接升级为高权重证据。

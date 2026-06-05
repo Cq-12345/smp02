@@ -145,6 +145,13 @@ Agent 分工：
 - top strategy 为 `llm_rag_principle_generation`。
 - `llm_smiles_generation` 在缺 predictor/chemistry evidence 时不进入下一轮预算；SFT 和 diffusion/flow 在 readiness gate 未通过前只进入数据收集目标。
 
+当前 human review queue 状态：
+
+- `scripts/build_human_experiment_review_queue.py` 已把 surrogate/PiEvo/Harness 候选转成人工实验复核队列。
+- 输入 58 条候选，去重 43 条，输出 30 条 review items。
+- 30 条 draft process records 基础格式通过，但 `ready_for_active_ledger=0`，说明仍需人工补固化/催化/后固化/酰亚胺化等工艺字段。
+- 这一步把“真实实验结果迭代优化”前的人工质量门禁落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
+
 ## 6. PiEvo-faithful 要求
 
 必须具备：
