@@ -1,0 +1,44 @@
+name,kind,description,feature,effect,weight,confidence,frozen,evidence_count
+peptide_like_out_of_domain,soft,Peptide-like ChEMBL molecules are poor monomer hypotheses.,peptide_like_risk,-1.0,0.75,0.8,False,0
+peg_like_penalty,soft,PEG-like segments are a strong low-Tg risk.,peg_like_risk,-1.0,0.75,0.7026280211983765,False,61
+aromatic_backbones_raise_tg,soft,Aromatic backbones tend to raise Tg.,aromatic_backbone,1.0,0.55,0.7,False,1500
+imide_anhydride_networks_raise_tg,soft,Imide or anhydride-derived networks often provide high Tg.,imide_or_anhydride,1.0,0.85,0.6983654136506949,False,823
+flexible_ether_penalty,soft,Long flexible ether segments can lower Tg.,flexible_ether_risk,-1.0,0.55,0.6567763087747635,False,53
+multi_aromatic_rigidity,soft,Multiple aromatic rings increase chain rigidity.,rigid_multi_aromatic,1.0,0.65,0.65,False,1500
+formal_charge_practical_penalty,soft,Charged molecules are lower-priority thermoset monomer hypotheses unless specifically justified.,formal_charge_practical_risk,-1.0,0.45,0.626871778948327,False,10
+too_flexible_penalty,soft,High rotatable-bond count increases flexibility risk.,too_flexible_risk,-1.0,0.45,0.6249217170183953,False,131
+druglike_hetero_complexity_penalty,soft,High HBA/HBD complexity is a risk for out-of-library monomer transfer.,druglike_hetero_complexity_risk,-1.0,0.5,0.6225907327035279,False,42
+high_functionality_crosslink_density,soft,Higher reactive functionality can increase crosslink density.,high_functionality,1.0,0.55,0.62,False,1500
+heavy_halogen_practical_risk,soft,Iodinated or brominated drug-like structures are lower-priority monomer hypotheses.,heavy_halogen_risk,-1.0,0.4,0.6138663981896098,False,44
+stereochemical_complexity_penalty,soft,Many stereocenters often indicate bioactive-molecule complexity rather than monomer suitability.,stereochemical_complexity_risk,-1.0,0.4,0.6070473501413992,False,610
+cyanate_ester_triazine,soft,Cyanate ester triazine networks can be high Tg.,cyanate_ester,1.0,0.9,0.6058963495731851,False,90
+long_aliphatic_penalty,soft,Long aliphatic segments usually lower Tg.,long_aliphatic_risk,-1.0,0.45,0.6008788889435095,False,135
+maleimide_rigid_network,soft,Bismaleimide motifs can create rigid high-Tg networks.,maleimide,1.0,0.75,0.5797842853118781,False,347
+reaction_a67f85420c33,soft,Reaction principle: 异氰酸酯-仲胺形成脲键。,reaction::异氰酸酯-仲胺形成脲键。,1.0,0.42,0.5648196985461523,False,37
+reaction_536dfe22d324,soft,Reaction principle: 氰酸酯-胺共反应。,reaction::氰酸酯-胺共反应。,1.0,0.42,0.5643387801800478,False,44
+reaction_5cde50869441,soft,Reaction principle: 环氧-仲胺开环固化。,reaction::环氧-仲胺开环固化。,1.0,0.42,0.5631162184446906,False,218
+reaction_michael,soft,Reaction principle: 马来酰亚胺-胺 Michael 加成。,reaction::马来酰亚胺-胺 Michael 加成。,1.0,0.42,0.5590598907336176,False,212
+reaction_7deb10577c5e,soft,Reaction principle: 酸酐-胺开环形成酰胺酸。,reaction::酸酐-胺开环形成酰胺酸。,1.0,0.42,0.5589616118525583,False,120
+reaction_b793ac896a4f,soft,Reaction principle: 环氧-羧酸开环酯化。,reaction::环氧-羧酸开环酯化。,1.0,0.42,0.5579251103591599,False,186
+sulfone_diamine_rigidity,soft,Sulfone-linked aromatic diamines are common high-Tg hard segments.,sulfone_linker,1.0,0.55,0.5575548604661836,False,377
+nitrile_rich_rigidity,soft,Nitrile-rich aromatic monomers often stiffen networks.,nitrile_rich,1.0,0.45,0.5570254247533325,False,111
+reaction_aaba7fbe7783,soft,Reaction principle: 异氰酸酯-羟基形成聚氨酯。,reaction::异氰酸酯-羟基形成聚氨酯。,1.0,0.42,0.5565577250588531,False,79
+reaction_8122f963caab,soft,Reaction principle: 环氧-酸酐固化，常需催化剂。,reaction::环氧-酸酐固化，常需催化剂。,1.0,0.42,0.5540156263295919,False,4
+reaction_cc7f1a60f1af,soft,Reaction principle: 环氧-羟基醚化，常需催化剂。,reaction::环氧-羟基醚化，常需催化剂。,1.0,0.42,0.5533602877098824,False,333
+reaction_839cd29ef5d7,soft,Reaction principle: 环氧-伯胺开环固化。,reaction::环氧-伯胺开环固化。,1.0,0.42,0.5517358848287113,False,175
+reaction_a5dd26ae10ad,soft,Reaction principle: 异氰酸酯-伯胺形成聚脲。,reaction::异氰酸酯-伯胺形成聚脲。,1.0,0.42,0.5504268316130089,False,32
+reaction_1d41d1c7896e,soft,Reaction principle: 酸酐-酚羟基酯化。,reaction::酸酐-酚羟基酯化。,1.0,0.42,0.55,False,0
+reaction_bc75cf8f07d2,soft,Reaction principle: 异氰酸酯-酚羟基形成氨基甲酸酯。,reaction::异氰酸酯-酚羟基形成氨基甲酸酯。,1.0,0.42,0.55,False,0
+reaction_michael_thiol_ene,soft,Reaction principle: 硫醇-Michael/thiol-ene 反应。,reaction::硫醇-Michael/thiol-ene 反应。,1.0,0.42,0.55,False,0
+reaction_461e81fa276b,soft,Reaction principle: 自由基均/共聚形成交联网络。,reaction::自由基均/共聚形成交联网络。,1.0,0.42,0.55,False,0
+reaction_ee82a65db02c,soft,Reaction principle: 氰酸酯三聚形成三嗪网络。,reaction::氰酸酯三聚形成三嗪网络。,1.0,0.42,0.55,False,0
+reaction_michael,soft,Reaction principle: 马来酰亚胺-硫醇 Michael 加成。,reaction::马来酰亚胺-硫醇 Michael 加成。,1.0,0.42,0.55,False,0
+reaction_2f387d801461,soft,Reaction principle: 酸酐-胺形成聚酰胺酸/聚酰亚胺前体。,reaction::酸酐-胺形成聚酰胺酸/聚酰亚胺前体。,1.0,0.42,0.5498728178053605,False,94
+reaction_aab22a9380a2,soft,Reaction principle: 马来酰亚胺与烯基共聚/加成。,reaction::马来酰亚胺与烯基共聚/加成。,1.0,0.42,0.548647452822974,False,164
+reaction_1ef23bb55506,soft,Reaction principle: 硫醇-烯点击反应。,reaction::硫醇-烯点击反应。,1.0,0.42,0.5452358222070789,False,64
+reaction_2ee4496097cb,soft,Reaction principle: 氰酸酯-酚共固化/催化三聚。,reaction::氰酸酯-酚共固化/催化三聚。,1.0,0.42,0.5423516825960727,False,57
+reaction_e3ab71c1126b,soft,Reaction principle: 酸酐-羟基酯化。,reaction::酸酐-羟基酯化。,1.0,0.42,0.5419092025698923,False,292
+reaction_bd312644298f,soft,Reaction principle: 自由基共聚。,reaction::自由基共聚。,1.0,0.42,0.5159214663746089,False,33
+observed_three_or_more_component_blending,soft,Observed near-target candidates where n>=3 tunes Tg toward the target.,three_or_more_component_blending,1.0,0.35,0.45495852095595185,False,651
+observed_template_generated_monomers,soft,Observed generated template monomers passing validators and producing near-target predictions.,contains_generated,1.0,0.25,0.4204217612900441,False,210
+observed_chembl_transferable_monomers,soft,Observed ChEMBL molecules passing hard validators and producing near-target predictions.,contains_chembl,1.0,0.25,0.4202974259985313,False,1242

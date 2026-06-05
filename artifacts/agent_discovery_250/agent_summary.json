@@ -1,0 +1,28 @@
+{
+  "target_tg_c": 250.0,
+  "target_window_c": 5.0,
+  "pool_stats": [
+    "library=179",
+    "generated=10",
+    "chembl=550",
+    "chembl_scanned=6590"
+  ],
+  "n_pool": 739,
+  "n_candidates": 141420,
+  "n_selected": 250,
+  "best_recommended_target_distance_c": 0.3241769231998717,
+  "best_recommended_predicted_tg_mean_c": 249.67582307680013,
+  "best_recommended_agent_score": -2.4159909869766882,
+  "closest_target_distance_c": 0.00012894453132616945,
+  "closest_predicted_tg_mean_c": 250.00012894453133,
+  "top25_diversity": 0.876623436863324,
+  "validation": {
+    "selected_rows": 250,
+    "ratio_sum_ok": 250,
+    "has_out_of_library": 250,
+    "n_range_ok": 250,
+    "compatibility_nonempty": 250,
+    "rdkit_valid": 250,
+    "all_selected_pass": true
+  }
+}

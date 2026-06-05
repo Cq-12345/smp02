@@ -4,3 +4,4 @@ data/chembl_36_chemreps.txt filter=lfs diff=lfs merge=lfs -text
 *.npz filter=lfs diff=lfs merge=lfs -text
 *.pkl filter=lfs diff=lfs merge=lfs -text
 paper/2605.16480v1.pdf filter=lfs diff=lfs merge=lfs -text
+artifacts/agent_discovery_250/candidate_formulations.csv filter=lfs diff=lfs merge=lfs -text

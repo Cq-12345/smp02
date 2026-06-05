@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 
 from smp02.closed_loop import run_closed_loop
+from smp02.agent_discovery import run_agent_discovery
 from smp02.data import augment_smiles, filter_smiles_by_charset, iter_chembl_smiles, load_smp_records, records_to_frame, unique_monomers
 from smp02.discovery import discover_candidates
 from smp02.functional_groups import classify_many
@@ -175,6 +176,19 @@ def closed_loop(cfg: dict) -> None:
     )
 
 
+def agent_discover(cfg: dict) -> None:
+    device = resolve_device(cfg.get("device", "cuda"))
+    selected = run_agent_discovery(cfg, device)
+    if not selected.empty:
+        best = selected.iloc[0]
+        print(
+            f"Best agent recommendation: Tg={float(best['predicted_tg_mean_c']):.2f} C, "
+            f"distance={float(best['target_distance_c']):.2f} C, "
+            f"score={float(best['agent_score']):.2f}, n={int(best['n_components'])}, sources={best['sources']}",
+            flush=True,
+        )
+
+
 def run_all(cfg: dict, force: bool = False) -> None:
     inspect_data(cfg)
     train_vae(cfg, force=force)
@@ -185,7 +199,7 @@ def run_all(cfg: dict, force: bool = False) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="SMP02 paper reproduction workflow")
-    parser.add_argument("command", choices=["inspect-data", "train-vae", "train-predictors", "discover", "closed-loop", "run-all"])
+    parser.add_argument("command", choices=["inspect-data", "train-vae", "train-predictors", "discover", "closed-loop", "agent-discover", "run-all"])
     parser.add_argument("--config", default="configs/reproduce.yaml")
     parser.add_argument("--force", action="store_true", help="overwrite existing VAE checkpoints")
     args = parser.parse_args()
@@ -201,6 +215,8 @@ def main() -> None:
         discover(cfg)
     elif args.command == "closed-loop":
         closed_loop(cfg)
+    elif args.command == "agent-discover":
+        agent_discover(cfg)
     elif args.command == "run-all":
         run_all(cfg, force=args.force)
 

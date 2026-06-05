@@ -1,0 +1,1398 @@
+[
+  {
+    "iteration": 1,
+    "generated_candidates": 51420,
+    "best_predicted_tg_mean_c": 249.99219444613325,
+    "best_target_distance_c": 0.00780555386674564,
+    "near_target_count": 1587,
+    "updated_principles": 26,
+    "added_principles": [
+      "observed_chembl_transferable_monomers",
+      "observed_template_generated_monomers"
+    ],
+    "anomalies": [
+      {
+        "formula": "O=C1OC(=O)c2cc(Oc3ccc4c(c3)C(=O)OC4=O)ccc21|Oc1ccc(-c2cc(-c3ccc(C(F)(F)F)cc3)nc3c2Cc2cccc(O)c2-3)cc1",
+        "ratios": "0.65000:0.35000",
+        "predicted_tg_mean_c": 249.99219444613325,
+        "target_distance_c": 0.00780555386674564,
+        "prior_score": 1.9745000000000001,
+        "ood_penalty": 3.3145225048065186,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Nc1nc(N)c2cc(NC(=O)Cc3cccc(C(F)(F)F)c3)ccc2n1|O=C1NC(=O)C(c2cn(CCOCCOCCO)c3ccccc23)=C1c1c[nH]c2ccccc12",
+        "ratios": "0.75000:0.25000",
+        "predicted_tg_mean_c": 249.98772364533167,
+        "target_distance_c": 0.012276354668330214,
+        "prior_score": 1.8845000000000003,
+        "ood_penalty": 3.352520704269409,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1)c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1|COc1ccc(C(CCN(C)CC(=O)O)Oc2ccc(C(F)(F)F)cc2)cc1",
+        "ratios": "0.25000:0.75000",
+        "predicted_tg_mean_c": 250.01349915529354,
+        "target_distance_c": 0.013499155293544618,
+        "prior_score": 1.9745000000000001,
+        "ood_penalty": 2.948580265045166,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "O=C1NC(=O)c2cc(Nc3ccc(-c4ccccc4)cc3)c(Nc3ccc(-c4ccccc4)cc3)cc21|O=C1OC(=O)c2cc(Oc3ccc4c(c3)C(=O)OC4=O)ccc21",
+        "ratios": "0.05000:0.95000",
+        "predicted_tg_mean_c": 249.98521901926364,
+        "target_distance_c": 0.014780980736361471,
+        "prior_score": 1.9745000000000001,
+        "ood_penalty": 3.421109437942505,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Nc1ccc(C(c2ccc(N)cc2)(C(F)(F)F)C(F)(F)F)cc1|O=C1NC(=O)C(c2cn(CCOCCOCCO)c3ccccc23)=C1c1c[nH]c2ccccc12",
+        "ratios": "0.65000:0.35000",
+        "predicted_tg_mean_c": 249.97815157994583,
+        "target_distance_c": 0.021848420054169537,
+        "prior_score": 1.8845000000000003,
+        "ood_penalty": 3.2081210613250732,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1)c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1|COc1ccccc1CNC(=O)c1cc(C(F)(F)F)nn1-c1cccc(-c2noc([C@H](C)N)n2)c1",
+        "ratios": "0.15000:0.85000",
+        "predicted_tg_mean_c": 250.03172446390366,
+        "target_distance_c": 0.03172446390365735,
+        "prior_score": 1.9745000000000001,
+        "ood_penalty": 4.282785892486572,
+        "reasons": [
+          "low_prior_but_near_target",
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "C#CCN(Cc1ccc2nc(C)nc(O)c2c1)c1ccc(C(=O)NCC)cc1|N#COc1ccc(CC2CCCC(Cc3ccc(OC#N)cc3)C2)cc1",
+        "ratios": "0.45000:0.55000",
+        "predicted_tg_mean_c": 249.9650373103718,
+        "target_distance_c": 0.034962689628201815,
+        "prior_score": 1.6400000000000001,
+        "ood_penalty": 3.0608766078948975,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CN(C)CCCn1cc(C2=C(c3cn(CCOCCOCCO)c4ccccc34)C(=O)NC2=O)c2ccccc21|Nc1nccc(Nc2ccc(S(N)(=O)=O)cc2)n1",
+        "ratios": "0.15000:0.85000",
+        "predicted_tg_mean_c": 249.9603979094577,
+        "target_distance_c": 0.039602090542302903,
+        "prior_score": 1.9080000000000006,
+        "ood_penalty": 2.083045482635498,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cc1c(C(=O)NCCCO)cnn1-c1nc(-c2cccc(C(F)(F)F)c2)cs1|O=C1OC(=O)c2cc(Oc3ccc4c(c3)C(=O)OC4=O)ccc21",
+        "ratios": "0.85000:0.15000",
+        "predicted_tg_mean_c": 250.04843580708263,
+        "target_distance_c": 0.04843580708262607,
+        "prior_score": 1.9745000000000001,
+        "ood_penalty": 3.657083511352539,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COC(=O)Nc1cc(NC(=O)c2cccs2)cc(C(F)(F)F)c1|O=C(c1ccc2c(c1)C(=O)OC2=O)c1ccc2c(c1)C(=O)OC2=O",
+        "ratios": "0.65000:0.35000",
+        "predicted_tg_mean_c": 250.05163844559553,
+        "target_distance_c": 0.05163844559552899,
+        "prior_score": 1.9745000000000001,
+        "ood_penalty": 3.1736037731170654,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(CNC(=O)Cc1ccccc1)NCC(O)COC(=O)c1ccccc1F|O=C1OC(=O)c2cc(Oc3ccc4c(c3)C(=O)OC4=O)ccc21",
+        "ratios": "0.35000:0.65000",
+        "predicted_tg_mean_c": 249.91890621269567,
+        "target_distance_c": 0.08109378730432582,
+        "prior_score": 1.9745000000000001,
+        "ood_penalty": 2.3352878093719482,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(N)cc1)c1ccc(C(C)(C)c2ccc(N)cc2)cc1|CN(C)CCCn1cc(C2=C(c3cn(CCOCCOCCO)c4ccccc34)C(=O)NC2=O)c2ccccc21",
+        "ratios": "0.55000:0.45000",
+        "predicted_tg_mean_c": 250.0876522735857,
+        "target_distance_c": 0.0876522735856895,
+        "prior_score": 1.6055000000000004,
+        "ood_penalty": 2.742072343826294,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC1(C)CCc2cc3c(C(F)(F)F)cc(O)nc3cc2N1|N#COc1ccc(-c2ccc(OC#N)cc2)cc1",
+        "ratios": "0.15000:0.85000",
+        "predicted_tg_mean_c": 250.09140363776137,
+        "target_distance_c": 0.09140363776137406,
+        "prior_score": 2.1670000000000003,
+        "ood_penalty": 5.208917140960693,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "O=C1NC(=O)c2cc(Nc3ccc(I)cc3)c(Nc3ccc(I)cc3)cc21|O=C1OC(=O)c2cc(Oc3ccc4c(c3)C(=O)OC4=O)ccc21",
+        "ratios": "0.65000:0.35000",
+        "predicted_tg_mean_c": 249.90422127055973,
+        "target_distance_c": 0.09577872944026922,
+        "prior_score": 1.7265000000000001,
+        "ood_penalty": 3.5276267528533936,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CN(C)S(=O)(=O)c1cc2c(N=O)c(O)[nH]c2c2c1CCCC2|COc1cc(C(c2cc(C)c(O)c(O)c2)c2cc(C)c(O)c(O)c2)ccc1OCC1CO1",
+        "ratios": "0.55000:0.45000",
+        "predicted_tg_mean_c": 249.90230312711637,
+        "target_distance_c": 0.09769687288363116,
+        "prior_score": 1.6820000000000002,
+        "ood_penalty": 1.977104902267456,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "N#COc1ccc(-c2ccc(OC#N)cc2)cc1|Oc1ccc(-c2cc(-c3ccc(C(F)(F)F)cc3)nc3c2Cc2cccc(O)c2-3)cc1",
+        "ratios": "0.95000:0.05000",
+        "predicted_tg_mean_c": 249.8981420647471,
+        "target_distance_c": 0.10185793525289455,
+        "prior_score": 2.1670000000000003,
+        "ood_penalty": 5.581172466278076,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cn1cc(C2=C(c3coc4ccccc34)C(=O)NC2=O)c2ccc(O)cc21|NS(=O)(=O)c1ccc(/C=C/c2ccc(O)c(O)c2)cc1",
+        "ratios": "0.45000:0.55000",
+        "predicted_tg_mean_c": 249.8945600112962,
+        "target_distance_c": 0.10543998870380733,
+        "prior_score": 2.712,
+        "ood_penalty": 4.198727130889893,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)=CCC/C(C)=C/Cc1c(O)cc(/C=C/c2ccccc2)cc1O|CN(C)CCCn1cc(C2=C(c3cn(CCOCCOCCO)c4ccccc34)C(=O)NC2=O)c2ccccc21",
+        "ratios": "0.65000:0.35000",
+        "predicted_tg_mean_c": 249.8904281571248,
+        "target_distance_c": 0.10957184287519794,
+        "prior_score": 1.6055000000000004,
+        "ood_penalty": 3.50075101852417,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1)c1ccc(Oc2ccc3c(c2)C(=O)OC3=O)cc1|Nc1nc(N)c2c(n1)CCC(Cc1ccc(OC(F)(F)F)cc1)C2",
+        "ratios": "0.35000:0.65000",
+        "predicted_tg_mean_c": 249.88816548121517,
+        "target_distance_c": 0.11183451878483197,
+        "prior_score": 1.9745000000000001,
+        "ood_penalty": 2.514287233352661,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Nc1nc(S)c2cc(S(=O)(=O)c3ccc4ccccc4c3)ccc2n1|O=C1S/C(=C\\c2cccc3ccccc23)C(O)(O)N1CC(=O)C(F)(F)F",
+        "ratios": "0.75000:0.25000",
+        "predicted_tg_mean_c": 250.1185978037839,
+        "target_distance_c": 0.11859780378389928,
+        "prior_score": 1.6820000000000002,
+        "ood_penalty": 3.4646458625793457,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      }
+    ]
+  },
+  {
+    "iteration": 2,
+    "generated_candidates": 18000,
+    "best_predicted_tg_mean_c": 249.99424432936686,
+    "best_target_distance_c": 0.0057556706331354235,
+    "near_target_count": 668,
+    "updated_principles": 33,
+    "added_principles": [
+      "observed_three_or_more_component_blending"
+    ],
+    "anomalies": [
+      {
+        "formula": "COc1cc(CC2CO2)ccc1OC(=O)c1ccc(C(=O)Oc2ccc(CC3CO3)cc2OC)cc1|O=C(NC1CC1)c1csc(C(O)c2cccc(C(F)(F)F)c2)n1",
+        "ratios": "0.44167:0.55833",
+        "predicted_tg_mean_c": 249.99223478102786,
+        "target_distance_c": 0.00776521897213911,
+        "prior_score": 1.2372804843097618,
+        "ood_penalty": 2.735368013381958,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCCc1ccc(CC(C)(Oc2ccc(C(C)C)cc2)C(=O)O)cc1|CN1CCN(c2c(F)cc3c(=O)c(C(=O)O)cn(CCF)c3c2F)CC1|COC(=O)C1=C(C)Nc2n[nH]c(C)c2C1c1cccc(O)c1|COc1cc(CO)cc(-c2cc(CO)cc(OC)c2OCC2CO2)c1OCC1CO1",
+        "ratios": "0.25136:0.16085:0.23374:0.35405",
+        "predicted_tg_mean_c": 250.02887853625998,
+        "target_distance_c": 0.028878536259981047,
+        "prior_score": 1.4682804843097617,
+        "ood_penalty": 2.481078863143921,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cc1ccc(-c2c(COCc3ccc(C(=O)O)cc3)c(C)nc(CC(C)C)c2CN)cc1|O=c1cc(-c2ccc(OCC3CO3)cc2)oc2cc(OCC3CO3)ccc12",
+        "ratios": "0.56437:0.43563",
+        "predicted_tg_mean_c": 250.0450676767356,
+        "target_distance_c": 0.04506767673561285,
+        "prior_score": 1.2389117410403467,
+        "ood_penalty": 1.8157039880752563,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=CCc1ccc(OCC2CO2)c(-c2cc(CC=C)ccc2OCC2CO2)c1|O=S(=O)(c1ccc(Br)cc1)N1CCN(Cc2ccc3cccnc3c2O)CC1",
+        "ratios": "0.85405:0.14595",
+        "predicted_tg_mean_c": 250.070429629501,
+        "target_distance_c": 0.07042962950100673,
+        "prior_score": 1.2935594318148615,
+        "ood_penalty": 2.9169669151306152,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CS(=O)(=O)Nc1cccc(-c2nc(C(c3ccc(F)cc3)c3ccc(F)cc3)sc2CC(=O)O)c1|O=C(c1ccc2c(c1)C(=O)OC2=O)c1ccc2c(c1)C(=O)OC2=O",
+        "ratios": "0.70744:0.29256",
+        "predicted_tg_mean_c": 250.07570326198837,
+        "target_distance_c": 0.07570326198836597,
+        "prior_score": 2.4868323522718327,
+        "ood_penalty": 4.374019145965576,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(C1CCC(OCC2CO2)CC1)C1CCC(OCC2CO2)CC1|CC(C)=C(c1ccncc1)c1ccc(-c2cccc(NC(=O)OC(C)(C)C)c2)cc1|Cc1cccc(CN(Cc2cccc(C)c2)c2ccc(NC(=O)c3ccc(NCCNC(=N)N)c(-c4ccccc4)c3)cc2)c1|O=C(O)c1ccc(-c2nc(-c3ccc4c(c3)OCO4)c(-c3ccccn3)[nH]2)cc1",
+        "ratios": "0.19856:0.17302:0.20286:0.42556",
+        "predicted_tg_mean_c": 249.90878622226145,
+        "target_distance_c": 0.09121377773854533,
+        "prior_score": 1.0516858444480233,
+        "ood_penalty": 2.4399287700653076,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(=O)Nc1ccc(/C=N/NC(=O)c2nc(-c3ccc(O)cc3)no2)cc1|COc1cc(CO)cc(-c2cc(CO)cc(OC)c2OCC2CO2)c1OCC1CO1|COc1ccccc1CNC(=O)c1cc(C(F)(F)F)nn1-c1cccc(-c2noc([C@H](C)N)n2)c1",
+        "ratios": "0.24297:0.31132:0.44571",
+        "predicted_tg_mean_c": 250.09383664506552,
+        "target_distance_c": 0.09383664506552236,
+        "prior_score": 1.4682804843097617,
+        "ood_penalty": 3.339106798171997,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C(=N/c1ccc(OCC2CO2)cc1)\\c1ccc(OCC2CO2)cc1|C=CCc1ccc(OCC2CO2)c(-c2cc(CC=C)ccc2OCC2CO2)c1|N#Cc1c(-c2cccc(NC(=O)C(O)CCC(=O)O)c2)cc(-c2ccccc2)nc1N",
+        "ratios": "0.25499:0.54071:0.20430",
+        "predicted_tg_mean_c": 249.90568297200238,
+        "target_distance_c": 0.09431702799761865,
+        "prior_score": 1.2389117410403467,
+        "ood_penalty": 2.2650039196014404,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCNCC1CCN(c2c(F)cc3c(=O)c(C(=O)O)cn(NC)c3c2F)C1|O=C1NC(=O)c2ccc(I)cc2/C1=C/NCc1ccc(-c2ccoc2)c(O)c1|O=C1OC(=O)C2CCCCC12",
+        "ratios": "0.42322:0.22195:0.35483",
+        "predicted_tg_mean_c": 249.83922103386286,
+        "target_distance_c": 0.16077896613714415,
+        "prior_score": 1.309834749205252,
+        "ood_penalty": 1.6092087030410767,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=Cn1cc(C(=O)O)c(=O)c2cc(F)c(N3CCC(CNCC)C3)c(F)c21|COc1cc(C(c2cc(C)c(OCC3CO3)c(OCC3CO3)c2)c2cc(C)c(OCC3CO3)c(OCC3CO3)c2)ccc1OCC1CO1|O=C(O)/C(O)=C/C(=O)c1ccnc2ccccc12|O=C(O)c1ccc(-c2ccccn2)nc1",
+        "ratios": "0.18584:0.22190:0.25569:0.33657",
+        "predicted_tg_mean_c": 249.82978395801405,
+        "target_distance_c": 0.17021604198595242,
+        "prior_score": 0.9596671599208135,
+        "ood_penalty": 2.700803518295288,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OCC2CO2)cc1)c1ccc(OCC2CO2)cc1|CCNCC1CCN(c2c(F)cc3c(=O)c(C(=O)O)cn(OC)c3c2F)C1|O=C(O)Cc1ccc2oc(-c3ccc(NC(=O)/C=C/c4cccc(Cl)c4F)c(F)c3)nc2c1|O=C1c2cc(O)c(O)cc2-c2cc(O)c(O)cc21",
+        "ratios": "0.17248:0.35533:0.20162:0.27057",
+        "predicted_tg_mean_c": 249.81121643313745,
+        "target_distance_c": 0.18878356686255415,
+        "prior_score": 1.4682804843097617,
+        "ood_penalty": 1.9681376218795776,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(CCC(C)(C)N=C=O)CN=C=O|CCNCC1CCN(c2c(F)cc3c(=O)c(C(=O)O)cn(C4CC4)c3c2F)C1|COc1cc(OC)c2c(O)cc(=O)oc2c1|O=C(O)c1cc(/N=N/c2ccc(O)c(C(=O)O)c2)ccc1O",
+        "ratios": "0.20676:0.06977:0.44679:0.27668",
+        "predicted_tg_mean_c": 250.20255106156498,
+        "target_distance_c": 0.20255106156497504,
+        "prior_score": 1.2097306029529151,
+        "ood_penalty": 2.1225976943969727,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCCCC1OC1CCCCC1OC1CCCCCCCC(=O)Oc1ccccc1|CN1C(=O)c2cc(Nc3ccccc3)c(Nc3ccccc3)cc2C1=O|Nc1ccc(-c2nc3ccc(N)cc3[nH]2)cc1",
+        "ratios": "0.38843:0.26197:0.34960",
+        "predicted_tg_mean_c": 250.21128333264045,
+        "target_distance_c": 0.2112833326404484,
+        "prior_score": 1.1364828349671654,
+        "ood_penalty": 1.6597203016281128,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(/C=N/c2ccc(OCC3CO3)cc2)ccc1OCC1CO1|Cc1ccc(Nc2cc(C)nc(N3CCN(C(=O)Nc4cccc(Cl)c4)CC3)n2)cc1|O=c1oc2c(O)c(O)cc3c(=O)oc4c(O)c(O)cc1c4c23",
+        "ratios": "0.12695:0.26646:0.60659",
+        "predicted_tg_mean_c": 250.2807796849646,
+        "target_distance_c": 0.2807796849646138,
+        "prior_score": 1.4690606642943824,
+        "ood_penalty": 3.9717094898223877,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OCC2CO2)cc1)c1ccc(OCC2CO2)cc1|CCCCCCC(C(=O)O)n1cnc2cc(-c3ccccc3S(=O)(=O)O)ccc21",
+        "ratios": "0.60465:0.39535",
+        "predicted_tg_mean_c": 249.7135687486234,
+        "target_distance_c": 0.2864312513765981,
+        "prior_score": 1.2662467719809445,
+        "ood_penalty": 2.6407651901245117,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C(=N/c1ccc(OCC2CO2)cc1)\\c1ccc(OCC2CO2)cc1|CC(C)(C)c1cc(/C=C/c2cccc(C(F)(F)F)c2)cc(C(C)(C)C)c1O|N#CC1(c2cc(CC(=O)O)cc(-c3ccnc4[nH]nc(C(F)(F)F)c34)c2)CC1|O=C(NC1CC1)c1ccc(Cl)c(Nc2nncc3c2cnn3-c2ccccc2Cl)c1",
+        "ratios": "0.49141:0.19317:0.24007:0.07535",
+        "predicted_tg_mean_c": 250.2911748918509,
+        "target_distance_c": 0.2911748918508863,
+        "prior_score": 1.7000606642943825,
+        "ood_penalty": 3.930927038192749,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OCCOCC2CO2)cc1)c1ccc(OCCOCC2CO2)cc1|COc1ccc(-c2ccc(Cn3cc(C(=O)O)c(=O)c4cccc(F)c43)cc2)cn1",
+        "ratios": "0.18363:0.81637",
+        "predicted_tg_mean_c": 249.7052253585851,
+        "target_distance_c": 0.2947746414149037,
+        "prior_score": 0.43461226003616465,
+        "ood_penalty": 2.2008163928985596,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=CCc1ccc(OCC2CO2)c(-c2cc(CC=C)ccc2OCC2CO2)c1|C[C@@H]1CN(c2cc(C(=O)Nc3ccc4c(c3)-c3c(c(C(N)=O)nn3-c3ccc(F)cc3)CC4)c(Cl)cn2)CCN1C|Oc1ccc(/C(=C(/c2ccccc2)C(F)(F)F)C(F)(F)F)cc1",
+        "ratios": "0.52828:0.19096:0.28076",
+        "predicted_tg_mean_c": 249.68557854823314,
+        "target_distance_c": 0.31442145176686154,
+        "prior_score": 1.4682804843097617,
+        "ood_penalty": 3.4817750453948975,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COC(=O)Nc1cc(NC(=O)c2cccs2)cc(C(F)(F)F)c1|O=c1cc(-c2ccc3c(c2)CN(Cc2ccco2)CO3)c2c3c(c(O)cc2o1)CN(Cc1ccco1)CO3|S=C(Nc1nc(Nc2ccc(Cl)cc2)nc(Nc2ccc(Cl)cc2)n1)N1N=C(c2ccccc2)CC1c1ccccc1Cl|c1ccc(C(c2ccc(OCC3CO3)cc2)c2ccc(OCC3CO3)cc2)cc1",
+        "ratios": "0.21395:0.17954:0.32342:0.28309",
+        "predicted_tg_mean_c": 250.42233803279322,
+        "target_distance_c": 0.42233803279322046,
+        "prior_score": 1.2640606642943824,
+        "ood_penalty": 1.591439127922058,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C#CCN(Cc1ccc2nc(C)nc(O)c2c1)c1ccc(C(=O)NCC)cc1|CN(C)c1cccc2c(S(=O)(=O)Nc3ncc(Br)nc3O)cccc12|COc1cc(/C=N/c2ccc(OCC3CO3)cc2)ccc1OCC1CO1",
+        "ratios": "0.36865:0.30546:0.32589",
+        "predicted_tg_mean_c": 250.4621892865506,
+        "target_distance_c": 0.462189286550597,
+        "prior_score": 1.2935594318148615,
+        "ood_penalty": 2.661686897277832,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      }
+    ]
+  },
+  {
+    "iteration": 3,
+    "generated_candidates": 18000,
+    "best_predicted_tg_mean_c": 249.99063076845763,
+    "best_target_distance_c": 0.009369231542365242,
+    "near_target_count": 555,
+    "updated_principles": 34,
+    "added_principles": [],
+    "anomalies": [
+      {
+        "formula": "Nc1nc(S)c2cc(S(=O)(=O)c3ccc4ccccc4c3)ccc2n1|O=C1NC(=O)c2ccc(I)cc2/C1=C/NCc1ccc(-c2ccoc2)c(O)c1",
+        "ratios": "0.77425:0.22575",
+        "predicted_tg_mean_c": 249.99063076845763,
+        "target_distance_c": 0.009369231542365242,
+        "prior_score": 2.136517659426091,
+        "ood_penalty": 4.247009754180908,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(OC)c2c(O)cc(=O)oc2c1|Cc1cc(-c2cc(C)c(OCC3CO3)c(C)c2)c(C)cc1OCC1CO1",
+        "ratios": "0.69057:0.30943",
+        "predicted_tg_mean_c": 249.9855109760604,
+        "target_distance_c": 0.014489023939603385,
+        "prior_score": 1.238654461480428,
+        "ood_penalty": 2.3123397827148438,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc2nc(N3CCN(C(=O)Nc4ccccc4)CC3)nc(N)c2cc1OC|O=C=Nc1ccc(Cc2ccc(N=C=O)cc2)cc1",
+        "ratios": "0.75420:0.24580",
+        "predicted_tg_mean_c": 250.04069982742962,
+        "target_distance_c": 0.04069982742961997,
+        "prior_score": 1.4831858227977868,
+        "ood_penalty": 2.538414478302002,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(O)cc2c1C(=O)CC(c1ccc(O)cc1)O2|N#COc1ccc(-c2ccc(OC#N)cc2)cc1",
+        "ratios": "0.18010:0.81990",
+        "predicted_tg_mean_c": 249.9568697277898,
+        "target_distance_c": 0.04313027221019183,
+        "prior_score": 2.377904618884692,
+        "ood_penalty": 5.209856033325195,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=CCc1ccc(OCC2CO2)c(-c2cc(CC=C)ccc2OCC2CO2)c1|COc1cc(OC)c(C(F)(F)F)cc1NC(=O)Nc1cccc(-c2cn3ccnc3c(NCc3ccncc3)n2)c1",
+        "ratios": "0.65281:0.34719",
+        "predicted_tg_mean_c": 250.0598523941093,
+        "target_distance_c": 0.05985239410929921,
+        "prior_score": 1.24211713744409,
+        "ood_penalty": 2.807068109512329,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cc1cc(OCC2CO2)c(C(C)(C)C)cc1-c1cc(C)c(OCC2CO2)c(C(C)(C)C)c1|Cn1nc(C(=O)NCCO)c2c1-c1nc(Nc3ccccc3)ncc1CC2",
+        "ratios": "0.57132:0.42868",
+        "predicted_tg_mean_c": 250.06515989662395,
+        "target_distance_c": 0.06515989662395327,
+        "prior_score": 1.238654461480428,
+        "ood_penalty": 2.532073497772217,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "N#COc1ccc(-c2ccc(OC#N)cc2)cc1|Nc1nccc(Nc2ccc(S(N)(=O)=O)cc2)n1",
+        "ratios": "0.29315:0.70685",
+        "predicted_tg_mean_c": 250.07882564484478,
+        "target_distance_c": 0.07882564484478394,
+        "prior_score": 2.6860840214769492,
+        "ood_penalty": 4.705848217010498,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "O=C(Cc1ccccc1)Nc1cccc(C(=O)/C=C(\\O)C(=O)O)c1|c1ccc(C(c2ccc(OCC3CO3)cc2)c2ccc(OCC3CO3)cc2)cc1",
+        "ratios": "0.24283:0.75717",
+        "predicted_tg_mean_c": 249.9194860848325,
+        "target_distance_c": 0.08051391516750073,
+        "prior_score": 1.347878470823107,
+        "ood_penalty": 3.1017911434173584,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1ccc(OCC2CO2)c(C(c2ccc(OCC3CO3)c(OC)c2)c2cc(OC)ccc2OCC2CO2)c1|Cc1ccc(Nc2cc(C)nc(N3CCN(C(=O)Nc4cccc(Cl)c4)CC3)n2)cc1|Nc1nc(N)c2nc(Sc3cccc(C(F)(F)F)c3)cnc2n1",
+        "ratios": "0.21911:0.46498:0.31591",
+        "predicted_tg_mean_c": 250.1459755765161,
+        "target_distance_c": 0.1459755765160935,
+        "prior_score": 1.3511600505077697,
+        "ood_penalty": 2.395744562149048,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCCCC1OC1CCCCC1OC1CCCCCCCC(=O)Oc1ccccc1|CN(C)S(=O)(=O)c1cc2c(N=O)c(O)[nH]c2c2c1CCCC2|N#CN/C(=N\\C(Cn1ccnc1)c1cc(C(F)(F)F)ccc1C(F)(F)F)Nc1ccc(Cl)cc1Cl|Nc1nc(N)c2cc(CNC(=O)c3cccc(C(F)(F)F)c3)ccc2n1",
+        "ratios": "0.29920:0.05502:0.28464:0.36114",
+        "predicted_tg_mean_c": 249.76438442790385,
+        "target_distance_c": 0.23561557209615103,
+        "prior_score": 1.2366121016151872,
+        "ood_penalty": 3.381847858428955,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C#CCN(Cc1ccc2nc(C)nc(O)c2c1)c1ccc(C(=O)NCc2ccsc2)cc1|CCCCN(Cc1cccc(C)c1O)C(=S)Nc1ccccc1|COc1cc(C(c2cc(C)c(OCC3CO3)c(O)c2)c2cc(C)c(OCC3CO3)c(O)c2)ccc1OCC1CO1",
+        "ratios": "0.70554:0.09898:0.19548",
+        "predicted_tg_mean_c": 249.75660626899725,
+        "target_distance_c": 0.24339373100275452,
+        "prior_score": 1.396154461480428,
+        "ood_penalty": 1.9288166761398315,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cn1cc(C2=C(c3cn(CCCSC(=N)N)c4ccccc34)C(=O)NC2=O)c2ccccc21|Nc1nc(N)c2c(S(=O)(=O)c3ccc4ccccc4c3)cccc2n1",
+        "ratios": "0.13362:0.86638",
+        "predicted_tg_mean_c": 250.24418732588555,
+        "target_distance_c": 0.24418732588554803,
+        "prior_score": 2.8184085090975994,
+        "ood_penalty": 3.9706928730010986,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC1(C)CC(=O)Nc2cc(C(=O)NCc3cccc(/C=C/C(=O)NO)c3)ccc21|COc1cc(CC2CO2)ccc1OCc1ccc(COc2ccc(CC3CO3)cc2OC)cc1|COc1ccccc1CNC(=O)c1cc(C(F)(F)F)nn1-c1cccc(-c2noc([C@H](C)N)n2)c1",
+        "ratios": "0.06170:0.23836:0.69994",
+        "predicted_tg_mean_c": 250.24688704554342,
+        "target_distance_c": 0.24688704554341712,
+        "prior_score": 1.6320878818433073,
+        "ood_penalty": 4.617188453674316,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OCCOCC2CO2)cc1)c1ccc(OCCOCC2CO2)cc1|C[C@H](O)CNc1nccc(-n2ccnc2C(=O)c2cccc(NC(=O)Nc3ccc(Cl)c(Cl)c3)c2)n1|Oc1ccc(/N=C(/Cc2ccc(Cl)cc2)c2ccc(O)c(O)c2O)cc1",
+        "ratios": "0.11740:0.56854:0.31406",
+        "predicted_tg_mean_c": 250.26983689740086,
+        "target_distance_c": 0.2698368974008645,
+        "prior_score": 0.5876694887506286,
+        "ood_penalty": 2.1138930320739746,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(COCC2CO2)ccc1OCC1CO1|Oc1ccc(/N=C(/Cc2ccc(Cl)cc2)c2ccc(O)c(O)c2O)cc1",
+        "ratios": "0.58356:0.41644",
+        "predicted_tg_mean_c": 250.29765662030258,
+        "target_distance_c": 0.29765662030257545,
+        "prior_score": 0.8666708958831575,
+        "ood_penalty": 1.4937965869903564,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C/C=C/C=C/C(=O)N1CCN(c2nc(N)c3cc(OC)c(OC)cc3n2)CC1|COc1ccc(OCC2CO2)c(CCCC(=O)OCCCCOC(=O)CCc2ccc(OCC3CO3)c(OC)c2)c1|Cc1cc2c(Cc3ccccc3)c(O)c(O)cc2c(O)c1-c1c(C)cc2c(Cc3ccccc3)c(O)c(O)cc2c1O|Cc1ccc(-c2c(COCc3ccc(C(=O)O)cc3)c(C)nc(CC(C)C)c2CN)cc1",
+        "ratios": "0.25611:0.19053:0.46702:0.08634",
+        "predicted_tg_mean_c": 249.65224090472836,
+        "target_distance_c": 0.34775909527164117,
+        "prior_score": 1.269370304307749,
+        "ood_penalty": 3.4933865070343018,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(C)c1cc(/C=C/c2cccc(C(F)(F)F)c2)cc(C(C)(C)C)c1O|O=C1NC(=O)c2cc(Nc3ccc(-c4ccccc4)cc3)c(Nc3ccc(-c4ccccc4)cc3)cc21|c1ccc2c(c1)-c1ccccc1C2(c1ccc(OCCOCC2CO2)cc1)c1ccc(OCCOCC2CO2)cc1",
+        "ratios": "0.08696:0.38583:0.52721",
+        "predicted_tg_mean_c": 250.37298622063747,
+        "target_distance_c": 0.3729862206374719,
+        "prior_score": 1.4155538346451348,
+        "ood_penalty": 2.783147096633911,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "O=C(O)/C(O)=C/C(=O)c1cccc(NC(=O)c2ccc(O)cc2)c1|O=C1OCC2=C1C(c1ccc(F)cc1)c1c(c3cccnc3c3ncccc13)N2",
+        "ratios": "0.16098:0.83902",
+        "predicted_tg_mean_c": 249.61486710292618,
+        "target_distance_c": 0.3851328970738166,
+        "prior_score": 1.4796551927171573,
+        "ood_penalty": 3.2461259365081787,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C#CCOc1ccc(Cc2ccc(O)cc2OCC#C)cc1|COc1ccc(OCC2CO2)c(C(c2ccc(OCC3CO3)c(OC)c2)c2cc(OC)ccc2OCC2CO2)c1|NC(CO)(CO)CCc1ccc(-c2ccc(Sc3ccc(Cl)cc3)cc2F)cc1",
+        "ratios": "0.10478:0.35385:0.54137",
+        "predicted_tg_mean_c": 250.40769103933488,
+        "target_distance_c": 0.40769103933487827,
+        "prior_score": 1.1152266301448903,
+        "ood_penalty": 2.733328342437744,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cc1c(C(=O)NCCCCCO)cnn1-c1nc(-c2cccc(C(F)(F)F)c2)cs1|Cc1cc(-c2cc(C)c(OCC3CO3)c(C)c2)c(C)cc1OCC1CO1",
+        "ratios": "0.80732:0.19268",
+        "predicted_tg_mean_c": 249.53857807298175,
+        "target_distance_c": 0.46142192701825024,
+        "prior_score": 1.238654461480428,
+        "ood_penalty": 3.474961042404175,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      }
+    ]
+  },
+  {
+    "iteration": 4,
+    "generated_candidates": 18000,
+    "best_predicted_tg_mean_c": 250.00012894453133,
+    "best_target_distance_c": 0.00012894453132616945,
+    "near_target_count": 641,
+    "updated_principles": 34,
+    "added_principles": [],
+    "anomalies": [
+      {
+        "formula": "CS(=O)(=O)Nc1ccc(Sc2ccc(NC3=NCCN3)cc2)cc1|Cc1cc(C)nc(N/C=C(\\C#N)C(=O)c2cccc(CSc3ccccc3)c2)n1|c1cc(N(CC2CO2)CC2CO2)ccc1Cc1ccc(N(CC2CO2)CC2CO2)cc1",
+        "ratios": "0.40984:0.15367:0.43649",
+        "predicted_tg_mean_c": 250.00012894453133,
+        "target_distance_c": 0.00012894453132616945,
+        "prior_score": 1.7074594031625672,
+        "ood_penalty": 3.912987232208252,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "N=C(N)NC(=O)OCc1cccc(N2CCC(Oc3cccnc3)CC2)c1F|O=C1NC(=O)C(c2cn(CCOCCO)c3ccccc23)=C1c1c[nH]c2ccccc12",
+        "ratios": "0.44974:0.55026",
+        "predicted_tg_mean_c": 249.9806296673894,
+        "target_distance_c": 0.019370332610606056,
+        "prior_score": 2.5150287720367808,
+        "ood_penalty": 3.7463817596435547,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(C(c2cc(C)c(OCC3CO3)c(OCC3CO3)c2)c2cc(C)c(OCC3CO3)c(OCC3CO3)c2)ccc1OCC1CO1|Cc1cccc(C)c1NC(=O)c1ccc(Nc2nc(-c3ccc(OC(F)(F)F)cc3)c3ccn(C)c3n2)cc1",
+        "ratios": "0.21473:0.78527",
+        "predicted_tg_mean_c": 250.02399959313536,
+        "target_distance_c": 0.0239995931353576,
+        "prior_score": 0.9638425550095197,
+        "ood_penalty": 3.3700504302978516,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCc1c(C)sc(NC(=S)NCc2ccccn2)c1C(=O)OC|COc1ccc(OCC2CO2)c(CCCC(=O)OCCOC(=O)CCc2ccc(OCC3CO3)c(OC)c2)c1|O=c1c(-c2cc(F)c(F)c(F)c2)coc2cc(O)ccc12",
+        "ratios": "0.26140:0.10583:0.63277",
+        "predicted_tg_mean_c": 250.02842466209572,
+        "target_distance_c": 0.028424662095716258,
+        "prior_score": 1.0378389170826194,
+        "ood_penalty": 2.980132818222046,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc2nc(N3CCC(C(=O)NCCO)CC3)nc(N)c2cc1OC|Nc1nc(O)c2cc(S(=O)(=O)c3ccc(Cl)c(Cl)c3)ccc2n1|c1ccc(C(c2ccc(OCC3CO3)cc2)c2ccc(OCC3CO3)cc2)cc1",
+        "ratios": "0.26178:0.54580:0.19242",
+        "predicted_tg_mean_c": 249.94407519506828,
+        "target_distance_c": 0.05592480493172047,
+        "prior_score": 1.8080009700963242,
+        "ood_penalty": 3.7357356548309326,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OCCOCC2CO2)cc1)c1ccc(OCCOCC2CO2)cc1|O=C(O)CCc1ccc(Cn2cccn2)cc1C(=O)NCc1ccc2ccccc2c1|O=C1c2cc(O)c(O)cc2-c2cc(O)c(O)cc21",
+        "ratios": "0.13770:0.37177:0.49053",
+        "predicted_tg_mean_c": 250.05869615097623,
+        "target_distance_c": 0.05869615097623182,
+        "prior_score": 0.8224437908105752,
+        "ood_penalty": 2.3504796028137207,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(C)c1cc(/C=C/c2cccc(C(F)(F)F)c2)cc(C(C)(C)C)c1O|CC1(C)CC(N=C=O)CC(C)(N=C=O)C1",
+        "ratios": "0.44402:0.55598",
+        "predicted_tg_mean_c": 250.15755194248052,
+        "target_distance_c": 0.15755194248052362,
+        "prior_score": 0.9669463617862734,
+        "ood_penalty": 2.1293861865997314,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)NC(=O)Cn1c(-c2cccc(Cl)c2)cn2cc(N3CCC4(CC3)CNC4)cc2c1=O|COc1ccc(OCC2CO2)c(C(c2ccc(OCC3CO3)c(OC)c2)c2cc(OC)ccc2OCC2CO2)c1|O=C(/C=C/c1ccc(O)c(O)c1)N1CCN(c2ccccc2)CC1|O=C1OC(=O)c2cc(Oc3ccc4c(c3)C(=O)OC4=O)ccc21",
+        "ratios": "0.38757:0.08317:0.10470:0.42456",
+        "predicted_tg_mean_c": 250.17023754074415,
+        "target_distance_c": 0.17023754074415365,
+        "prior_score": 2.6433030054632862,
+        "ood_penalty": 3.8770077228546143,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OCC2CO2)cc1)c1ccc(OCC2CO2)cc1|CCNCC1CCN(c2c(F)cc3c(=O)c(C(=O)O)cn(CC)c3c2F)C1",
+        "ratios": "0.40848:0.59152",
+        "predicted_tg_mean_c": 249.77229498564645,
+        "target_distance_c": 0.22770501435354618,
+        "prior_score": 1.2424481423055482,
+        "ood_penalty": 2.7708590030670166,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OCC2CO2)cc1)c1ccc(OCC2CO2)cc1|Cn1nc(C(=O)NCCO)c2c1-c1nc(Nc3ccccc3)ncc1CC2",
+        "ratios": "0.05036:0.94964",
+        "predicted_tg_mean_c": 249.77189881218567,
+        "target_distance_c": 0.22810118781433175,
+        "prior_score": 1.2393909314514402,
+        "ood_penalty": 4.211597442626953,
+        "reasons": [
+          "low_prior_but_near_target",
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "NCCc1cnc(S)n1[C@H]1CCc2c(F)cc(F)cc2C1|O=C(NCC/C=C/c1ccccc1)c1ccccc1CN1CCc2ccc(O)cc2C1",
+        "ratios": "0.83803:0.16197",
+        "predicted_tg_mean_c": 249.7653875831848,
+        "target_distance_c": 0.23461241681519596,
+        "prior_score": 1.4808790321568037,
+        "ood_penalty": 2.125936985015869,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OCC2CO2)cc1)c1ccc(OCC2CO2)cc1|Oc1ccc(C2=Nc3ccccc3OC(c3ccccc3Cl)/C2=C/Nc2ccc(Cl)cc2)cc1",
+        "ratios": "0.47798:0.52202",
+        "predicted_tg_mean_c": 249.75659665854633,
+        "target_distance_c": 0.24340334145367137,
+        "prior_score": 1.2393909314514402,
+        "ood_penalty": 3.304373025894165,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "O=C1CSC(c2ccc([N+](=O)[O-])cc2)N1c1ccc(Cl)cc1O|O=c1cc(-c2ccc(OCC3CO3)cc2)oc2cc(OCC3CO3)ccc12",
+        "ratios": "0.43398:0.56602",
+        "predicted_tg_mean_c": 250.2488708055431,
+        "target_distance_c": 0.24887080554310614,
+        "prior_score": 1.2393909314514402,
+        "ood_penalty": 2.279175043106079,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC1(C)CC(N=C=O)CC(C)(N=C=O)C1|COc1ccc(-c2csc(N/N=C/c3ccc(O)cc3O)n2)cc1|CS(=O)(=O)c1ccc(C(=O)c2ccc3n2CCC3C(=O)O)cc1",
+        "ratios": "0.12719:0.11096:0.76185",
+        "predicted_tg_mean_c": 249.70184440221084,
+        "target_distance_c": 0.2981555977891617,
+        "prior_score": 1.4298629222007382,
+        "ood_penalty": 1.643427848815918,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)NC(=N)c1ccc2nc(NC(=O)c3ccccc3)sc2c1|COCCNCc1ccc(-c2ccc3c(Nc4ccc(Cl)cc4F)ccnc3c2)o1|COc1cc(C(c2cc(C)c(OCC3CO3)c(O)c2)c2cc(C)c(OCC3CO3)c(O)c2)ccc1OCC1CO1",
+        "ratios": "0.28494:0.65103:0.06403",
+        "predicted_tg_mean_c": 250.3011646484534,
+        "target_distance_c": 0.3011646484534083,
+        "prior_score": 1.4024907533357112,
+        "ood_penalty": 3.525042772293091,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(C)c1cc(/C=C/c2cccc(C(F)(F)F)c2)cc(C(C)(C)C)c1O|CCCCNC(=O)CC1CCN(c2nc(N)c3cc(OC)c(OC)cc3n2)CC1|O=C1NC(=O)C(c2cn(CCOCCO)c3ccccc23)=C1c1c[nH]c2ccccc12",
+        "ratios": "0.19649:0.10312:0.70039",
+        "predicted_tg_mean_c": 250.31240254804706,
+        "target_distance_c": 0.3124025480470607,
+        "prior_score": 2.904113582449614,
+        "ood_penalty": 4.209471702575684,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cc1ccc(O)c(C2C3=C(COC3=O)Nc3c2c2cccnc2c2ncccc32)c1|O=C(/C=C/c1ccc(O)c(O)c1)N1CCN(c2ccccc2)CC1",
+        "ratios": "0.28087:0.71913",
+        "predicted_tg_mean_c": 250.32912191444274,
+        "target_distance_c": 0.3291219144427373,
+        "prior_score": 1.4767884706303689,
+        "ood_penalty": 3.8912575244903564,
+        "reasons": [
+          "low_prior_but_near_target",
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(CO)cc(-c2cc(CO)cc(OC)c2OCC2CO2)c1OCC1CO1|Oc1ccc(/N=C(/Cc2ccc(F)cc2)c2ccc(O)c(O)c2)cc1",
+        "ratios": "0.52944:0.47056",
+        "predicted_tg_mean_c": 249.66355589224833,
+        "target_distance_c": 0.33644410775167444,
+        "prior_score": 1.2393909314514402,
+        "ood_penalty": 1.6263518333435059,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cc1c(C(=O)NCCCCCO)cnn1-c1nc(-c2cccc(C(F)(F)F)c2)cs1|Cc1cc(OCC2CO2)c(C(C)(C)C)cc1-c1cc(C)c(OCC2CO2)c(C(C)(C)C)c1|O=C(COc1cccc(F)c1C(=O)NCCCCO)N[C@H](CO)Cc1ccccc1",
+        "ratios": "0.57370:0.21028:0.21602",
+        "predicted_tg_mean_c": 249.62961501224325,
+        "target_distance_c": 0.37038498775675066,
+        "prior_score": 1.397338842039049,
+        "ood_penalty": 3.5373995304107666,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C#CCN(Cc1ccc2nc(C)nc(O)c2c1)c1ccc(C(=O)NCc2ccsc2)cc1|COc1ccc(OCC2CO2)c(CCC(=O)OC2CC3OCC(OC(=O)CCc4ccc(OCC5CO5)c(OC)c4)C2O3)c1|C[C@@H](NCc1ccc(OCCc2ccccc2)cc1)C(N)=O",
+        "ratios": "0.83437:0.10192:0.06371",
+        "predicted_tg_mean_c": 250.38729472610294,
+        "target_distance_c": 0.3872947261029367,
+        "prior_score": 0.7589772724632271,
+        "ood_penalty": 2.283437490463257,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      }
+    ]
+  },
+  {
+    "iteration": 5,
+    "generated_candidates": 18000,
+    "best_predicted_tg_mean_c": 250.00774211470417,
+    "best_target_distance_c": 0.007742114704171854,
+    "near_target_count": 615,
+    "updated_principles": 36,
+    "added_principles": [],
+    "anomalies": [
+      {
+        "formula": "CCc1c(C#N)c(-c2ccc(-c3ccc(OC)cc3)cc2)c(C(=O)O)n1C|COc1ccc(OCC2CO2)c(C(c2ccc(OCC3CO3)c(OC)c2)c2cc(OC)ccc2OCC2CO2)c1|Cc1ccc(Cn2nc(OC(C(=O)O)C(=O)O)c3ccccc32)cc1|Nc1nc(N)c2c(S(=O)(=O)c3ccc(Cl)c(Cl)c3)cccc2n1",
+        "ratios": "0.07725:0.33946:0.25057:0.33272",
+        "predicted_tg_mean_c": 250.03256262978107,
+        "target_distance_c": 0.03256262978106861,
+        "prior_score": 1.6561037765733442,
+        "ood_penalty": 3.82493257522583,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "C#CCN(Cc1ccc2nc(CN3CCOCC3)nc(O)c2c1)c1ccc(C(=O)NCc2cccc([N+](=O)[O-])c2)cc1|O=C1OCC2=C1C(c1ccc(F)cc1)c1c(c3cccnc3c3ncccc13)N2|O=C=NCCCCCCN=C=O",
+        "ratios": "0.26829:0.55138:0.18033",
+        "predicted_tg_mean_c": 249.94563131557987,
+        "target_distance_c": 0.0543686844201261,
+        "prior_score": 1.6108685378785643,
+        "ood_penalty": 3.9856276512145996,
+        "reasons": [
+          "low_prior_but_near_target",
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OC#N)cc1)c1ccc(OC#N)cc1|O=C(NCC/C=C/c1ccccc1)c1ccccc1CN1CCc2ccc(O)cc2C1|O=c1oc2c(Cl)c(Cl)ccc2c2cc(O)c(O)cc12",
+        "ratios": "0.13721:0.55405:0.30874",
+        "predicted_tg_mean_c": 249.91653460138073,
+        "target_distance_c": 0.08346539861926772,
+        "prior_score": 2.4259468904662786,
+        "ood_penalty": 4.470308780670166,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=CCc1ccc(OCC2CO2)c(-c2cc(CC=C)ccc2OCC2CO2)c1|O=C1NC(=O)c2cc(Nc3ccc(I)cc3)c(Nc3ccc(I)cc3)cc21",
+        "ratios": "0.12783:0.87217",
+        "predicted_tg_mean_c": 249.91243585831518,
+        "target_distance_c": 0.08756414168482252,
+        "prior_score": 1.5962877100241515,
+        "ood_penalty": 2.740231990814209,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCNCC1CCN(c2c(F)cc3c(=O)c(C(=O)O)cn(CC4CC4)c3c2F)C1|Cc1cc(-c2cc(C)c(OCC3CO3)c(C)c2)c(C)cc1OCC1CO1",
+        "ratios": "0.38542:0.61458",
+        "predicted_tg_mean_c": 249.88553798335087,
+        "target_distance_c": 0.11446201664912792,
+        "prior_score": 1.2423715125996297,
+        "ood_penalty": 3.1059088706970215,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC1(C)CC(N=C=O)CC(C)(N=C=O)C1|CN1CCc2cccc3c2[C@H]1Cc1ccc(CO)c(O)c1-3|O=C(/C=C/c1ccc(C(F)(F)F)cc1)c1ccc(O)cc1|O=C(c1c(F)c(F)c(F)c(F)c1F)c1ccc2n1CCC2C(=O)O",
+        "ratios": "0.22880:0.39919:0.05532:0.31669",
+        "predicted_tg_mean_c": 249.8799407266112,
+        "target_distance_c": 0.12005927338879019,
+        "prior_score": 1.1291569884933457,
+        "ood_penalty": 1.8940327167510986,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCN(CC)c1ccc(Nc2cc3c(cc2Nc2ccc(N(CC)CC)cc2)C(=O)NC3=O)cc1|COc1cc2nc(N3CCN(C(=O)/C(F)=C/c4ccccc4)CC3)nc(N)c2cc1OC|NCCc1cnc(S)n1[C@H]1CCc2c(F)cc(F)cc2C1",
+        "ratios": "0.06809:0.76840:0.16351",
+        "predicted_tg_mean_c": 250.12013488727018,
+        "target_distance_c": 0.12013488727018284,
+        "prior_score": 2.235810770087882,
+        "ood_penalty": 4.157900810241699,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=CCc1ccc(OCC2CO2)c(-c2cc(CC=C)ccc2OCC2CO2)c1|CC(C)(O)C(=O)c1ccc(OCCO)cc1|Oc1ccc(/N=C(/Cc2ccc(Cl)cc2)c2ccc(O)c(O)c2O)cc1",
+        "ratios": "0.36096:0.52796:0.11108",
+        "predicted_tg_mean_c": 250.1258871541674,
+        "target_distance_c": 0.12588715416740115,
+        "prior_score": 1.3987517775496634,
+        "ood_penalty": 1.2593152523040771,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(N)COC(C)COCC(C)(COCC(C)OCC(C)N)COCC(C)OCC(C)N|Nc1nc(N)c2c(Cl)c(N)ccc2n1|O=C(Nc1cc(Cl)ccc1O)c1ccc(F)cc1|O=C(Oc1cccc(OC(=O)c2ccc(OCCOCC3CO3)cc2)c1)c1ccc(OCCOCC2CO2)cc1",
+        "ratios": "0.18976:0.29954:0.43821:0.07249",
+        "predicted_tg_mean_c": 249.8619317668893,
+        "target_distance_c": 0.13806823311068683,
+        "prior_score": 0.1346207582610076,
+        "ood_penalty": 1.940411925315857,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C(=O)c1cc(C(F)(F)F)nn1-c1ccc2onc(N)c2c1)c1ccc(-c2ccccc2S(C)(=O)=O)cc1F|COc1ccc(C2SCC(=O)N2c2ccc(Cl)cc2O)cc1|N#COc1ccc(CC2CCCC(Cc3ccc(OC#N)cc3)C2)cc1|Nc1ccc(C(c2ccc(N)cc2)(C(F)(F)F)C(F)(F)F)cc1",
+        "ratios": "0.07745:0.15262:0.56309:0.20684",
+        "predicted_tg_mean_c": 250.1438099608087,
+        "target_distance_c": 0.14380996080871,
+        "prior_score": 2.554968874886658,
+        "ood_penalty": 4.370980262756348,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "COCCn1cnc2c(O)nc(Nc3ccccc3)nc21|N#COc1ccc(-c2ccc(OC#N)cc2)cc1|O=C(O)c1cccc(OCc2cn3ccccc3n2)c1",
+        "ratios": "0.47629:0.44471:0.07900",
+        "predicted_tg_mean_c": 250.15016426731108,
+        "target_distance_c": 0.15016426731108368,
+        "prior_score": 2.53175979823123,
+        "ood_penalty": 4.518138885498047,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=C(C)C(=O)OCCOCCOC(=O)C(=C)C|CN(CCC(Cc1ccc(C(F)(F)F)cc1)c1ccccc1)CC(=O)O|N#CC(CC=CCC1CO1)CCC=CCC1CO1",
+        "ratios": "0.07815:0.78142:0.14043",
+        "predicted_tg_mean_c": 250.1683200387445,
+        "target_distance_c": 0.16832003874449697,
+        "prior_score": 0.5027751596326323,
+        "ood_penalty": 1.759382724761963,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cc1cc(-c2cc(C)c(OCC3CO3)c(C)c2)c(C)cc1OCC1CO1|Cc1ccccc1NC(=O)Nc1ccc([N+](=O)[O-])cc1O|O=C(NCCc1c[nH]c2ccc(O)cc12)c1ccc(O)cc1",
+        "ratios": "0.22963:0.18768:0.58269",
+        "predicted_tg_mean_c": 249.82736458584367,
+        "target_distance_c": 0.172635414156332,
+        "prior_score": 1.3987517775496634,
+        "ood_penalty": 2.2701146602630615,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=CCNc1ccc(-c2ccc(N3CC(CNC(C)=O)OC3=O)cc2)ccc1=O|CCCCC1OC1CCCCC1OC1CCCCCCCC(=O)Oc1ccccc1|CS(=O)(=O)Nc1cccc(-c2nc(C(c3ccc(F)cc3)c3ccc(F)cc3)sc2CC(=O)O)c1",
+        "ratios": "0.16955:0.29697:0.53348",
+        "predicted_tg_mean_c": 250.17712575129906,
+        "target_distance_c": 0.17712575129905872,
+        "prior_score": 1.0191826661453542,
+        "ood_penalty": 2.4909586906433105,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "O=C(O)Cc1ccc2oc(-c3ccc(NC(=O)/C=C/c4cccc(Cl)c4F)c(F)c3)nc2c1|O=c1cc(-c2ccc(OCC3CO3)cc2)oc2cc(OCC3CO3)ccc12",
+        "ratios": "0.91748:0.08252",
+        "predicted_tg_mean_c": 249.81627372175205,
+        "target_distance_c": 0.18372627824794563,
+        "prior_score": 1.2423715125996297,
+        "ood_penalty": 5.39302921295166,
+        "reasons": [
+          "low_prior_but_near_target",
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "Oc1ccc2cc3nc4ccccc4c(-c4ccccc4)c3cc2c1|c1cc(N(CC2CO2)CC2CO2)ccc1OCC1CO1",
+        "ratios": "0.40955:0.59045",
+        "predicted_tg_mean_c": 249.8076279956035,
+        "target_distance_c": 0.19237200439650337,
+        "prior_score": 0.8718676074700801,
+        "ood_penalty": 2.4353785514831543,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(COc2ccc3c(c2)C(C)=CC(C)(C)N3)cc(OC)c1|O=c1cc(-c2ccc(OCC3CO3)cc2)oc2cc(OCC3CO3)ccc12",
+        "ratios": "0.21024:0.78976",
+        "predicted_tg_mean_c": 249.78668271614129,
+        "target_distance_c": 0.2133172838587143,
+        "prior_score": 1.245255411576502,
+        "ood_penalty": 3.1553797721862793,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCCCC1OC1CCCCC1OC1CCCCCCCC(=O)Oc1ccccc1|Cc1ccc(Nc2cc3c(cc2Nc2ccc(C)cc2)C(=O)NC3=O)cc1",
+        "ratios": "0.15353:0.84647",
+        "predicted_tg_mean_c": 249.78356849032724,
+        "target_distance_c": 0.21643150967275915,
+        "prior_score": 0.9177588541235262,
+        "ood_penalty": 3.1273462772369385,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1occc1CN)c1occc1CN|CCC(C)(CC)C(=O)n1ncc2c3c(N)nc(N)nc3ccc21|COc1cc(CO)cc(-c2cc(CO)cc(OC)c2OCC2CO2)c1OCC1CO1|COc1cc2c(/C=C3/C(=O)N(C)c4ccc(O)cc43)c[nH]c2cc1C",
+        "ratios": "0.13572:0.22669:0.14783:0.48976",
+        "predicted_tg_mean_c": 250.22578671778263,
+        "target_distance_c": 0.2257867177826256,
+        "prior_score": 1.6302449771005922,
+        "ood_penalty": 2.25752592086792,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCOC(=O)c1ccc(N/C(S)=N/c2ccc3c(c2)C(C)(C)CC(C)(C)S3)cc1|O=C1NC(NC2CC2)=N/C1=C\\c1c[nH]c2ncccc12",
+        "ratios": "0.79223:0.20777",
+        "predicted_tg_mean_c": 250.23392812116788,
+        "target_distance_c": 0.2339281211678781,
+        "prior_score": 1.4819342762293943,
+        "ood_penalty": 3.5387001037597656,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      }
+    ]
+  },
+  {
+    "iteration": 6,
+    "generated_candidates": 18000,
+    "best_predicted_tg_mean_c": 250.000869539317,
+    "best_target_distance_c": 0.0008695393169944055,
+    "near_target_count": 586,
+    "updated_principles": 34,
+    "added_principles": [],
+    "anomalies": [
+      {
+        "formula": "COc1cc(CC2CO2)ccc1OCc1ccc(COc2ccc(CC3CO3)cc2OC)cc1|O=C(NC1CC1)c1ccc(Cl)c(Nc2nncc3c2cnn3-c2ccccc2Cl)c1",
+        "ratios": "0.62319:0.37681",
+        "predicted_tg_mean_c": 250.000869539317,
+        "target_distance_c": 0.0008695393169944055,
+        "prior_score": 1.2453120359180365,
+        "ood_penalty": 1.5625678300857544,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CCc1ccsc1C(=NOCCN1CCC[C@@H](C(=O)O)C1)c1sccc1CC|O=C1C=CC(=O)N(c2ccc(Cc3ccc(N4C(=O)C=CC4=O)cc3)cc2)C1=O|O=C1OCC2=C1C(c1cccc(Cl)c1)c1c(c3cccnc3c3ncccc13)N2",
+        "ratios": "0.09477:0.45030:0.45493",
+        "predicted_tg_mean_c": 249.98244344024812,
+        "target_distance_c": 0.017556559751881196,
+        "prior_score": 2.6741493315999767,
+        "ood_penalty": 4.150107383728027,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(/C=N/c2ccc(OCC3CO3)cc2)ccc1OCC1CO1|N#CC1(c2cc(CC(=O)O)cc(-c3ccnc4[nH]nc(C(F)(F)F)c34)c2)CC1|O=C(NC1CC1)c1csc(C(O)c2cccc(C(F)(F)F)c2)n1|O=C(c1cccc(C(F)(F)F)c1)c1ccc2n1CCC2C(=O)O",
+        "ratios": "0.18504:0.38221:0.31765:0.11510",
+        "predicted_tg_mean_c": 250.05554559763988,
+        "target_distance_c": 0.05554559763987754,
+        "prior_score": 1.6332471670235318,
+        "ood_penalty": 3.9038259983062744,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=C(C)C(=O)OCCOCCOc1ccc(C(C)(C)c2ccc(OCCOCCOC(=O)C(=C)C)cc2)cc1|COc1cc2nc(N3CCC(C(=O)NCC4CC4)CC3)nc(N)c2cc1OC|Nc1nc(S)c2ccccc2n1|O=C1OCC2=C1C(c1ccc(F)cc1)c1c(c3cccnc3c3ncccc13)N2",
+        "ratios": "0.23507:0.08203:0.19809:0.48481",
+        "predicted_tg_mean_c": 250.06588467593616,
+        "target_distance_c": 0.06588467593616087,
+        "prior_score": 1.2792783163438197,
+        "ood_penalty": 2.4879462718963623,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "N#Cc1c(O)nc(N)nc1-c1ccccc1[N+](=O)[O-]|Oc1ccc(/N=C(/Cc2ccc(F)cc2)c2ccc(O)c(O)c2)cc1|c1cc(N(CC2CO2)CC2CO2)ccc1OCC1CO1",
+        "ratios": "0.55921:0.28069:0.16010",
+        "predicted_tg_mean_c": 250.0847118361672,
+        "target_distance_c": 0.08471183616720168,
+        "prior_score": 1.036602172372146,
+        "ood_penalty": 2.076282024383545,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(c1ccc(Cl)cc1)c1c2n(c3cc(F)cc(S(C)(=O)=O)c13)CCC2CC(=O)O|O=c1cc(-c2ccc(OCC3CO3)cc2)oc2cc(OCC3CO3)ccc12",
+        "ratios": "0.28213:0.71787",
+        "predicted_tg_mean_c": 249.89813990946442,
+        "target_distance_c": 0.1018600905355811,
+        "prior_score": 1.5495531851136233,
+        "ood_penalty": 3.4854648113250732,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(COCC1CO1)COCC1CO1|CCOC(=O)c1ccc(N/C(S)=N/c2ccc3c(c2)C(C)(C)CC(C)(C)S3)cc1|Nc1ccc(Oc2ccc(-c3ccc(Oc4ccc(N)cc4)cc3)cc2)cc1",
+        "ratios": "0.35138:0.25808:0.39054",
+        "predicted_tg_mean_c": 249.89275884764743,
+        "target_distance_c": 0.10724115235257159,
+        "prior_score": 1.2713541806386641,
+        "ood_penalty": 1.7347395420074463,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(C1CCC(OCC2CO2)CC1)C1CCC(OCC2CO2)CC1|Nc1nc(N)c2c(S(=O)(=O)c3ccc4ccccc4c3)cccc2n1|O=C(Nc1cc(C(=O)Nc2cccc3ccccc23)cc(C(=O)Nc2cccc3cc(S(=O)(=O)O)ccc23)c1)c1cccc(Cl)c1",
+        "ratios": "0.41431:0.50061:0.08508",
+        "predicted_tg_mean_c": 249.88027951035212,
+        "target_distance_c": 0.11972048964787518,
+        "prior_score": 1.3072168891498168,
+        "ood_penalty": 2.2621805667877197,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "N#Cc1c(N)nc(Sc2ccc(O)cc2)c(C#N)c1-c1ccc(Cl)cc1|NS(=O)(=O)c1ccc(/C=C/c2ccc(O)c(O)c2)cc1|c1cc(N(CC2CO2)CC2CO2)ccc1OCC1CO1",
+        "ratios": "0.38059:0.35572:0.26369",
+        "predicted_tg_mean_c": 250.12112515055452,
+        "target_distance_c": 0.12112515055451922,
+        "prior_score": 1.5923021111467461,
+        "ood_penalty": 3.0230815410614014,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C=Cc1ccc(C=C)cc1|O=C1OCC2=C1C(c1ccc(F)cc1)c1c(c3cccnc3c3ncccc13)N2",
+        "ratios": "0.41635:0.58365",
+        "predicted_tg_mean_c": 249.81545122361047,
+        "target_distance_c": 0.1845487763895335,
+        "prior_score": 1.4699122186028835,
+        "ood_penalty": 2.6576168537139893,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CN1CCN(c2cc3c(cc2F)c(=O)c(C(=O)O)cn3-c2ccc(F)cc2)CC1|Cc1cc(OCC2CO2)c(C(C)(C)C)cc1-c1cc(C)c(OCC2CO2)c(C(C)(C)C)c1",
+        "ratios": "0.93419:0.06581",
+        "predicted_tg_mean_c": 249.74297130054765,
+        "target_distance_c": 0.2570286994523485,
+        "prior_score": 1.242576785691108,
+        "ood_penalty": 3.1861917972564697,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(COc2ccc3c(c2)C(C)=CC(C)(C)N3)cc(OC)c1|O=c1cc(-c2ccc(OCC3CO3)cc2)oc2cc(OCC3CO3)ccc12",
+        "ratios": "0.20424:0.79576",
+        "predicted_tg_mean_c": 249.72434760815005,
+        "target_distance_c": 0.2756523918499454,
+        "prior_score": 1.2453120359180365,
+        "ood_penalty": 3.145401954650879,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cc1cc(OCC2CO2)c(C(C)(C)C)cc1-c1cc(C)c(OCC2CO2)c(C(C)(C)C)c1|O=C(O)Cc1ccc2oc(-c3ccc(NC(=O)/C=C/c4cccc(Cl)c4F)c(F)c3)nc2c1",
+        "ratios": "0.61146:0.38854",
+        "predicted_tg_mean_c": 249.7203544916302,
+        "target_distance_c": 0.2796455083698106,
+        "prior_score": 1.242576785691108,
+        "ood_penalty": 3.3804867267608643,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(C)(c1ccc(OCCOCCOCCOCC2CO2)cc1)c1ccc(OCCOCCOCCOCC2CO2)cc1|CCNCC1CCN(c2c(F)cc3c(=O)c(C(=O)O)cn(C)c3c2F)C1|Cc1cc(O)c(O)c2oc(=O)c3cc(O)c(O)cc3c12",
+        "ratios": "0.09859:0.80481:0.09660",
+        "predicted_tg_mean_c": 249.7179061915616,
+        "target_distance_c": 0.2820938084383897,
+        "prior_score": 0.5088898424215578,
+        "ood_penalty": 3.4795031547546387,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "C[C@H](O)CNc1nccc(-n2ccnc2C(=O)c2cccc(NC(=O)Nc3ccc(Cl)c(Cl)c3)c2)n1|O=C1NC(=O)c2ccc(I)cc2/C1=C/NCc1ccc(-c2ccoc2)c(O)c1|c1ccc2c(c1)-c1ccccc1C2(c1ccc(OCCOCC2CO2)cc1)c1ccc(OCCOCC2CO2)cc1",
+        "ratios": "0.60185:0.33452:0.06363",
+        "predicted_tg_mean_c": 250.35684505616135,
+        "target_distance_c": 0.35684505616134743,
+        "prior_score": 0.9412360211320288,
+        "ood_penalty": 2.664029359817505,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC(=O)Nc1cc(O)ccc1/C=C/c1ccc(O)cc1|COc1ccc(OCC2CO2)c(C(c2ccc(OCC3CO3)c(OC)c2)c2cc(OC)ccc2OCC2CO2)c1|NC(=O)Nc1sc(-c2ccc(CN3CCCCC3)cc2)cc1C(N)=O",
+        "ratios": "0.30123:0.18339:0.51538",
+        "predicted_tg_mean_c": 249.605154607601,
+        "target_distance_c": 0.39484539239899163,
+        "prior_score": 1.3509566867479357,
+        "ood_penalty": 2.8013038635253906,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "Cc1ccc(NC(=O)Nc2cc(C(C)(C)C)nn2-c2ccc(C)cc2)cc1|O=C1OC(=O)C2CCCCC12|Oc1ccc(/C(=C(/c2ccccc2)C(F)(F)F)C(F)(F)F)cc1",
+        "ratios": "0.58826:0.23568:0.17606",
+        "predicted_tg_mean_c": 250.4516114568224,
+        "target_distance_c": 0.45161145682240544,
+        "prior_score": 1.9543736162826784,
+        "ood_penalty": 3.9971113204956055,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      },
+      {
+        "formula": "CC1CCC2C(=O)OC(=O)C2C1|COc1cc2c(c(OC)c1)C(=O)/C(=C/c1ccc(N(C)C)cc1)N2",
+        "ratios": "0.35700:0.64300",
+        "predicted_tg_mean_c": 249.52714934298692,
+        "target_distance_c": 0.47285065701308326,
+        "prior_score": 1.5680773100301426,
+        "ood_penalty": 2.475872755050659,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1ccc(OCC2CO2)c(CCCC(=O)OCCOC(=O)CCc2ccc(OCC3CO3)c(OC)c2)c1|O=C(/C=C/c1ccc(O)c(O)c1)N1CCN(c2ccccc2)CC1|OC1CCc2cccc(Nc3ncc(-c4ccc(Cl)cc4)o3)c2C1",
+        "ratios": "0.24231:0.24888:0.50881",
+        "predicted_tg_mean_c": 249.47783648949024,
+        "target_distance_c": 0.5221635105097562,
+        "prior_score": 0.8045021808670334,
+        "ood_penalty": 1.6007497310638428,
+        "reasons": [
+          "low_prior_but_near_target"
+        ]
+      },
+      {
+        "formula": "COc1cc(C(c2cc(C)c(O)c(O)c2)c2cc(C)c(O)c(O)c2)ccc1OCC1CO1|C[C@@H](Oc1cc(-n2cnc3cc(-c4ccnc(N)c4)ccc32)sc1C(N)=O)c1ccccc1C(F)(F)F|Oc1ccc(C(=C2CCCCC2)c2ccc(O)cc2)cc1",
+        "ratios": "0.30379:0.58270:0.11351",
+        "predicted_tg_mean_c": 250.53315051151773,
+        "target_distance_c": 0.5331505115177322,
+        "prior_score": 1.875985956300295,
+        "ood_penalty": 4.054109573364258,
+        "reasons": [
+          "high_ood_but_near_target"
+        ]
+      }
+    ]
+  }
+]
