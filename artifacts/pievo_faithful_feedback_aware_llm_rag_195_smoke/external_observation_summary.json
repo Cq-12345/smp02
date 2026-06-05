@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "ledger_path": "artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv",
+  "input_rows": 2,
+  "candidate_rows_after_filter": 2,
+  "accepted_rows": 2,
+  "rejected_rows": 0,
+  "rejected": [],
+  "source_counts": {
+    "surrogate": 2
+  },
+  "total_authority_weight": 2.0,
+  "mean_reward": 0.9637168072058939
+}

@@ -137,10 +137,15 @@ h = (m_1..m_n, r_1..r_n)
 - `artifacts/trail/generation/prompt_records/generation_record_ledger.csv`
 - `reports/generation_record_schema_smoke.md`
 - `scripts/run_feedback_aware_llm_rag_agent.py`
+- `scripts/import_generation_ledger_observations.py`
 - `artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv`
+- `artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv`
 - `artifacts/trail/generation_feedback_strict/strategy_feedback.csv`
 - `reports/feedback_aware_llm_rag_agent.md`
+- `reports/feedback_aware_llm_rag_pievo_feedback.md`
 - `reports/generation_failure_feedback_strict.md`
+- `configs/pievo_faithful_feedback_aware_llm_rag_195_smoke.yaml`
+- `artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json`
 
 当前 record schema 已覆盖：
 
@@ -168,6 +173,8 @@ Feedback-aware LLM/RAG agent 状态：
 - 默认 provider 为 `offline_policy`，用于可复现 smoke；若设置 `OPENAI_API_KEY`，可切换到 `openai_compatible` provider，但输出仍必须写入同一 generation ledger。
 - 当前 strict feedback 中，`functional_group_replacement` 和 `llm_rag_principle_generation` 均被保留，`llm_smiles_generation` 因缺 predictor/chemistry evidence 被抑制。
 - Agent smoke 生成 2 条 `llm_rag_principle_generation` records，2 条都通过 Harness；最佳距离为 0.003 C，mean generation reward 为 0.9637。
+- `scripts/import_generation_ledger_observations.py` 已把这 2 条成功 records 转成 surrogate observation ledger；失败/缺预测 records 不会被提升为 observation。
+- `configs/pievo_faithful_feedback_aware_llm_rag_195_smoke.yaml` 已把该 ledger 接入 PiEvo-faithful：6 轮 smoke 接收 2 条外部 observations、0 条拒绝，6 条 selected 全部通过 target guard，最佳 selected distance 为 0.0055 C。
 
 ### 3.5 失败回流
 
@@ -254,8 +261,8 @@ PYTHONPATH=src python trail/harness/constraints.py \
 
 ## 6. 近期优先级
 
-1. 若接入外部 LLM，使用 `scripts/run_feedback_aware_llm_rag_agent.py --provider openai_compatible`，并保持 generation record -> predictor/Harness/PiEvo 的审计链。
+1. 若接入外部 LLM，使用 `scripts/run_feedback_aware_llm_rag_agent.py --provider openai_compatible`，并保持 generation record -> predictor/Harness -> observation ledger -> PiEvo 的审计链。
 2. 将 LLM 生成继续限制在“提出 principle/官能团组合/候选模板”，SMILES 草案必须由 RDKit、预测模型和 Harness 再验证。
 3. 对 feedback-guided replacement 做更大候选池和真实/高保真 observation 版本的 PiEvo sweep，确认 surrogate posterior 规律是否能被物理证据保留。
-4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 侧已完成互补反应对约束和 PiEvo posterior 对比。
+4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 和 feedback-aware LLM/RAG 侧都已完成 observation ledger -> PiEvo posterior 的 smoke 闭环。
 5. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。

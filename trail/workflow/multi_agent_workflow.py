@@ -29,12 +29,16 @@ def summarize(
     generation_feedback: Path,
     generation_ledger: Path,
     feedback_aware_ledger: Path,
+    feedback_aware_observation_ledger: Path,
+    feedback_aware_pievo_summary: Path,
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
     feedback = read_json(generation_feedback, {})
     ledger = pd.read_csv(generation_ledger) if generation_ledger.exists() else pd.DataFrame()
     feedback_aware = pd.read_csv(feedback_aware_ledger) if feedback_aware_ledger.exists() else pd.DataFrame()
+    feedback_aware_observations = pd.read_csv(feedback_aware_observation_ledger) if feedback_aware_observation_ledger.exists() else pd.DataFrame()
+    feedback_aware_pievo = read_json(feedback_aware_pievo_summary, {})
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
@@ -48,6 +52,14 @@ def summarize(
             if not feedback_aware.empty and "harness_pass" in feedback_aware
             else 0
         ),
+        "feedback_aware_llm_rag_observation_rows": int(len(feedback_aware_observations)),
+        "feedback_aware_llm_rag_observation_pass": (
+            int(feedback_aware_observations["ledger_pass"].fillna(False).astype(bool).sum())
+            if not feedback_aware_observations.empty and "ledger_pass" in feedback_aware_observations
+            else 0
+        ),
+        "feedback_aware_llm_rag_pievo_best_distance_c": feedback_aware_pievo.get("best_selected_target_distance_c"),
+        "feedback_aware_llm_rag_pievo_external_rows": feedback_aware_pievo.get("external_observation_summary", {}).get("accepted_rows", 0),
         "generation_feedback": feedback,
     }
 
@@ -59,6 +71,8 @@ def main() -> None:
     parser.add_argument("--generation-feedback", default="artifacts/trail/generation_feedback_strict/generation_feedback_summary.json")
     parser.add_argument("--generation-ledger", default="artifacts/trail/generation/prompt_records/generation_record_ledger.csv")
     parser.add_argument("--feedback-aware-ledger", default="artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv")
+    parser.add_argument("--feedback-aware-observation-ledger", default="artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv")
+    parser.add_argument("--feedback-aware-pievo-summary", default="artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
     result = summarize(
@@ -67,6 +81,8 @@ def main() -> None:
         Path(args.generation_feedback),
         Path(args.generation_ledger),
         Path(args.feedback_aware_ledger),
+        Path(args.feedback_aware_observation_ledger),
+        Path(args.feedback_aware_pievo_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

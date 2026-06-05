@@ -57,7 +57,16 @@ strategies:
       outputs:
         - artifacts/trail/generation/feedback_aware_llm_rag/generation_record_ledger.csv
         - artifacts/trail/generation/feedback_aware_llm_rag/feedback_aware_policy.json
+        - artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv
+        - artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json
         - reports/feedback_aware_llm_rag_agent.md
+        - reports/feedback_aware_llm_rag_pievo_feedback.md
+      pievo_bridge:
+        importer: scripts/import_generation_ledger_observations.py
+        config: configs/pievo_faithful_feedback_aware_llm_rag_195_smoke.yaml
+        source_type: surrogate
+        accepted_observations: 2
+        pievo_rounds: 6
   llm_smiles_generation:
     maturity: draft_record_contract_implemented
     generator: scripts/build_prompt_generation_records.py

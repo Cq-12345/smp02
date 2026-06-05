@@ -223,6 +223,10 @@
   "generation_harness_pass": 3,
   "feedback_aware_llm_rag_rows": 2,
   "feedback_aware_llm_rag_harness_pass": 2,
+  "feedback_aware_llm_rag_observation_rows": 2,
+  "feedback_aware_llm_rag_observation_pass": 2,
+  "feedback_aware_llm_rag_pievo_best_distance_c": 0.005546302352854582,
+  "feedback_aware_llm_rag_pievo_external_rows": 2,
   "generation_feedback": {
     "generation_records": 4,
     "generation_harness_pass": 3,
