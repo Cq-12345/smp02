@@ -1,0 +1,51 @@
+seed: 42
+device: cuda
+data_path: data/SMP_Dataset.xlsx
+chembl_path: data/chembl_36_chemreps.txt
+output_dir: artifacts/reproduce
+
+smiles:
+  max_length: 204
+  min_charset_size: 55
+  augment_per_monomer: 1000
+  augmented_limit: 158114
+
+vae:
+  latent_sizes: [16, 32, 64, 128, 256, 512, 1024]
+  batch_size: 512
+  pretrain_epochs: 20
+  finetune_epochs: 20
+  learning_rate: 0.0001
+  reconstruction_weight: 1.0
+  kl_weight: 1.0
+  validity_weight: 0.1
+  chembl_limit: 550000
+  num_workers: 4
+
+predictors:
+  test_size: 0.15
+  pcp_tolerance: 0.15
+  cnn_epochs: 250
+  cnn_batch_size: 16
+  cnn_learning_rate: 0.00001
+  cnn_weight_decay: 0.001
+  rf_estimators: 100
+  svr_c: 1000.0
+  svr_epsilon: 1.0
+  svr_kernel: rbf
+
+discovery:
+  latent_size: 64
+  target_tg_min: 190.0
+  target_tg_max: 200.0
+  ratio_start: 0.05
+  ratio_stop: 0.95
+  ratio_step: 0.05
+  max_candidates: 500
+
+closed_loop:
+  iterations: 5
+  top_k: 50
+  uncertainty_weight: 0.2
+  target_center: 195.0
+

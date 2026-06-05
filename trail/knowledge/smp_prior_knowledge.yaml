@@ -1,0 +1,37 @@
+materials_domain: thermoset_shape_memory_polymers
+target_property:
+  name: glass_transition_temperature
+  symbol: Tg
+  target_range_celsius: [190, 200]
+priors:
+  high_tg_features:
+    - aromatic_backbones
+    - imide_or_anhydride_derived_networks
+    - cyanate_ester_triazine_networks
+    - high_crosslink_density
+    - rigid_biphenyl_or_bisphenol_units
+  lower_tg_risk_features:
+    - long_aliphatic_ether_segments
+    - flexible_polyethylene_glycol_segments
+    - low_functionality_linear_monomers
+  synthesis_constraints:
+    - compatible_reactive_groups_required
+    - molar_ratios_sum_to_one
+    - prefer_commercial_or_literature_known_monomers_for_validation
+reaction_principles:
+  epoxy_amine:
+    groups: [epoxy, primary_amine]
+    expected_network: crosslinked_epoxy
+  anhydride_amine:
+    groups: [anhydride, primary_amine]
+    expected_network: polyimide_or_polyamic_acid_precursor
+  isocyanate_hydroxyl:
+    groups: [isocyanate, hydroxyl]
+    expected_network: polyurethane
+  cyanate_ester_self:
+    groups: [cyanate_ester, cyanate_ester]
+    expected_network: triazine
+  acrylate_radical:
+    groups: [acrylate_or_methacrylate, vinyl]
+    expected_network: radical_crosslinked
+

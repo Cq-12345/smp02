@@ -1,0 +1,28 @@
+classes:
+  Monomer:
+    description: Small molecule reactant represented by SMILES.
+  FunctionalGroup:
+    description: Reactive or structural group detected by SMARTS.
+  ReactionPrinciple:
+    description: Rule linking compatible functional groups to a plausible thermoset network.
+  SMPRecipe:
+    description: Candidate shape memory polymer formulation with molar ratios.
+  PredictionModel:
+    description: Tg predictor trained on WVCM latent vectors.
+relations:
+  has_functional_group:
+    domain: Monomer
+    range: FunctionalGroup
+  compatible_via:
+    domain: FunctionalGroup
+    range: ReactionPrinciple
+  uses_monomer:
+    domain: SMPRecipe
+    range: Monomer
+  predicted_by:
+    domain: SMPRecipe
+    range: PredictionModel
+  optimizes_property:
+    domain: PredictionModel
+    range: glass_transition_temperature
+

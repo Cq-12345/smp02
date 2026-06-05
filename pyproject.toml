@@ -1,0 +1,28 @@
+[project]
+name = "smp02"
+version = "0.1.0"
+description = "Reproduction workflow for ML-driven discovery of thermoset shape memory polymers."
+requires-python = ">=3.10"
+dependencies = [
+  "joblib",
+  "matplotlib",
+  "networkx",
+  "numpy",
+  "openpyxl",
+  "pandas",
+  "python-docx",
+  "pyyaml",
+  "rdkit",
+  "scikit-learn",
+  "seaborn",
+  "torch",
+  "torch-geometric",
+  "tqdm",
+]
+
+[project.scripts]
+smp02 = "smp02.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

@@ -1,0 +1,15 @@
+joblib
+matplotlib
+networkx
+numpy
+openpyxl
+pandas
+python-docx
+pyyaml
+rdkit
+scikit-learn
+seaborn
+torch
+torch-geometric
+tqdm
+
