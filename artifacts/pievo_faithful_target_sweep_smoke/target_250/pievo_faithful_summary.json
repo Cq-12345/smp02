@@ -1,0 +1,33 @@
+{
+  "target_tg_c": 250.0,
+  "target_window_c": 5.0,
+  "reward_temperature_c": 5.0,
+  "pool_stats": [
+    "library=80",
+    "generated=10",
+    "chembl=60",
+    "chembl_scanned=875"
+  ],
+  "rounds": 4,
+  "selected_rows": 4,
+  "history_rows": 4,
+  "external_observation_summary": {
+    "enabled": false,
+    "accepted_rows": 0,
+    "rejected_rows": 0
+  },
+  "total_authority_weight": 4.0,
+  "posterior_entropy": 3.6635436019768646,
+  "map_principle": "aromatic_backbones_raise_tg",
+  "best_selected_target_distance_c": 16.893757732137374,
+  "top25_diversity": 0.8969265984454119,
+  "validation": {
+    "selected_rows": 4,
+    "ratio_sum_ok": 4,
+    "has_out_of_library": 4,
+    "n_range_ok": 4,
+    "compatibility_nonempty": 4,
+    "rdkit_valid": 4,
+    "all_selected_pass": true
+  }
+}

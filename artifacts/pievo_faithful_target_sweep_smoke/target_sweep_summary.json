@@ -1,0 +1,50 @@
+[
+  {
+    "target_tg_c": 190.0,
+    "output_dir": "artifacts/pievo_faithful_target_sweep_smoke/target_190",
+    "rounds": 4,
+    "selected_rows": 4,
+    "history_rows": 4,
+    "map_principle": "aromatic_backbones_raise_tg",
+    "posterior_entropy": 3.663561645938986,
+    "all_selected_pass": true,
+    "best_selected_predicted_tg_mean_c": 159.68367750984615,
+    "best_selected_target_distance_c": 30.31632249015385,
+    "best_selected_reward": 0.002326792665698,
+    "closest_candidate_predicted_tg_mean_c": 189.86542635778096,
+    "closest_candidate_target_distance_c": 0.1345736422190384,
+    "closest_candidate_reward": 0.9734442450910102
+  },
+  {
+    "target_tg_c": 200.0,
+    "output_dir": "artifacts/pievo_faithful_target_sweep_smoke/target_200",
+    "rounds": 4,
+    "selected_rows": 4,
+    "history_rows": 4,
+    "map_principle": "maleimide_rigid_network",
+    "posterior_entropy": 3.663561646129645,
+    "all_selected_pass": true,
+    "best_selected_predicted_tg_mean_c": 239.71686279491064,
+    "best_selected_target_distance_c": 39.71686279491064,
+    "best_selected_reward": 0.0003550071744473,
+    "closest_candidate_predicted_tg_mean_c": 200.2333672676166,
+    "closest_candidate_target_distance_c": 0.2333672676165861,
+    "closest_candidate_reward": 0.9543990023424498
+  },
+  {
+    "target_tg_c": 250.0,
+    "output_dir": "artifacts/pievo_faithful_target_sweep_smoke/target_250",
+    "rounds": 4,
+    "selected_rows": 4,
+    "history_rows": 4,
+    "map_principle": "aromatic_backbones_raise_tg",
+    "posterior_entropy": 3.6635436019768646,
+    "all_selected_pass": true,
+    "best_selected_predicted_tg_mean_c": 266.8937577321374,
+    "best_selected_target_distance_c": 16.893757732137374,
+    "best_selected_reward": 0.0340899879459434,
+    "closest_candidate_predicted_tg_mean_c": 249.634744891289,
+    "closest_candidate_target_distance_c": 0.3652551087110112,
+    "closest_candidate_reward": 0.9295534013818484
+  }
+]
