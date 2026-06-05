@@ -1,25 +1,29 @@
 {
-  "nodes": 109,
-  "edges": 95,
+  "nodes": 126,
+  "edges": 151,
   "node_kinds": {
     "applicability_principle": 3,
     "candidate_source": 3,
-    "class": 12,
+    "class": 14,
     "feature": 11,
     "functional_group": 13,
     "hard_constraint": 6,
+    "literature_source": 5,
     "network_type": 19,
+    "process_condition_template": 8,
     "reaction_principle": 20,
-    "relation": 11,
+    "relation": 13,
     "structural_principle": 10,
     "target_property": 1
   },
   "edge_relations": {
     "compatible_via": 40,
+    "conditioned_by_process": 20,
     "constrained_by": 6,
     "influences": 13,
     "produces_network": 20,
     "sourced_from": 3,
+    "supported_by_source": 36,
     "supports_principle": 13
   }
 }

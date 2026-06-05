@@ -46,6 +46,16 @@
     },
     {
       "kind": "class",
+      "description": "Paper, supplementary file, database, or local registry supporting a principle or candidate source.",
+      "id": "LiteratureSource"
+    },
+    {
+      "kind": "class",
+      "description": "Cure, catalyst, stoichiometry, and post-cure fields required to interpret a reaction principle.",
+      "id": "ProcessConditionTemplate"
+    },
+    {
+      "kind": "class",
       "description": "Candidate shape memory polymer formulation with molar ratios.",
       "id": "SMPRecipe"
     },
@@ -134,6 +144,18 @@
       "domain": "FunctionalGroup",
       "range": "StructuralPrinciple",
       "id": "supports_principle"
+    },
+    {
+      "kind": "relation",
+      "domain": "StructuralPrinciple",
+      "range": "LiteratureSource",
+      "id": "supported_by_source"
+    },
+    {
+      "kind": "relation",
+      "domain": "ReactionPrinciple",
+      "range": "ProcessConditionTemplate",
+      "id": "conditioned_by_process"
     },
     {
       "kind": "hard_constraint",
@@ -589,6 +611,110 @@
       "id": "amino_succinimide_network"
     },
     {
+      "kind": "literature_source",
+      "source_type": "paper",
+      "local_file": "paper/Journal of Polymer Science - 2024 - Teimouri - Machine Learning‐Driven Discovery of Thermoset Shape Memory Polymers With.pdf",
+      "evidence_scope": "tl_vae_wvcm_predictor;functional_group_pairing_forward_design;190_200_c_target_design",
+      "notes": "本项目复现的主论文；提供工作流、目标窗口和数据集背景。",
+      "id": "teimouri_2024_ml_smp"
+    },
+    {
+      "kind": "literature_source",
+      "source_type": "supplementary_information",
+      "local_file": "paper/pol20241095-sup-0001-supinfo.docx",
+      "evidence_scope": "model_hyperparameters;dataset_context",
+      "notes": "补充材料用于复现超参数和数据背景。",
+      "id": "teimouri_2024_supplement"
+    },
+    {
+      "kind": "literature_source",
+      "source_type": "database",
+      "local_file": "data/chembl_36_chemreps.txt",
+      "evidence_scope": "external_molecule_pool;vae_pretraining_domain",
+      "notes": "ChEMBL 是外部候选池，不等价于 SMP 实验事实。",
+      "id": "chembl_36"
+    },
+    {
+      "kind": "literature_source",
+      "source_type": "curated_rule_set",
+      "local_file": "docs/functional_group_classification_and_matching.md",
+      "evidence_scope": "smarts_functional_groups;reaction_compatibility_harness",
+      "notes": "由于主论文未公开完整 SMARTS/兼容性矩阵，本项目维护可审计的本地规则。",
+      "id": "local_functional_group_rules"
+    },
+    {
+      "kind": "literature_source",
+      "source_type": "local_registry",
+      "local_file": "trail/candidates/source_registry.yaml",
+      "evidence_scope": "candidate_source_authority;sparse_functional_group_audit",
+      "notes": "候选来源、权威等级和稀疏官能团扩展优先级。",
+      "id": "candidate_source_registry"
+    },
+    {
+      "kind": "process_condition_template",
+      "trigger": "thermal",
+      "catalyst": "optional_accelerator",
+      "cure_schedule_fields": "mix_temperature_c;cure_temperature_c;cure_time_h;post_cure_temperature_c;post_cure_time_h",
+      "notes": "环氧-胺体系通常对当量比、升温程序和后固化敏感。",
+      "id": "epoxy_amine_thermal_cure"
+    },
+    {
+      "kind": "process_condition_template",
+      "trigger": "thermal",
+      "catalyst": "tertiary_amine_or_imidazole_optional",
+      "cure_schedule_fields": "catalyst_loading;cure_temperature_c;post_cure_temperature_c",
+      "notes": "环氧-酸酐常需要催化剂；缺少催化剂时应降低工艺置信度。",
+      "id": "epoxy_anhydride_catalyzed_cure"
+    },
+    {
+      "kind": "process_condition_template",
+      "trigger": "thermal_or_solution_imidization",
+      "catalyst": "optional",
+      "cure_schedule_fields": "solvent;imidization_temperature_c;imidization_time_h",
+      "notes": "酸酐-胺路线可能先形成聚酰胺酸/酰胺酸，再进一步酰亚胺化。",
+      "id": "anhydride_amine_imidization"
+    },
+    {
+      "kind": "process_condition_template",
+      "trigger": "ambient_or_thermal",
+      "catalyst": "tin_or_amine_optional",
+      "cure_schedule_fields": "moisture_control;nco_index;cure_temperature_c",
+      "notes": "异氰酸酯体系对水分、NCO 指数和催化剂敏感。",
+      "id": "isocyanate_urethane_urea"
+    },
+    {
+      "kind": "process_condition_template",
+      "trigger": "thermal_or_photo_radical",
+      "catalyst": "peroxide_or_photoinitiator",
+      "cure_schedule_fields": "initiator_type;initiator_loading;irradiation_or_cure_temperature_c",
+      "notes": "自由基体系必须记录引发剂和光/热触发方式。",
+      "id": "radical_vinyl_cure"
+    },
+    {
+      "kind": "process_condition_template",
+      "trigger": "base_photo_or_radical",
+      "catalyst": "base_or_photoinitiator_optional",
+      "cure_schedule_fields": "thiol_ene_stoichiometry;catalyst_or_initiator;cure_temperature_c",
+      "notes": "thiol-ene/thiol-acrylate 对化学计量、碱/光引发和氧阻聚条件敏感。",
+      "id": "thiol_click_cure"
+    },
+    {
+      "kind": "process_condition_template",
+      "trigger": "high_temperature_thermal",
+      "catalyst": "metal_or_phenolic_catalyst_optional",
+      "cure_schedule_fields": "trimerization_temperature_c;catalyst_loading;post_cure_temperature_c",
+      "notes": "氰酸酯常需高温三聚或催化；工艺条件对最终 Tg 影响很大。",
+      "id": "cyanate_ester_triazine_cure"
+    },
+    {
+      "kind": "process_condition_template",
+      "trigger": "thermal_or_michael_addition",
+      "catalyst": "base_or_radical_optional",
+      "cure_schedule_fields": "cure_temperature_c;co_reactant_stoichiometry;post_cure_temperature_c",
+      "notes": "马来酰亚胺可以 Michael 加成或共聚，需记录共反应物和触发方式。",
+      "id": "maleimide_addition_or_copolymerization"
+    },
+    {
       "kind": "candidate_source",
       "description": "SMP_Dataset.xlsx 中已经出现的单体。",
       "trust_level": "high",
@@ -669,6 +795,18 @@
       "key": 0
     },
     {
+      "relation": "supported_by_source",
+      "source": "aromatic_backbones_raise_tg",
+      "target": "teimouri_2024_ml_smp",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "aromatic_backbones_raise_tg",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "supports_principle",
       "source": "aromatic_backbone",
       "target": "aromatic_backbones_raise_tg",
@@ -678,6 +816,18 @@
       "relation": "influences",
       "source": "multi_aromatic_rigidity",
       "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "multi_aromatic_rigidity",
+      "target": "teimouri_2024_ml_smp",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "multi_aromatic_rigidity",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -693,6 +843,18 @@
       "key": 0
     },
     {
+      "relation": "supported_by_source",
+      "source": "imide_anhydride_networks_raise_tg",
+      "target": "teimouri_2024_ml_smp",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "imide_anhydride_networks_raise_tg",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "supports_principle",
       "source": "imide_or_anhydride",
       "target": "imide_anhydride_networks_raise_tg",
@@ -702,6 +864,18 @@
       "relation": "influences",
       "source": "cyanate_ester_triazine",
       "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "cyanate_ester_triazine",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "cyanate_ester_triazine",
+      "target": "candidate_source_registry",
       "key": 0
     },
     {
@@ -741,6 +915,18 @@
       "key": 0
     },
     {
+      "relation": "supported_by_source",
+      "source": "maleimide_rigid_network",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "maleimide_rigid_network",
+      "target": "candidate_source_registry",
+      "key": 0
+    },
+    {
       "relation": "supports_principle",
       "source": "maleimide",
       "target": "maleimide_rigid_network",
@@ -771,6 +957,12 @@
       "key": 0
     },
     {
+      "relation": "supported_by_source",
+      "source": "high_functionality_crosslink_density",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "supports_principle",
       "source": "high_functionality",
       "target": "high_functionality_crosslink_density",
@@ -780,6 +972,18 @@
       "relation": "influences",
       "source": "flexible_ether_penalty",
       "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "flexible_ether_penalty",
+      "target": "teimouri_2024_ml_smp",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "flexible_ether_penalty",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -795,6 +999,12 @@
       "key": 0
     },
     {
+      "relation": "supported_by_source",
+      "source": "peg_like_penalty",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "supports_principle",
       "source": "peg_like_risk",
       "target": "peg_like_penalty",
@@ -807,6 +1017,12 @@
       "key": 0
     },
     {
+      "relation": "supported_by_source",
+      "source": "long_aliphatic_penalty",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "supports_principle",
       "source": "long_aliphatic_risk",
       "target": "long_aliphatic_penalty",
@@ -816,6 +1032,12 @@
       "relation": "influences",
       "source": "too_flexible_penalty",
       "target": "glass_transition_temperature",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "too_flexible_penalty",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -864,6 +1086,18 @@
       "relation": "produces_network",
       "source": "epoxy_primary_amine",
       "target": "crosslinked_epoxy",
+      "key": 0
+    },
+    {
+      "relation": "conditioned_by_process",
+      "source": "epoxy_primary_amine",
+      "target": "epoxy_amine_thermal_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "epoxy_primary_amine",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -933,6 +1167,18 @@
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "epoxy_secondary_amine",
+      "target": "epoxy_amine_thermal_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "epoxy_secondary_amine",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "compatible_via",
       "source": "secondary_amine",
       "target": "epoxy_secondary_amine",
@@ -954,6 +1200,18 @@
       "relation": "produces_network",
       "source": "epoxy_anhydride",
       "target": "epoxy_ester_network",
+      "key": 0
+    },
+    {
+      "relation": "conditioned_by_process",
+      "source": "epoxy_anhydride",
+      "target": "epoxy_anhydride_catalyzed_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "epoxy_anhydride",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -987,6 +1245,18 @@
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "epoxy_carboxylic_acid",
+      "target": "epoxy_anhydride_catalyzed_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "epoxy_carboxylic_acid",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "compatible_via",
       "source": "carboxylic_acid",
       "target": "epoxy_carboxylic_acid",
@@ -996,6 +1266,18 @@
       "relation": "produces_network",
       "source": "epoxy_hydroxyl",
       "target": "etherified_epoxy_network",
+      "key": 0
+    },
+    {
+      "relation": "conditioned_by_process",
+      "source": "epoxy_hydroxyl",
+      "target": "epoxy_anhydride_catalyzed_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "epoxy_hydroxyl",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -1023,9 +1305,33 @@
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "anhydride_primary_amine",
+      "target": "anhydride_amine_imidization",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "anhydride_primary_amine",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "produces_network",
       "source": "anhydride_secondary_amine",
       "target": "amic_acid_or_imide_related_network",
+      "key": 0
+    },
+    {
+      "relation": "conditioned_by_process",
+      "source": "anhydride_secondary_amine",
+      "target": "anhydride_amine_imidization",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "anhydride_secondary_amine",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -1035,9 +1341,33 @@
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "anhydride_hydroxyl",
+      "target": "anhydride_amine_imidization",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "anhydride_hydroxyl",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "produces_network",
       "source": "isocyanate_hydroxyl",
       "target": "polyurethane",
+      "key": 0
+    },
+    {
+      "relation": "conditioned_by_process",
+      "source": "isocyanate_hydroxyl",
+      "target": "isocyanate_urethane_urea",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "isocyanate_hydroxyl",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -1065,15 +1395,51 @@
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "isocyanate_primary_amine",
+      "target": "isocyanate_urethane_urea",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "isocyanate_primary_amine",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "produces_network",
       "source": "isocyanate_secondary_amine",
       "target": "substituted_urea_network",
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "isocyanate_secondary_amine",
+      "target": "isocyanate_urethane_urea",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "isocyanate_secondary_amine",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "produces_network",
       "source": "acrylate_vinyl_radical",
       "target": "radical_crosslinked",
+      "key": 0
+    },
+    {
+      "relation": "conditioned_by_process",
+      "source": "acrylate_vinyl_radical",
+      "target": "radical_vinyl_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "acrylate_vinyl_radical",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -1113,6 +1479,18 @@
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "thiol_ene",
+      "target": "thiol_click_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "thiol_ene",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "compatible_via",
       "source": "thiol",
       "target": "thiol_ene",
@@ -1137,15 +1515,51 @@
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "thiol_acrylate",
+      "target": "thiol_click_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "thiol_acrylate",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "produces_network",
       "source": "cyanate_ester_self",
       "target": "triazine_network",
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "cyanate_ester_self",
+      "target": "cyanate_ester_triazine_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "cyanate_ester_self",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "produces_network",
       "source": "cyanate_ester_phenol",
       "target": "co_cured_cyanate_network",
+      "key": 0
+    },
+    {
+      "relation": "conditioned_by_process",
+      "source": "cyanate_ester_phenol",
+      "target": "cyanate_ester_triazine_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "cyanate_ester_phenol",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -1161,9 +1575,33 @@
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "cyanate_ester_amine",
+      "target": "cyanate_ester_triazine_cure",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "cyanate_ester_amine",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "produces_network",
       "source": "maleimide_vinyl",
       "target": "maleimide_copolymer_network",
+      "key": 0
+    },
+    {
+      "relation": "conditioned_by_process",
+      "source": "maleimide_vinyl",
+      "target": "maleimide_addition_or_copolymerization",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "maleimide_vinyl",
+      "target": "local_functional_group_rules",
       "key": 0
     },
     {
@@ -1173,9 +1611,33 @@
       "key": 0
     },
     {
+      "relation": "conditioned_by_process",
+      "source": "maleimide_thiol",
+      "target": "maleimide_addition_or_copolymerization",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "maleimide_thiol",
+      "target": "local_functional_group_rules",
+      "key": 0
+    },
+    {
       "relation": "produces_network",
       "source": "maleimide_amine",
       "target": "amino_succinimide_network",
+      "key": 0
+    },
+    {
+      "relation": "conditioned_by_process",
+      "source": "maleimide_amine",
+      "target": "maleimide_addition_or_copolymerization",
+      "key": 0
+    },
+    {
+      "relation": "supported_by_source",
+      "source": "maleimide_amine",
+      "target": "local_functional_group_rules",
       "key": 0
     }
   ]

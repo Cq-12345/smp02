@@ -192,3 +192,139 @@ candidate_sources:
   chembl:
     description: "ChEMBL 化合物经 RDKit、元素、charset、官能团和适用域筛选后进入候选池。"
     trust_level: low_to_medium
+literature_sources:
+  teimouri_2024_ml_smp:
+    source_type: paper
+    local_file: "paper/Journal of Polymer Science - 2024 - Teimouri - Machine Learning‐Driven Discovery of Thermoset Shape Memory Polymers With.pdf"
+    evidence_scope:
+      - tl_vae_wvcm_predictor
+      - functional_group_pairing_forward_design
+      - 190_200_c_target_design
+    notes: "本项目复现的主论文；提供工作流、目标窗口和数据集背景。"
+  teimouri_2024_supplement:
+    source_type: supplementary_information
+    local_file: "paper/pol20241095-sup-0001-supinfo.docx"
+    evidence_scope:
+      - model_hyperparameters
+      - dataset_context
+    notes: "补充材料用于复现超参数和数据背景。"
+  chembl_36:
+    source_type: database
+    local_file: "data/chembl_36_chemreps.txt"
+    evidence_scope:
+      - external_molecule_pool
+      - vae_pretraining_domain
+    notes: "ChEMBL 是外部候选池，不等价于 SMP 实验事实。"
+  local_functional_group_rules:
+    source_type: curated_rule_set
+    local_file: "docs/functional_group_classification_and_matching.md"
+    evidence_scope:
+      - smarts_functional_groups
+      - reaction_compatibility_harness
+    notes: "由于主论文未公开完整 SMARTS/兼容性矩阵，本项目维护可审计的本地规则。"
+  candidate_source_registry:
+    source_type: local_registry
+    local_file: "trail/candidates/source_registry.yaml"
+    evidence_scope:
+      - candidate_source_authority
+      - sparse_functional_group_audit
+    notes: "候选来源、权威等级和稀疏官能团扩展优先级。"
+process_condition_templates:
+  epoxy_amine_thermal_cure:
+    trigger: thermal
+    catalyst: optional_accelerator
+    cure_schedule_fields:
+      - mix_temperature_c
+      - cure_temperature_c
+      - cure_time_h
+      - post_cure_temperature_c
+      - post_cure_time_h
+    notes: "环氧-胺体系通常对当量比、升温程序和后固化敏感。"
+  epoxy_anhydride_catalyzed_cure:
+    trigger: thermal
+    catalyst: tertiary_amine_or_imidazole_optional
+    cure_schedule_fields:
+      - catalyst_loading
+      - cure_temperature_c
+      - post_cure_temperature_c
+    notes: "环氧-酸酐常需要催化剂；缺少催化剂时应降低工艺置信度。"
+  anhydride_amine_imidization:
+    trigger: thermal_or_solution_imidization
+    catalyst: optional
+    cure_schedule_fields:
+      - solvent
+      - imidization_temperature_c
+      - imidization_time_h
+    notes: "酸酐-胺路线可能先形成聚酰胺酸/酰胺酸，再进一步酰亚胺化。"
+  isocyanate_urethane_urea:
+    trigger: ambient_or_thermal
+    catalyst: tin_or_amine_optional
+    cure_schedule_fields:
+      - moisture_control
+      - nco_index
+      - cure_temperature_c
+    notes: "异氰酸酯体系对水分、NCO 指数和催化剂敏感。"
+  radical_vinyl_cure:
+    trigger: thermal_or_photo_radical
+    catalyst: peroxide_or_photoinitiator
+    cure_schedule_fields:
+      - initiator_type
+      - initiator_loading
+      - irradiation_or_cure_temperature_c
+    notes: "自由基体系必须记录引发剂和光/热触发方式。"
+  thiol_click_cure:
+    trigger: base_photo_or_radical
+    catalyst: base_or_photoinitiator_optional
+    cure_schedule_fields:
+      - thiol_ene_stoichiometry
+      - catalyst_or_initiator
+      - cure_temperature_c
+    notes: "thiol-ene/thiol-acrylate 对化学计量、碱/光引发和氧阻聚条件敏感。"
+  cyanate_ester_triazine_cure:
+    trigger: high_temperature_thermal
+    catalyst: metal_or_phenolic_catalyst_optional
+    cure_schedule_fields:
+      - trimerization_temperature_c
+      - catalyst_loading
+      - post_cure_temperature_c
+    notes: "氰酸酯常需高温三聚或催化；工艺条件对最终 Tg 影响很大。"
+  maleimide_addition_or_copolymerization:
+    trigger: thermal_or_michael_addition
+    catalyst: base_or_radical_optional
+    cure_schedule_fields:
+      - cure_temperature_c
+      - co_reactant_stoichiometry
+      - post_cure_temperature_c
+    notes: "马来酰亚胺可以 Michael 加成或共聚，需记录共反应物和触发方式。"
+reaction_evidence_map:
+  epoxy_primary_amine: {evidence_sources: [local_functional_group_rules], process_template: epoxy_amine_thermal_cure}
+  epoxy_secondary_amine: {evidence_sources: [local_functional_group_rules], process_template: epoxy_amine_thermal_cure}
+  epoxy_anhydride: {evidence_sources: [local_functional_group_rules], process_template: epoxy_anhydride_catalyzed_cure}
+  epoxy_carboxylic_acid: {evidence_sources: [local_functional_group_rules], process_template: epoxy_anhydride_catalyzed_cure}
+  epoxy_hydroxyl: {evidence_sources: [local_functional_group_rules], process_template: epoxy_anhydride_catalyzed_cure}
+  anhydride_primary_amine: {evidence_sources: [local_functional_group_rules], process_template: anhydride_amine_imidization}
+  anhydride_secondary_amine: {evidence_sources: [local_functional_group_rules], process_template: anhydride_amine_imidization}
+  anhydride_hydroxyl: {evidence_sources: [local_functional_group_rules], process_template: anhydride_amine_imidization}
+  isocyanate_hydroxyl: {evidence_sources: [local_functional_group_rules], process_template: isocyanate_urethane_urea}
+  isocyanate_primary_amine: {evidence_sources: [local_functional_group_rules], process_template: isocyanate_urethane_urea}
+  isocyanate_secondary_amine: {evidence_sources: [local_functional_group_rules], process_template: isocyanate_urethane_urea}
+  acrylate_vinyl_radical: {evidence_sources: [local_functional_group_rules], process_template: radical_vinyl_cure}
+  thiol_ene: {evidence_sources: [local_functional_group_rules], process_template: thiol_click_cure}
+  thiol_acrylate: {evidence_sources: [local_functional_group_rules], process_template: thiol_click_cure}
+  cyanate_ester_self: {evidence_sources: [local_functional_group_rules], process_template: cyanate_ester_triazine_cure}
+  cyanate_ester_phenol: {evidence_sources: [local_functional_group_rules], process_template: cyanate_ester_triazine_cure}
+  cyanate_ester_amine: {evidence_sources: [local_functional_group_rules], process_template: cyanate_ester_triazine_cure}
+  maleimide_vinyl: {evidence_sources: [local_functional_group_rules], process_template: maleimide_addition_or_copolymerization}
+  maleimide_thiol: {evidence_sources: [local_functional_group_rules], process_template: maleimide_addition_or_copolymerization}
+  maleimide_amine: {evidence_sources: [local_functional_group_rules], process_template: maleimide_addition_or_copolymerization}
+structural_evidence_map:
+  aromatic_backbones_raise_tg: [teimouri_2024_ml_smp, local_functional_group_rules]
+  multi_aromatic_rigidity: [teimouri_2024_ml_smp, local_functional_group_rules]
+  imide_anhydride_networks_raise_tg: [teimouri_2024_ml_smp, local_functional_group_rules]
+  cyanate_ester_triazine: [local_functional_group_rules, candidate_source_registry]
+  maleimide_rigid_network: [local_functional_group_rules, candidate_source_registry]
+  high_functionality_crosslink_density: [local_functional_group_rules]
+  flexible_ether_penalty: [teimouri_2024_ml_smp, local_functional_group_rules]
+  peg_like_penalty: [local_functional_group_rules]
+  long_aliphatic_penalty: [local_functional_group_rules]
+  too_flexible_penalty: [local_functional_group_rules]

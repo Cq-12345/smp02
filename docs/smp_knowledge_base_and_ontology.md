@@ -18,12 +18,14 @@
 
 本轮扩展后的图谱规模：
 
-- 109 个节点。
-- 95 条边。
+- 126 个节点。
+- 151 条边。
 - 20 条反应原则。
 - 10 条结构先验。
 - 3 条适用域/可转移性先验。
 - 6 条硬约束。
+- 5 个文献/证据来源节点。
+- 8 个工艺条件模板节点。
 
 ## 2. 硬约束
 
@@ -69,6 +71,21 @@
 - mechanism。
 - confidence。
 - notes。
+- process condition template。
+- evidence sources。
+
+新增工艺条件模板：
+
+- `epoxy_amine_thermal_cure`
+- `epoxy_anhydride_catalyzed_cure`
+- `anhydride_amine_imidization`
+- `isocyanate_urethane_urea`
+- `radical_vinyl_cure`
+- `thiol_click_cure`
+- `cyanate_ester_triazine_cure`
+- `maleimide_addition_or_copolymerization`
+
+这些模板不等于真实实验条件；它们定义后续 observation ledger 和人工审核必须补充的字段，如催化剂、固化温度、后固化温度、引发剂、NCO 指数、水分控制等。
 
 ## 5. 候选来源本体
 
@@ -100,7 +117,7 @@ p_t(P) proportional p0(P) * product_s p(y_s | h_s, P)
 
 下一步应继续补：
 
-- 论文来源字段：每条先验和反应规则对应的文献或实验依据。
-- 工艺条件字段：催化剂、固化温度、后固化、光/热/自由基条件。
+- 将真实文献中的具体配方和固化程序绑定到 `literature_sources`，而不是只保留本地文件级来源。
+- 将 observation ledger 的 `notes/method` 拆成结构化工艺字段：催化剂、固化温度、后固化、光/热/自由基条件。
 - 风险字段：毒性、挥发性、商业可得性、合成复杂度。
 - 与真实 DSC 结果连接的 observation schema。

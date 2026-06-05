@@ -13,6 +13,10 @@ classes:
     description: Deterministic validator that must not be weakened by principle learning.
   CandidateSource:
     description: Provenance class for library, generated, and database-derived components.
+  LiteratureSource:
+    description: Paper, supplementary file, database, or local registry supporting a principle or candidate source.
+  ProcessConditionTemplate:
+    description: Cure, catalyst, stoichiometry, and post-cure fields required to interpret a reaction principle.
   SMPRecipe:
     description: Candidate shape memory polymer formulation with molar ratios.
   PredictionModel:
@@ -57,3 +61,9 @@ relations:
   supports_principle:
     domain: FunctionalGroup
     range: StructuralPrinciple
+  supported_by_source:
+    domain: StructuralPrinciple
+    range: LiteratureSource
+  conditioned_by_process:
+    domain: ReactionPrinciple
+    range: ProcessConditionTemplate

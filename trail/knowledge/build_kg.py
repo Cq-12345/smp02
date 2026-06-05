@@ -61,6 +61,43 @@ def build_graph(knowledge_path: Path, ontology_path: Path) -> nx.MultiDiGraph:
         graph.add_node(network, kind="network_type")
         graph.add_edge(name, network, relation="produces_network")
 
+    for name, source in knowledge.get("literature_sources", {}).items():
+        graph.add_node(
+            name,
+            kind="literature_source",
+            source_type=str(source.get("source_type", "")),
+            local_file=str(source.get("local_file", "")),
+            evidence_scope=";".join(source.get("evidence_scope", [])),
+            notes=str(source.get("notes", "")),
+        )
+
+    for name, template in knowledge.get("process_condition_templates", {}).items():
+        graph.add_node(
+            name,
+            kind="process_condition_template",
+            trigger=str(template.get("trigger", "")),
+            catalyst=str(template.get("catalyst", "")),
+            cure_schedule_fields=";".join(template.get("cure_schedule_fields", [])),
+            notes=str(template.get("notes", "")),
+        )
+
+    for reaction_name, evidence in knowledge.get("reaction_evidence_map", {}).items():
+        if reaction_name not in graph:
+            continue
+        process_template = evidence.get("process_template")
+        if process_template and process_template in graph:
+            graph.add_edge(reaction_name, process_template, relation="conditioned_by_process")
+        for source_name in evidence.get("evidence_sources", []):
+            if source_name in graph:
+                graph.add_edge(reaction_name, source_name, relation="supported_by_source")
+
+    for principle_name, source_names in knowledge.get("structural_evidence_map", {}).items():
+        if principle_name not in graph:
+            continue
+        for source_name in source_names:
+            if source_name in graph:
+                graph.add_edge(principle_name, source_name, relation="supported_by_source")
+
     for name, source in knowledge.get("candidate_sources", {}).items():
         graph.add_node(name, kind="candidate_source", **source)
         graph.add_edge("Monomer", name, relation="sourced_from")
