@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "ledger_path": "artifacts/trail/experiments/observation_ledger.csv",
+  "input_rows": 2,
+  "candidate_rows_after_filter": 2,
+  "accepted_rows": 2,
+  "rejected_rows": 0,
+  "rejected": [],
+  "source_counts": {
+    "surrogate": 1,
+    "real_dsc": 1
+  },
+  "total_authority_weight": 6.0,
+  "mean_reward": 0.8703991104408579
+}

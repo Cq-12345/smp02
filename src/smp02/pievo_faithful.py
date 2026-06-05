@@ -16,14 +16,21 @@ from sklearn.exceptions import ConvergenceWarning
 from smp02.agent_discovery import (
     AgentConfig,
     FormulaCandidate,
+    MonomerCandidate,
     Principle,
     build_monomer_pool,
+    classify_mol,
+    compatibility_edges,
+    compute_prior_score,
     encode_pool,
     evaluate_formulas,
     fingerprint_diversity,
+    formula_features,
     formula_key,
+    functionality_estimate,
     initial_principles,
     load_charset_meta,
+    monomer_features,
     monomer_pool_frame,
     ood_reference_scale,
     parse_agent_config,
@@ -34,6 +41,9 @@ from smp02.agent_discovery import (
 )
 from smp02.predictors import load_predictor
 from smp02.utils import ensure_dir, load_config, resolve_device, save_json, set_seed
+
+from rdkit import Chem
+from rdkit.Chem import Descriptors, rdMolDescriptors
 
 
 @dataclass
@@ -50,6 +60,9 @@ class PiEvoFaithfulConfig:
     reward_temperature_c: float
     max_added_principles: int
     random_seed: int
+    external_observation_ledger: Path | None = None
+    external_observation_limit: int | None = None
+    external_observation_require_pass: bool = True
 
 
 @dataclass
@@ -60,6 +73,10 @@ class Observation:
     reward: float
     predicted_tg_mean_c: float
     predicted_tg_sigma_c: float
+    authority_weight: float = 1.0
+    source_type: str = "surrogate"
+    observation_id: str = ""
+    evidence_role: str = "surrogate_selected"
 
 
 @dataclass
@@ -119,6 +136,8 @@ class PrincipleGPExpert:
 def parse_pievo_faithful_config(cfg: dict, agent_cfg: AgentConfig) -> PiEvoFaithfulConfig:
     raw = cfg.get("pievo_faithful", {})
     default_out = agent_cfg.output_dir.parent / f"{agent_cfg.output_dir.name}_pievo_faithful"
+    external_ledger = raw.get("external_observation_ledger")
+    external_limit = raw.get("external_observation_limit")
     return PiEvoFaithfulConfig(
         output_dir=Path(raw.get("output_dir", default_out)),
         rounds=int(raw.get("rounds", 12)),
@@ -132,6 +151,9 @@ def parse_pievo_faithful_config(cfg: dict, agent_cfg: AgentConfig) -> PiEvoFaith
         reward_temperature_c=float(raw.get("reward_temperature_c", max(agent_cfg.target_window_c, 1.0))),
         max_added_principles=int(raw.get("max_added_principles", 6)),
         random_seed=int(raw.get("random_seed", cfg.get("seed", 42))),
+        external_observation_ledger=None if external_ledger in {None, ""} else Path(external_ledger),
+        external_observation_limit=None if external_limit in {None, ""} else int(external_limit),
+        external_observation_require_pass=bool(raw.get("external_observation_require_pass", True)),
     )
 
 
@@ -175,12 +197,33 @@ def row_bool(row: dict[str, object], name: str) -> bool:
     return bool(value)
 
 
+def truthy(value: object) -> bool:
+    try:
+        if pd.isna(value):
+            return False
+    except (TypeError, ValueError):
+        pass
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y"}
+    return bool(value)
+
+
+def finite_or_default(value: object, default: float) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return float(default)
+    return number if math.isfinite(number) else float(default)
+
+
 def principle_feature_vector(row: dict[str, object], principle: Principle, agent_cfg: AgentConfig, pievo_cfg: PiEvoFaithfulConfig) -> np.ndarray:
     aligned = 1.0 if row_bool(row, principle.feature) else 0.0
-    target_distance = float(row.get("target_distance_c", agent_cfg.target_window_c * 10.0))
+    target_tg_c = finite_or_default(row.get("target_tg_c"), agent_cfg.target_tg_c)
+    target_distance = finite_or_default(row.get("target_distance_c"), agent_cfg.target_window_c * 10.0)
+    observed_or_predicted_tg_c = finite_or_default(row.get("observed_tg_c"), row.get("predicted_tg_mean_c", agent_cfg.target_tg_c))
     target_proximity = target_reward(
-        float(row.get("predicted_tg_mean_c", agent_cfg.target_tg_c)),
-        agent_cfg.target_tg_c,
+        observed_or_predicted_tg_c,
+        target_tg_c,
         pievo_cfg.reward_temperature_c,
     )
     return np.asarray(
@@ -197,6 +240,165 @@ def principle_feature_vector(row: dict[str, object], principle: Principle, agent
         ],
         dtype=float,
     )
+
+
+AUTHORITY_WEIGHTS = {
+    "surrogate": 1.0,
+    "literature": 2.0,
+    "high_fidelity_simulation": 3.0,
+    "real_dsc": 5.0,
+}
+
+
+def parse_ratio_string(value: object, n_components: int) -> tuple[float, ...]:
+    try:
+        ratios = tuple(float(part) for part in str(value).split(":") if str(part).strip())
+    except ValueError as exc:
+        raise ValueError(f"Invalid ratio string: {value}") from exc
+    if len(ratios) != n_components:
+        raise ValueError(f"Ratio count {len(ratios)} does not match component count {n_components}.")
+    total = sum(ratios)
+    if total <= 0.0 or abs(total - 1.0) > 1e-3:
+        raise ValueError(f"Ratios must sum to 1.0, got {total:.6f}.")
+    return ratios
+
+
+def external_monomer_candidate(smiles: str, observation_id: str, idx: int) -> MonomerCandidate:
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        raise ValueError(f"Invalid SMILES in external observation {observation_id}: {smiles}")
+    canonical = Chem.MolToSmiles(mol, canonical=True)
+    groups, counts = classify_mol(mol)
+    features = monomer_features(mol, groups, counts)
+    return MonomerCandidate(
+        smiles=canonical,
+        source="external",
+        label=f"{observation_id}_{idx}",
+        groups=groups,
+        monomer_prior_score=0.0,
+        molecular_weight=float(Descriptors.MolWt(mol)),
+        heavy_atoms=int(mol.GetNumHeavyAtoms()),
+        aromatic_rings=int(rdMolDescriptors.CalcNumAromaticRings(mol)),
+        rotatable_bonds=int(rdMolDescriptors.CalcNumRotatableBonds(mol)),
+        functionality=int(functionality_estimate(counts)),
+        in_library=True,
+        features=features,
+    )
+
+
+def external_observation_from_row(
+    row: pd.Series,
+    principles: list[Principle],
+    agent_cfg: AgentConfig,
+    pievo_cfg: PiEvoFaithfulConfig,
+    row_index: int,
+) -> Observation:
+    observation_id = str(row.get("observation_id", f"external_{row_index}"))
+    source_type = str(row.get("source_type", "surrogate"))
+    smiles_values = [part.strip() for part in str(row["smiles"]).split("|") if part.strip()]
+    if not smiles_values:
+        raise ValueError(f"External observation {observation_id} has no SMILES.")
+    ratios = parse_ratio_string(row["ratios"], len(smiles_values))
+    monomers = [external_monomer_candidate(smiles, observation_id, idx) for idx, smiles in enumerate(smiles_values)]
+    if len(monomers) == 1:
+        reasons: tuple[str, ...] = ()
+    else:
+        reasons, _ = compatibility_edges(monomers)
+        reasons = tuple(reasons)
+    features = formula_features(monomers, reasons, new_component_count=0)
+    for col, value in row.items():
+        if str(col).startswith("feature_"):
+            features[str(col).removeprefix("feature_")] = truthy(value)
+
+    target_tg_c = finite_or_default(row.get("target_tg_c"), agent_cfg.target_tg_c)
+    observed_tg_c = finite_or_default(row.get("observed_tg_c"), target_tg_c)
+    predicted_tg_c = finite_or_default(row.get("predicted_tg_mean_c"), observed_tg_c)
+    predicted_sigma_c = finite_or_default(row.get("predicted_tg_sigma_c"), 0.0)
+    reward = target_reward(observed_tg_c, target_tg_c, pievo_cfg.reward_temperature_c)
+    authority_weight = finite_or_default(row.get("authority_weight"), AUTHORITY_WEIGHTS.get(source_type, 1.0))
+    canonical_smiles = tuple(m.smiles for m in monomers)
+    ratio_text = ":".join(f"{ratio:.5f}" for ratio in ratios)
+    row_dict: dict[str, object] = {
+        "formula_id": observation_id,
+        "n_components": len(monomers),
+        "smiles": "|".join(canonical_smiles),
+        "ratios": ratio_text,
+        "sources": source_type,
+        "labels": "|".join(m.label for m in monomers),
+        "groups": "|".join(";".join(m.groups) for m in monomers),
+        "new_component_count": 0,
+        "compatibility_reasons": "|".join(reasons),
+        "predicted_tg_mean_c": predicted_tg_c,
+        "predicted_tg_sigma_c": predicted_sigma_c,
+        "observed_tg_c": observed_tg_c,
+        "target_tg_c": target_tg_c,
+        "target_distance_c": abs(observed_tg_c - target_tg_c),
+        "prior_score": compute_prior_score(features, principles),
+        "ood_distance": math.nan,
+        "ood_penalty": 0.0,
+        "agent_score": math.nan,
+        "observation_id": observation_id,
+        "observation_source_type": source_type,
+        "authority_weight": authority_weight,
+        "evidence_role": "external_observation",
+    }
+    row_dict.update({f"feature_{name}": value for name, value in features.items()})
+    return Observation(
+        round_index=0,
+        hypothesis_key=f"external:{observation_id}",
+        row=row_dict,
+        reward=reward,
+        predicted_tg_mean_c=predicted_tg_c,
+        predicted_tg_sigma_c=predicted_sigma_c,
+        authority_weight=authority_weight,
+        source_type=source_type,
+        observation_id=observation_id,
+        evidence_role="external_observation",
+    )
+
+
+def load_external_observations(
+    pievo_cfg: PiEvoFaithfulConfig,
+    principles: list[Principle],
+    agent_cfg: AgentConfig,
+) -> tuple[list[Observation], dict[str, object]]:
+    path = pievo_cfg.external_observation_ledger
+    if path is None:
+        return [], {"enabled": False, "accepted_rows": 0, "rejected_rows": 0}
+    if not path.exists():
+        raise FileNotFoundError(f"Missing external observation ledger: {path}")
+    df = pd.read_csv(path, low_memory=False)
+    input_rows = int(len(df))
+    if pievo_cfg.external_observation_require_pass and "ledger_pass" in df.columns:
+        df = df[df["ledger_pass"].map(truthy)].copy()
+    if pievo_cfg.external_observation_limit is not None:
+        df = df.head(pievo_cfg.external_observation_limit).copy()
+    observations: list[Observation] = []
+    rejected: list[dict[str, object]] = []
+    for idx, row in df.iterrows():
+        try:
+            observations.append(external_observation_from_row(row, principles, agent_cfg, pievo_cfg, int(idx)))
+        except Exception as exc:
+            rejected.append(
+                {
+                    "row_index": int(idx),
+                    "observation_id": str(row.get("observation_id", f"external_{idx}")),
+                    "reason": str(exc),
+                }
+            )
+    summary = {
+        "enabled": True,
+        "ledger_path": str(path),
+        "input_rows": input_rows,
+        "candidate_rows_after_filter": int(len(df)),
+        "accepted_rows": int(len(observations)),
+        "rejected_rows": int(len(rejected)),
+        "rejected": rejected,
+        "source_counts": pd.Series([obs.source_type for obs in observations]).value_counts().to_dict(),
+        "total_authority_weight": float(sum(obs.authority_weight for obs in observations)),
+        "mean_reward": None if not observations else float(np.mean([obs.reward for obs in observations])),
+    }
+    return observations, summary
 
 
 def initial_priors(principles: list[Principle]) -> dict[str, float]:
@@ -242,7 +444,8 @@ def sequential_predictive_log_likelihood(
             expert.fit(np.empty((0, 9), dtype=float), np.empty(0, dtype=float))
         x_obs = principle_feature_vector(obs.row, principle, agent_cfg, pievo_cfg)
         mean, variance = expert.predict(x_obs)
-        logp += math.log(gaussian_likelihood(obs.reward, mean, variance + pievo_cfg.observation_noise**2))
+        log_likelihood = math.log(gaussian_likelihood(obs.reward, mean, variance + pievo_cfg.observation_noise**2))
+        logp += max(float(obs.authority_weight), 0.0) * log_likelihood
         prior_x.append(x_obs)
         prior_y.append(obs.reward)
     return logp
@@ -267,7 +470,8 @@ def update_posterior_full_history(
             expert = experts[principle.name]
             for obs in history:
                 mean, variance = expert.predict(principle_feature_vector(obs.row, principle, agent_cfg, pievo_cfg))
-                logp += math.log(gaussian_likelihood(obs.reward, mean, variance + pievo_cfg.observation_noise**2))
+                log_likelihood = math.log(gaussian_likelihood(obs.reward, mean, variance + pievo_cfg.observation_noise**2))
+                logp += max(float(obs.authority_weight), 0.0) * log_likelihood
         else:
             logp += sequential_predictive_log_likelihood(principle, history, agent_cfg, pievo_cfg)
         log_weights[principle.name] = logp
@@ -472,6 +676,9 @@ def write_pievo_report(
     principles: list[Principle],
     beliefs: dict[str, float],
     round_history: list[dict[str, object]],
+    external_summary: dict[str, object],
+    total_history_rows: int,
+    total_authority_weight: float,
     validation: dict[str, object],
 ) -> None:
     lines = [
@@ -482,14 +689,23 @@ def write_pievo_report(
         "## Objective",
         "",
         f"- Target Tg: {agent_cfg.target_tg_c:.2f} C",
-        f"- Reward: exp(-abs(predicted_Tg - target_Tg) / {pievo_cfg.reward_temperature_c:.2f})",
+        f"- Reward: exp(-abs(observed_or_predicted_Tg - target_Tg) / {pievo_cfg.reward_temperature_c:.2f})",
         f"- Rounds: {pievo_cfg.rounds}",
         "",
         "## PiEvo State",
         "",
         f"- Active principles: {len(principles)}",
+        f"- Total observations in posterior history: {total_history_rows}",
+        f"- Total authority weight: {total_authority_weight:.3f}",
         f"- Posterior entropy: {entropy(beliefs):.6f}",
         f"- MAP principle: {max(beliefs, key=beliefs.get) if beliefs else '-'}",
+        "",
+        "## External Evidence",
+        "",
+        f"- External ledger enabled: {bool(external_summary.get('enabled', False))}",
+        f"- Accepted external rows: {int(external_summary.get('accepted_rows', 0))}",
+        f"- Rejected external rows: {int(external_summary.get('rejected_rows', 0))}",
+        f"- External source counts: {external_summary.get('source_counts', {})}",
         "",
         "## Selected Observations",
         "",
@@ -527,6 +743,7 @@ def write_pievo_report(
             "## Interpretation",
             "",
             "- Posterior belief is evidence-weighted model belief, not physical truth.",
+            "- External ledger observations enter `observation_history.csv`; only rows marked `surrogate_selected` are written as new PiEvo recommendations in `selected_formulations.csv`.",
             "- A principle with low posterior is not deleted immediately; it should be dormant/pruned only after enough independent observations.",
             "- Real synthesis/DSC observations should be appended as higher-authority evidence and can override surrogate-only beliefs.",
         ]
@@ -556,7 +773,8 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
     priors = initial_priors(principles)
     beliefs = priors.copy()
     rng = np.random.default_rng(pievo_cfg.random_seed)
-    history: list[Observation] = []
+    external_history, external_summary = load_external_observations(pievo_cfg, principles, agent_cfg)
+    history: list[Observation] = list(external_history)
     round_history: list[dict[str, object]] = []
     all_diagnostics: list[pd.DataFrame] = []
     global_seen: set[str] = set()
@@ -615,14 +833,29 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
         all_diagnostics.append(diagnostics)
         key = str(selected_row["smiles"]) + "@" + str(selected_row["ratios"])
         reward = target_reward(float(selected_row["predicted_tg_mean_c"]), agent_cfg.target_tg_c, pievo_cfg.reward_temperature_c)
+        selected_dict = selected_row.to_dict()
+        selected_dict.update(
+            {
+                "observed_tg_c": float(selected_row["predicted_tg_mean_c"]),
+                "target_tg_c": agent_cfg.target_tg_c,
+                "observation_id": f"surrogate_round_{round_index}",
+                "observation_source_type": "surrogate",
+                "authority_weight": 1.0,
+                "evidence_role": "surrogate_selected",
+            }
+        )
         history.append(
             Observation(
                 round_index=round_index,
                 hypothesis_key=key,
-                row=selected_row.to_dict(),
+                row=selected_dict,
                 reward=reward,
                 predicted_tg_mean_c=float(selected_row["predicted_tg_mean_c"]),
                 predicted_tg_sigma_c=float(selected_row["predicted_tg_sigma_c"]),
+                authority_weight=1.0,
+                source_type="surrogate",
+                observation_id=f"surrogate_round_{round_index}",
+                evidence_role="surrogate_selected",
             )
         )
         round_history.append(
@@ -642,11 +875,46 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
 
     experts = train_principle_experts(principles, history, agent_cfg, pievo_cfg)
     beliefs = update_posterior_full_history(principles, priors, experts, history, agent_cfg, pievo_cfg)
-    selected = pd.DataFrame([obs.row | {"environment_reward": obs.reward, "pievo_round": obs.round_index} for obs in history])
+    observation_history = pd.DataFrame(
+        [
+            obs.row
+            | {
+                "environment_reward": obs.reward,
+                "pievo_round": obs.round_index,
+                "authority_weight": obs.authority_weight,
+                "observation_source_type": obs.source_type,
+                "evidence_role": obs.evidence_role,
+            }
+            for obs in history
+        ]
+    )
+    observation_history.to_csv(out / "observation_history.csv", index=False)
+    if external_history:
+        pd.DataFrame(
+            [
+                obs.row
+                | {
+                    "environment_reward": obs.reward,
+                    "pievo_round": obs.round_index,
+                    "authority_weight": obs.authority_weight,
+                    "observation_source_type": obs.source_type,
+                    "evidence_role": obs.evidence_role,
+                }
+                for obs in external_history
+            ]
+        ).to_csv(out / "external_observations_used.csv", index=False)
+    selected = pd.DataFrame(
+        [
+            obs.row | {"environment_reward": obs.reward, "pievo_round": obs.round_index}
+            for obs in history
+            if obs.evidence_role == "surrogate_selected"
+        ]
+    )
     selected.to_csv(out / "selected_formulations.csv", index=False)
     if all_diagnostics:
         pd.concat(all_diagnostics, ignore_index=True).to_csv(out / "candidate_diagnostics.csv", index=False)
     save_json(round_history, out / "round_history.json")
+    save_json(external_summary, out / "external_observation_summary.json")
     save_json({name: float(prob) for name, prob in beliefs.items()}, out / "principle_posterior.json")
     save_json([asdict(p) for p in principles], out / "principles.json")
     validation = validate_formula_frame(selected, agent_cfg) if not selected.empty else {"selected_rows": 0, "all_selected_pass": False}
@@ -659,6 +927,9 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
             "pool_stats": pool_stats,
             "rounds": pievo_cfg.rounds,
             "selected_rows": int(len(selected)),
+            "history_rows": int(len(history)),
+            "external_observation_summary": external_summary,
+            "total_authority_weight": float(sum(obs.authority_weight for obs in history)),
             "posterior_entropy": entropy(beliefs),
             "map_principle": max(beliefs, key=beliefs.get) if beliefs else None,
             "best_selected_target_distance_c": None if selected.empty else float(selected["target_distance_c"].min()),
@@ -667,7 +938,19 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
         },
         out / "pievo_faithful_summary.json",
     )
-    write_pievo_report(out, agent_cfg, pievo_cfg, selected, principles, beliefs, round_history, validation)
+    write_pievo_report(
+        out,
+        agent_cfg,
+        pievo_cfg,
+        selected,
+        principles,
+        beliefs,
+        round_history,
+        external_summary,
+        len(history),
+        float(sum(obs.authority_weight for obs in history)),
+        validation,
+    )
     return selected
 
 

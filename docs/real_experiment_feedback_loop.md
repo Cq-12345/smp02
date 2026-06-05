@@ -64,7 +64,7 @@ PYTHONPATH=src python trail/experiments/import_observations.py \
 
 ## 5. 与 PiEvo 的连接
 
-后续 PiEvo-faithful 应把 ledger 中通过审核的 observation 加入 history：
+当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
 
 ```text
 H_t = H_surrogate + H_real + H_literature
@@ -77,6 +77,32 @@ log p_t(P) = log p0(P) + sum_s w_s * log p(y_s | h_s, P)
 ```
 
 这样真实实验可以更快压低无法解释真实 Tg 的 principle，也可以提升能解释真实 anomaly 的 principle。
+
+对应配置：
+
+```yaml
+pievo_faithful:
+  external_observation_ledger: artifacts/trail/experiments/observation_ledger.csv
+  external_observation_require_pass: true
+  external_observation_limit: 2
+```
+
+输出文件：
+
+- `observation_history.csv`：全部 posterior history。
+- `external_observations_used.csv`：本轮接收的外部观测。
+- `external_observation_summary.json`：接收/拒绝行数、来源计数和外部总权重。
+- `selected_formulations.csv`：只保存本轮 PiEvo 新选择的 surrogate 配方，不混入外部历史观测。
+
+Smoke 结果：
+
+- 配置：`configs/pievo_faithful_ledger_smoke.yaml`
+- 外部 ledger：2 行接收、0 行拒绝。
+- 外部权重：surrogate 1 + real_dsc 5 = 6。
+- posterior history：2 条外部观测 + 4 条本轮 surrogate 观测 = 6。
+- 最佳本轮新选择：预测 Tg 249.63 C，距 250 C 目标 0.37 C。
+
+注意：示例 ledger 中的 `real_dsc` 行仍是占位演示数据，不应当作为真实物理实验结论引用。
 
 ## 6. 人工闭环
 

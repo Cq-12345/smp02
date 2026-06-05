@@ -1,0 +1,51 @@
+seed: 42
+device: cuda
+data_path: data/SMP_Dataset.xlsx
+chembl_path: data/chembl_36_chemreps.txt
+output_dir: artifacts/reproduce
+
+agent_discovery:
+  target_tg_c: 250.0
+  target_window_c: 5.0
+  output_dir: artifacts/agent_discovery_250_smoke
+  latent_size: 512
+  vae_checkpoint: artifacts/reproduce/vae/finetuned_latent_512.pt
+  predictor_path: artifacts/reproduce/predictors/latent_512/zoo_gaussianprocess_rbf_latent_512.joblib
+  training_features_path: artifacts/reproduce/predictors/latent_512/wvcm_features_latent_512.npz
+  max_components: 4
+  min_components: 1
+  min_ratio: 0.05
+  require_out_of_library: true
+  generated_pool_limit: 24
+  chembl_limit: 2000
+  chembl_pool_limit: 60
+  library_pool_limit: 80
+  pair_pool_limit: 60
+  iterations: 2
+  samples_per_iteration: 800
+  elite_k: 40
+  selected_top_k: 40
+  prediction_batch_size: 2048
+  encode_batch_size: 512
+  prior_learning_rate: 0.12
+  uncertainty_weight: 0.06
+  ood_weight: 0.35
+  prior_weight: 1.6
+  novelty_weight: 0.15
+  component_count_weight: 0.05
+
+pievo_faithful:
+  output_dir: artifacts/pievo_faithful_ledger_smoke
+  rounds: 4
+  candidate_batch_size: 220
+  warmup_rounds: 2
+  observation_noise: 0.08
+  anomaly_threshold: 0.75
+  anomaly_min_count: 2
+  ids_mc_samples: 16
+  ids_epsilon: 0.000001
+  reward_temperature_c: 5.0
+  max_added_principles: 3
+  external_observation_ledger: artifacts/trail/experiments/observation_ledger.csv
+  external_observation_limit: 2
+  external_observation_require_pass: true

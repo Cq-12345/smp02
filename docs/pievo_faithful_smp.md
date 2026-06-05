@@ -10,10 +10,10 @@
 T_target = config.agent_discovery.target_tg_c
 ```
 
-环境反馈不直接使用 `Tg_hat`，而使用“接近目标”的 reward：
+环境反馈不直接使用 `Tg_hat`，而使用“接近目标”的 reward。对 surrogate 观测，`T_observed = Tg_hat`；对真实 DSC、文献或高保真模拟，`T_observed` 使用 ledger 中记录的观测 Tg：
 
 ```text
-y(h) = exp(-abs(Tg_hat(h) - T_target) / tau)
+y(h) = exp(-abs(T_observed(h) - T_target) / tau)
 ```
 
 其中 `tau = pievo_faithful.reward_temperature_c`。这样无论目标是 190 C、200 C、250 C 还是其他温度，闭环都在优化“接近目标”而不是盲目追求更高 Tg。
@@ -77,22 +77,34 @@ M_P: phi(h, P) -> y
 
 ### 2.4 Full-history Posterior
 
-每轮用完整历史重新计算 principle 后验：
+每轮用完整历史重新计算 principle 后验。若 observation ledger 提供了不同来源权重，真实 DSC、文献、高保真模拟和 surrogate 观测会以不同 authority weight 进入同一个后验：
 
 ```text
-p_t(P) proportional p0(P) * product_s p(y_s | h_s, P)
+log p_t(P) = log p0(P) + sum_s w_s log p(y_s | h_s, P)
 ```
 
 实现位置：
 
 - `src/smp02/pievo_faithful.py::update_posterior_full_history`
 - `src/smp02/pievo_faithful.py::sequential_predictive_log_likelihood`
+- `src/smp02/pievo_faithful.py::load_external_observations`
 - `src/smp02/pievo_faithful.py::gaussian_likelihood`
 - `src/smp02/pievo_faithful.py::normalize_log_weights`
 
 这一步是“抛弃没用规律”的数学基础：不能解释历史观测的 principle 会得到低 likelihood，后验自然下降。
 
 工程上采用 sequential predictive likelihood：第 `s` 个历史观测只用 `1..s-1` 的历史训练对应 GP，再计算 `p(y_s | h_s, P)`。这样仍然使用完整历史证据，但避免 GP 在同一个训练点上自我解释导致所有 principle likelihood 接近相同。
+
+当前权重默认值：
+
+```text
+surrogate: 1
+literature: 2
+high_fidelity_simulation: 3
+real_dsc: 5
+```
+
+这些权重不是物理真理，只是 posterior 更新时的证据强度。真实实验记录必须先经过人工/脚本审核，标记为 `ledger_pass` 后再进入 active history。
 
 ### 2.5 MAP Residual Anomaly
 
@@ -151,11 +163,22 @@ smp02 pievo-faithful --config configs/pievo_faithful_smoke.yaml
 会输出：
 
 - `selected_formulations.csv`：每轮被 PiEvo-faithful 选中并观测的配方。
+- `observation_history.csv`：进入 full-history posterior 的全部观测，包括外部 ledger 和本轮 surrogate 选择。
+- `external_observations_used.csv`：本轮实际接收的外部 ledger 观测。
+- `external_observation_summary.json`：外部观测接收、拒绝、来源计数和权重汇总。
 - `candidate_diagnostics.csv`：候选的 expected reward、IDS regret、information gain、IDS ratio。
 - `principle_posterior.json`：最终 principle 后验。
 - `principles.json`：初始和 anomaly-derived principles。
 - `round_history.json`：每轮 anomaly、posterior entropy、MAP principle、选择方式。
 - `pievo_faithful_report.md`：中文/英文混合报告。
+
+如果要验证真实/人工 ledger 接入，可以运行：
+
+```bash
+smp02 pievo-faithful --config configs/pievo_faithful_ledger_smoke.yaml
+```
+
+该 smoke 会读取 `artifacts/trail/experiments/observation_ledger.csv`，并把通过审核的外部观测作为 round 0 history。注意：当前示例 ledger 中的 `real_dsc` 行是 schema 占位行，不代表真实 DSC 已经完成。
 
 ## 4. 如何理解“发现新规律、抛弃没用规律”
 
