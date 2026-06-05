@@ -63,6 +63,9 @@ class PiEvoFaithfulConfig:
     external_observation_ledger: Path | None = None
     external_observation_limit: int | None = None
     external_observation_require_pass: bool = True
+    target_guard_enabled: bool = False
+    target_guard_max_distance_c: float = 5.0
+    target_guard_min_candidates: int = 1
 
 
 @dataclass
@@ -154,6 +157,9 @@ def parse_pievo_faithful_config(cfg: dict, agent_cfg: AgentConfig) -> PiEvoFaith
         external_observation_ledger=None if external_ledger in {None, ""} else Path(external_ledger),
         external_observation_limit=None if external_limit in {None, ""} else int(external_limit),
         external_observation_require_pass=bool(raw.get("external_observation_require_pass", True)),
+        target_guard_enabled=bool(raw.get("target_guard_enabled", False)),
+        target_guard_max_distance_c=float(raw.get("target_guard_max_distance_c", agent_cfg.target_window_c)),
+        target_guard_min_candidates=int(raw.get("target_guard_min_candidates", 1)),
     )
 
 
@@ -606,6 +612,58 @@ def information_gain(
     return float(max(0.0, current_entropy - float(np.mean(posterior_entropies))))
 
 
+def target_guard_selection_pool(
+    candidates: pd.DataFrame,
+    agent_cfg: AgentConfig,
+    pievo_cfg: PiEvoFaithfulConfig,
+) -> tuple[pd.DataFrame, dict[str, object]]:
+    max_distance = float(pievo_cfg.target_guard_max_distance_c)
+    distances = pd.to_numeric(candidates["target_distance_c"], errors="coerce")
+    feasible = distances <= max_distance
+    feasible_count = int(feasible.sum())
+    if not pievo_cfg.target_guard_enabled:
+        return candidates, {
+            "enabled": False,
+            "active": False,
+            "max_distance_c": max_distance,
+            "candidate_count": feasible_count,
+            "pool_size": int(len(candidates)),
+            "reason": "disabled",
+        }
+    if feasible_count >= max(1, int(pievo_cfg.target_guard_min_candidates)):
+        pool = candidates.loc[feasible].copy()
+        return pool, {
+            "enabled": True,
+            "active": True,
+            "max_distance_c": max_distance,
+            "candidate_count": feasible_count,
+            "pool_size": int(len(pool)),
+            "reason": f"target_distance_c <= {max_distance:g}",
+        }
+    return candidates, {
+        "enabled": True,
+        "active": False,
+        "max_distance_c": max_distance,
+        "candidate_count": feasible_count,
+        "pool_size": int(len(candidates)),
+        "reason": f"insufficient feasible candidates for target_window={agent_cfg.target_window_c:g}",
+    }
+
+
+def attach_selection_pool_diagnostics(
+    diagnostics: pd.DataFrame,
+    selection_pool: pd.DataFrame,
+    guard: dict[str, object],
+) -> None:
+    diagnostics["pievo_target_guard_enabled"] = bool(guard["enabled"])
+    diagnostics["pievo_target_guard_active"] = bool(guard["active"])
+    diagnostics["pievo_target_guard_max_distance_c"] = float(guard["max_distance_c"])
+    diagnostics["pievo_target_guard_candidate_count"] = int(guard["candidate_count"])
+    diagnostics["pievo_selection_pool_size"] = int(guard["pool_size"])
+    diagnostics["pievo_selection_pool_reason"] = str(guard["reason"])
+    diagnostics["pievo_selection_pool_member"] = diagnostics.index.isin(selection_pool.index)
+
+
 def select_by_ids(
     candidates: pd.DataFrame,
     principles: list[Principle],
@@ -616,7 +674,10 @@ def select_by_ids(
     pievo_cfg: PiEvoFaithfulConfig,
     rng: np.random.Generator,
 ) -> tuple[pd.Series, pd.DataFrame]:
-    rows = [row.to_dict() for _, row in candidates.iterrows()]
+    selection_pool, guard = target_guard_selection_pool(candidates, agent_cfg, pievo_cfg)
+    rows = [row.to_dict() for _, row in selection_pool.iterrows()]
+    diagnostics = candidates.copy()
+    attach_selection_pool_diagnostics(diagnostics, selection_pool, guard)
     if len(history) < pievo_cfg.warmup_rounds:
         warmup_scores = []
         for row in rows:
@@ -626,12 +687,14 @@ def select_by_ids(
                 variance_sum += beliefs.get(principle.name, 0.0) * variance
             warmup_scores.append(variance_sum)
         idx = int(np.argmax(warmup_scores))
-        diagnostics = candidates.copy()
-        diagnostics["pievo_selection_method"] = "warmup_max_variance"
-        diagnostics["pievo_warmup_variance"] = warmup_scores
+        selected_index = selection_pool.index[idx]
+        method = "target_guard_warmup_max_variance" if guard["active"] else "warmup_max_variance"
+        diagnostics["pievo_selection_method"] = method
+        diagnostics["pievo_warmup_variance"] = np.nan
+        diagnostics.loc[selection_pool.index, "pievo_warmup_variance"] = warmup_scores
         diagnostics["pievo_selected"] = False
-        diagnostics.iloc[idx, diagnostics.columns.get_loc("pievo_selected")] = True
-        return candidates.iloc[idx], diagnostics
+        diagnostics.loc[selected_index, "pievo_selected"] = True
+        return candidates.loc[selected_index], diagnostics
 
     prediction_by_principle: dict[str, list[float]] = {}
     for principle in principles:
@@ -643,7 +706,6 @@ def select_by_ids(
         values = prediction_by_principle[principle.name]
         expected_optimal += beliefs.get(principle.name, 0.0) * max(values)
 
-    diagnostics = candidates.copy()
     ids_regrets = []
     ids_information = []
     ids_ratios = []
@@ -657,15 +719,20 @@ def select_by_ids(
         ids_regrets.append(regret)
         ids_information.append(info)
         ids_ratios.append(ratio)
-    diagnostics["pievo_selection_method"] = "ids_min_regret2_over_information"
-    diagnostics["pievo_expected_reward"] = expected_rewards
-    diagnostics["pievo_regret"] = ids_regrets
-    diagnostics["pievo_information_gain"] = ids_information
-    diagnostics["pievo_ids_ratio"] = ids_ratios
+    diagnostics["pievo_selection_method"] = "target_guard_ids_min_regret2_over_information" if guard["active"] else "ids_min_regret2_over_information"
+    diagnostics["pievo_expected_reward"] = np.nan
+    diagnostics["pievo_regret"] = np.nan
+    diagnostics["pievo_information_gain"] = np.nan
+    diagnostics["pievo_ids_ratio"] = np.nan
+    diagnostics.loc[selection_pool.index, "pievo_expected_reward"] = expected_rewards
+    diagnostics.loc[selection_pool.index, "pievo_regret"] = ids_regrets
+    diagnostics.loc[selection_pool.index, "pievo_information_gain"] = ids_information
+    diagnostics.loc[selection_pool.index, "pievo_ids_ratio"] = ids_ratios
     selected_idx = int(np.argmin(ids_ratios))
+    selected_index = selection_pool.index[selected_idx]
     diagnostics["pievo_selected"] = False
-    diagnostics.iloc[selected_idx, diagnostics.columns.get_loc("pievo_selected")] = True
-    return candidates.iloc[selected_idx], diagnostics
+    diagnostics.loc[selected_index, "pievo_selected"] = True
+    return candidates.loc[selected_index], diagnostics
 
 
 def write_pievo_report(
@@ -699,6 +766,7 @@ def write_pievo_report(
         f"- Total authority weight: {total_authority_weight:.3f}",
         f"- Posterior entropy: {entropy(beliefs):.6f}",
         f"- MAP principle: {max(beliefs, key=beliefs.get) if beliefs else '-'}",
+        f"- Target guard: {pievo_cfg.target_guard_enabled} within {pievo_cfg.target_guard_max_distance_c:.2f} C",
         "",
         "## External Evidence",
         "",
@@ -709,14 +777,16 @@ def write_pievo_report(
         "",
         "## Selected Observations",
         "",
-        "| Round | Tg mean (C) | target distance (C) | reward | selected by | anomalies | added principles |",
-        "| --- | ---: | ---: | ---: | --- | ---: | --- |",
+        "| Round | Tg mean (C) | target distance (C) | reward | selected by | guard active | feasible candidates | anomalies | added principles |",
+        "| --- | ---: | ---: | ---: | --- | --- | ---: | ---: | --- |",
     ]
     for item in round_history:
         lines.append(
             f"| {item['round']} | {item['selected_predicted_tg_mean_c']:.2f} | "
             f"{item['selected_target_distance_c']:.2f} | {item['selected_reward']:.4f} | "
-            f"{item['selection_method']} | {item['anomaly_count']} | {', '.join(item['added_principles']) or '-'} |"
+            f"{item['selection_method']} | {item.get('target_guard_active', False)} | "
+            f"{int(item.get('target_guard_candidate_count', 0))} | {item['anomaly_count']} | "
+            f"{', '.join(item['added_principles']) or '-'} |"
         )
     lines.extend(
         [
@@ -831,6 +901,7 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
         selected_row, diagnostics = select_by_ids(scored, principles, beliefs, experts, history, agent_cfg, pievo_cfg, rng)
         diagnostics["round"] = round_index
         all_diagnostics.append(diagnostics)
+        selected_diag = diagnostics.loc[diagnostics["pievo_selected"]].iloc[0]
         key = str(selected_row["smiles"]) + "@" + str(selected_row["ratios"])
         reward = target_reward(float(selected_row["predicted_tg_mean_c"]), agent_cfg.target_tg_c, pievo_cfg.reward_temperature_c)
         selected_dict = selected_row.to_dict()
@@ -844,6 +915,16 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
                 "evidence_role": "surrogate_selected",
             }
         )
+        for field in [
+            "pievo_selection_method",
+            "pievo_target_guard_enabled",
+            "pievo_target_guard_active",
+            "pievo_target_guard_max_distance_c",
+            "pievo_target_guard_candidate_count",
+            "pievo_selection_pool_size",
+            "pievo_selection_pool_reason",
+        ]:
+            selected_dict[field] = selected_diag.get(field)
         history.append(
             Observation(
                 round_index=round_index,
@@ -866,6 +947,11 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
                 "selected_predicted_tg_mean_c": float(selected_row["predicted_tg_mean_c"]),
                 "selected_target_distance_c": float(selected_row["target_distance_c"]),
                 "selected_reward": reward,
+                "target_guard_enabled": bool(selected_diag.get("pievo_target_guard_enabled", False)),
+                "target_guard_active": bool(selected_diag.get("pievo_target_guard_active", False)),
+                "target_guard_max_distance_c": float(selected_diag.get("pievo_target_guard_max_distance_c", math.nan)),
+                "target_guard_candidate_count": int(selected_diag.get("pievo_target_guard_candidate_count", 0)),
+                "selection_pool_size": int(selected_diag.get("pievo_selection_pool_size", len(scored))),
                 "anomaly_count": len(anomalies),
                 "added_principles": added,
                 "posterior_entropy": entropy(beliefs),
@@ -924,6 +1010,9 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
             "target_tg_c": agent_cfg.target_tg_c,
             "target_window_c": agent_cfg.target_window_c,
             "reward_temperature_c": pievo_cfg.reward_temperature_c,
+            "target_guard_enabled": pievo_cfg.target_guard_enabled,
+            "target_guard_max_distance_c": pievo_cfg.target_guard_max_distance_c,
+            "target_guard_min_candidates": pievo_cfg.target_guard_min_candidates,
             "pool_stats": pool_stats,
             "rounds": pievo_cfg.rounds,
             "selected_rows": int(len(selected)),
@@ -933,6 +1022,12 @@ def run_pievo_faithful(cfg: dict, device: torch.device) -> pd.DataFrame:
             "posterior_entropy": entropy(beliefs),
             "map_principle": max(beliefs, key=beliefs.get) if beliefs else None,
             "best_selected_target_distance_c": None if selected.empty else float(selected["target_distance_c"].min()),
+            "selected_within_target_guard": None
+            if selected.empty
+            else int((selected["target_distance_c"] <= pievo_cfg.target_guard_max_distance_c).sum()),
+            "all_selected_within_target_guard": False
+            if selected.empty
+            else bool((selected["target_distance_c"] <= pievo_cfg.target_guard_max_distance_c).all()),
             "top25_diversity": None if selected.empty else fingerprint_diversity(selected.head(25)["smiles"].map(lambda value: str(value).split("|")[0])),
             "validation": validation,
         },

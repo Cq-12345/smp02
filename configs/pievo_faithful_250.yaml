@@ -46,3 +46,6 @@ pievo_faithful:
   ids_epsilon: 0.000001
   reward_temperature_c: 5.0
   max_added_principles: 6
+  target_guard_enabled: true
+  target_guard_max_distance_c: 5.0
+  target_guard_min_candidates: 1

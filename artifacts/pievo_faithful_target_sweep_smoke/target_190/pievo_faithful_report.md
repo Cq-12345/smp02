@@ -13,8 +13,9 @@ This run uses the VAE-WVCM predictor as the experiment environment, while the ag
 - Active principles: 40
 - Total observations in posterior history: 4
 - Total authority weight: 4.000
-- Posterior entropy: 3.663562
-- MAP principle: aromatic_backbones_raise_tg
+- Posterior entropy: 3.620392
+- MAP principle: maleimide_rigid_network
+- Target guard: True within 5.00 C
 
 ## External Evidence
 
@@ -25,42 +26,42 @@ This run uses the VAE-WVCM predictor as the experiment environment, while the ag
 
 ## Selected Observations
 
-| Round | Tg mean (C) | target distance (C) | reward | selected by | anomalies | added principles |
-| --- | ---: | ---: | ---: | --- | ---: | --- |
-| 1 | 267.69 | 77.69 | 0.0000 | warmup_max_variance | 0 | - |
-| 2 | 156.51 | 33.49 | 0.0012 | warmup_max_variance | 0 | - |
-| 3 | 156.77 | 33.23 | 0.0013 | ids_min_regret2_over_information | 0 | - |
-| 4 | 159.68 | 30.32 | 0.0023 | ids_min_regret2_over_information | 0 | - |
+| Round | Tg mean (C) | target distance (C) | reward | selected by | guard active | feasible candidates | anomalies | added principles |
+| --- | ---: | ---: | ---: | --- | --- | ---: | ---: | --- |
+| 1 | 189.87 | 0.13 | 0.9734 | target_guard_warmup_max_variance | True | 3 | 0 | - |
+| 2 | 191.92 | 1.92 | 0.6811 | target_guard_warmup_max_variance | True | 10 | 0 | - |
+| 3 | 190.97 | 0.97 | 0.8238 | target_guard_ids_min_regret2_over_information | True | 8 | 0 | - |
+| 4 | 188.97 | 1.03 | 0.8142 | target_guard_ids_min_regret2_over_information | True | 7 | 0 | - |
 
 ## Top Posterior Principles
 
 | Principle | posterior | feature | effect | description |
 | --- | ---: | --- | ---: | --- |
-| aromatic_backbones_raise_tg | 0.025641 | aromatic_backbone | 1.0 | Aromatic backbones tend to raise Tg. |
-| multi_aromatic_rigidity | 0.025641 | rigid_multi_aromatic | 1.0 | Multiple aromatic rings increase chain rigidity. |
-| cyanate_ester_triazine | 0.025641 | cyanate_ester | 1.0 | Cyanate ester triazine networks can be high Tg. |
-| nitrile_rich_rigidity | 0.025641 | nitrile_rich | 1.0 | Nitrile-rich aromatic monomers often stiffen networks. |
-| high_functionality_crosslink_density | 0.025641 | high_functionality | 1.0 | Higher reactive functionality can increase crosslink density. |
-| flexible_ether_penalty | 0.025641 | flexible_ether_risk | -1.0 | Long flexible ether segments can lower Tg. |
-| peg_like_penalty | 0.025641 | peg_like_risk | -1.0 | PEG-like segments are a strong low-Tg risk. |
-| long_aliphatic_penalty | 0.025641 | long_aliphatic_risk | -1.0 | Long aliphatic segments usually lower Tg. |
-| peptide_like_out_of_domain | 0.025641 | peptide_like_risk | -1.0 | Peptide-like ChEMBL molecules are poor monomer hypotheses. |
-| too_flexible_penalty | 0.025641 | too_flexible_risk | -1.0 | High rotatable-bond count increases flexibility risk. |
-| heavy_halogen_practical_risk | 0.025641 | heavy_halogen_risk | -1.0 | Iodinated or brominated drug-like structures are lower-priority monomer hypotheses. |
-| druglike_hetero_complexity_penalty | 0.025641 | druglike_hetero_complexity_risk | -1.0 | High HBA/HBD complexity is a risk for out-of-library monomer transfer. |
-| formal_charge_practical_penalty | 0.025641 | formal_charge_practical_risk | -1.0 | Charged molecules are lower-priority thermoset monomer hypotheses unless specifically justified. |
-| reaction_1d41d1c7896e | 0.025641 | reaction::酸酐-酚羟基酯化。 | 1.0 | Reaction principle: 酸酐-酚羟基酯化。 |
-| reaction_bc75cf8f07d2 | 0.025641 | reaction::异氰酸酯-酚羟基形成氨基甲酸酯。 | 1.0 | Reaction principle: 异氰酸酯-酚羟基形成氨基甲酸酯。 |
-| reaction_michael_thiol_ene | 0.025641 | reaction::硫醇-Michael/thiol-ene 反应。 | 1.0 | Reaction principle: 硫醇-Michael/thiol-ene 反应。 |
-| reaction_bd312644298f | 0.025641 | reaction::自由基共聚。 | 1.0 | Reaction principle: 自由基共聚。 |
-| reaction_461e81fa276b | 0.025641 | reaction::自由基均/共聚形成交联网络。 | 1.0 | Reaction principle: 自由基均/共聚形成交联网络。 |
-| reaction_michael | 0.025641 | reaction::马来酰亚胺-硫醇 Michael 加成。 | 1.0 | Reaction principle: 马来酰亚胺-硫醇 Michael 加成。 |
-| reaction_aab22a9380a2 | 0.025641 | reaction::马来酰亚胺与烯基共聚/加成。 | 1.0 | Reaction principle: 马来酰亚胺与烯基共聚/加成。 |
-| maleimide_rigid_network | 0.025641 | maleimide | 1.0 | Bismaleimide motifs can create rigid high-Tg networks. |
-| stereochemical_complexity_penalty | 0.025641 | stereochemical_complexity_risk | -1.0 | Many stereocenters often indicate bioactive-molecule complexity rather than monomer suitability. |
-| reaction_839cd29ef5d7 | 0.025641 | reaction::环氧-伯胺开环固化。 | 1.0 | Reaction principle: 环氧-伯胺开环固化。 |
-| reaction_5cde50869441 | 0.025641 | reaction::环氧-仲胺开环固化。 | 1.0 | Reaction principle: 环氧-仲胺开环固化。 |
-| reaction_8122f963caab | 0.025641 | reaction::环氧-酸酐固化，常需催化剂。 | 1.0 | Reaction principle: 环氧-酸酐固化，常需催化剂。 |
+| maleimide_rigid_network | 0.034258 | maleimide | 1.0 | Bismaleimide motifs can create rigid high-Tg networks. |
+| stereochemical_complexity_penalty | 0.034258 | stereochemical_complexity_risk | -1.0 | Many stereocenters often indicate bioactive-molecule complexity rather than monomer suitability. |
+| reaction_839cd29ef5d7 | 0.034258 | reaction::环氧-伯胺开环固化。 | 1.0 | Reaction principle: 环氧-伯胺开环固化。 |
+| reaction_5cde50869441 | 0.034258 | reaction::环氧-仲胺开环固化。 | 1.0 | Reaction principle: 环氧-仲胺开环固化。 |
+| reaction_8122f963caab | 0.034258 | reaction::环氧-酸酐固化，常需催化剂。 | 1.0 | Reaction principle: 环氧-酸酐固化，常需催化剂。 |
+| reaction_b793ac896a4f | 0.034258 | reaction::环氧-羧酸开环酯化。 | 1.0 | Reaction principle: 环氧-羧酸开环酯化。 |
+| reaction_cc7f1a60f1af | 0.034258 | reaction::环氧-羟基醚化，常需催化剂。 | 1.0 | Reaction principle: 环氧-羟基醚化，常需催化剂。 |
+| reaction_2f387d801461 | 0.034258 | reaction::酸酐-胺形成聚酰胺酸/聚酰亚胺前体。 | 1.0 | Reaction principle: 酸酐-胺形成聚酰胺酸/聚酰亚胺前体。 |
+| reaction_7deb10577c5e | 0.034258 | reaction::酸酐-胺开环形成酰胺酸。 | 1.0 | Reaction principle: 酸酐-胺开环形成酰胺酸。 |
+| reaction_e3ab71c1126b | 0.034258 | reaction::酸酐-羟基酯化。 | 1.0 | Reaction principle: 酸酐-羟基酯化。 |
+| reaction_aaba7fbe7783 | 0.034258 | reaction::异氰酸酯-羟基形成聚氨酯。 | 1.0 | Reaction principle: 异氰酸酯-羟基形成聚氨酯。 |
+| reaction_a5dd26ae10ad | 0.034258 | reaction::异氰酸酯-伯胺形成聚脲。 | 1.0 | Reaction principle: 异氰酸酯-伯胺形成聚脲。 |
+| reaction_a67f85420c33 | 0.034258 | reaction::异氰酸酯-仲胺形成脲键。 | 1.0 | Reaction principle: 异氰酸酯-仲胺形成脲键。 |
+| reaction_1ef23bb55506 | 0.034258 | reaction::硫醇-烯点击反应。 | 1.0 | Reaction principle: 硫醇-烯点击反应。 |
+| reaction_ee82a65db02c | 0.034258 | reaction::氰酸酯三聚形成三嗪网络。 | 1.0 | Reaction principle: 氰酸酯三聚形成三嗪网络。 |
+| reaction_2ee4496097cb | 0.034258 | reaction::氰酸酯-酚共固化/催化三聚。 | 1.0 | Reaction principle: 氰酸酯-酚共固化/催化三聚。 |
+| reaction_536dfe22d324 | 0.034258 | reaction::氰酸酯-胺共反应。 | 1.0 | Reaction principle: 氰酸酯-胺共反应。 |
+| cyanate_ester_triazine | 0.019002 | cyanate_ester | 1.0 | Cyanate ester triazine networks can be high Tg. |
+| nitrile_rich_rigidity | 0.019002 | nitrile_rich | 1.0 | Nitrile-rich aromatic monomers often stiffen networks. |
+| long_aliphatic_penalty | 0.019002 | long_aliphatic_risk | -1.0 | Long aliphatic segments usually lower Tg. |
+| sulfone_diamine_rigidity | 0.019002 | sulfone_linker | 1.0 | Sulfone-linked aromatic diamines are common high-Tg hard segments. |
+| aromatic_backbones_raise_tg | 0.018980 | aromatic_backbone | 1.0 | Aromatic backbones tend to raise Tg. |
+| multi_aromatic_rigidity | 0.018980 | rigid_multi_aromatic | 1.0 | Multiple aromatic rings increase chain rigidity. |
+| high_functionality_crosslink_density | 0.018980 | high_functionality | 1.0 | Higher reactive functionality can increase crosslink density. |
+| flexible_ether_penalty | 0.018980 | flexible_ether_risk | -1.0 | Long flexible ether segments can lower Tg. |
 
 ## Validation
 

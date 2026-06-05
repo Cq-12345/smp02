@@ -38,7 +38,8 @@ log p_t(P) = log p0(P) + sum_s w_s log p(y_s | h_s, P)
 | posterior total authority weight | 10.0 |
 | selected surrogate rows | 4 |
 | best selected target distance (C) | 0.3653 |
-| posterior entropy | 3.6636 |
+| selected within 5C guard | 4 |
+| posterior entropy | 3.5564 |
 
 外部来源计数：
 
@@ -57,5 +58,7 @@ reward = 0.9296
 ## 解释
 
 这个 smoke 证明 ledger 已经不只是文档或 CSV，而是真正进入了 PiEvo-faithful 的 full-history posterior。高权重真实观测可以通过 likelihood 项更快改变 principle posterior，从而更接近 PiEvo 中“用历史证据发现/淘汰原则”的数学结构。
+
+同时，target guard 已经开启；本轮 4 个 surrogate 选择全部落在 250 C 目标的 5 C 可行域内。
 
 当前 ledger 里的 `real_dsc` 行是 schema 占位示例，不是实际 DSC 结论。因此本报告只能证明接口和数学链路可运行，不能证明该占位配方有真实物理 Tg。

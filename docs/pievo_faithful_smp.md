@@ -152,6 +152,31 @@ I_t(h) = H[p_t(P)] - E_y[H[p_t(P | h, y)]]
 - `src/smp02/pievo_faithful.py::information_gain`
 - `src/smp02/pievo_faithful.py::select_by_ids`
 
+### 2.8 Target-Feasible IDS
+
+多目标 smoke 暴露过一个问题：候选池中存在很接近目标 Tg 的配方，但短程 warmup/IDS 可能因为探索方差而选择远离目标的样本。为避免闭环浪费实验轮次，当前实现加入 target guard：
+
+```text
+H_feasible = {h in H : |T_observed_or_predicted(h) - T_target| <= delta}
+h_t = argmin_{h in H_feasible} Delta_t(h)^2 / (I_t(h) + eps)
+```
+
+若 `H_feasible` 为空或候选数低于阈值，系统回退到全集 `H`，避免在低资源目标上完全停滞。这样仍然保留 PiEvo 的 IDS 数学结构，只是把可实验/可推荐的假设空间收缩到目标可行域。
+
+配置：
+
+```yaml
+pievo_faithful:
+  target_guard_enabled: true
+  target_guard_max_distance_c: 5.0
+  target_guard_min_candidates: 1
+```
+
+实现位置：
+
+- `src/smp02/pievo_faithful.py::target_guard_selection_pool`
+- `src/smp02/pievo_faithful.py::select_by_ids`
+
 ## 3. 当前输出
 
 运行：

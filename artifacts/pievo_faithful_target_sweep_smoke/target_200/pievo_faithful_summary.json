@@ -2,6 +2,9 @@
   "target_tg_c": 200.0,
   "target_window_c": 5.0,
   "reward_temperature_c": 5.0,
+  "target_guard_enabled": true,
+  "target_guard_max_distance_c": 5.0,
+  "target_guard_min_candidates": 1,
   "pool_stats": [
     "library=80",
     "generated=10",
@@ -17,10 +20,12 @@
     "rejected_rows": 0
   },
   "total_authority_weight": 4.0,
-  "posterior_entropy": 3.663561646129645,
-  "map_principle": "maleimide_rigid_network",
-  "best_selected_target_distance_c": 39.71686279491064,
-  "top25_diversity": 0.9097328436769131,
+  "posterior_entropy": 3.6484966931324694,
+  "map_principle": "aromatic_backbones_raise_tg",
+  "best_selected_target_distance_c": 0.11448195374762804,
+  "selected_within_target_guard": 4,
+  "all_selected_within_target_guard": true,
+  "top25_diversity": 0.85695492398431,
   "validation": {
     "selected_rows": 4,
     "ratio_sum_ok": 4,

@@ -2,12 +2,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pandas as pd
+import numpy as np
+
 from smp02.agent_discovery import AgentConfig, Principle
 from smp02.pievo_faithful import (
     Observation,
     PiEvoFaithfulConfig,
     load_external_observations,
     normalize_log_weights,
+    select_by_ids,
     surprisal_score,
     target_reward,
     update_posterior_full_history,
@@ -21,6 +25,12 @@ class DummyExpert:
 
     def predict(self, _x):
         return self.mean, self.variance
+
+
+class DistanceVarianceExpert:
+    def predict(self, x):
+        target_distance_scaled = float(x.reshape(1, -1)[0, 7])
+        return 0.5, 10.0 if target_distance_scaled > 5.0 else 0.01
 
 
 def fake_agent_cfg() -> AgentConfig:
@@ -159,6 +169,53 @@ def test_load_external_observations_adds_weighted_history(tmp_path: Path) -> Non
     assert observations[0].row["target_tg_c"] == 200.0
     assert observations[0].row["target_distance_c"] == 2.0
     assert observations[0].row["feature_aromatic_backbone"] is True
+
+
+def test_target_guard_limits_warmup_selection_to_near_target_candidates() -> None:
+    principles = [Principle("target_guard_test", "soft", "test principle", "feature_a", 1.0, 1.0, 1.0)]
+    candidates = pd.DataFrame(
+        [
+            {
+                "formula_id": "near",
+                "target_distance_c": 1.0,
+                "predicted_tg_mean_c": 249.0,
+                "predicted_tg_sigma_c": 1.0,
+                "prior_score": 0.0,
+                "ood_penalty": 0.0,
+                "n_components": 2,
+                "new_component_count": 1,
+                "feature_feature_a": True,
+            },
+            {
+                "formula_id": "far_high_variance",
+                "target_distance_c": 100.0,
+                "predicted_tg_mean_c": 150.0,
+                "predicted_tg_sigma_c": 1.0,
+                "prior_score": 0.0,
+                "ood_penalty": 0.0,
+                "n_components": 2,
+                "new_component_count": 1,
+                "feature_feature_a": True,
+            },
+        ]
+    )
+    cfg = fake_pievo_cfg()
+    cfg.target_guard_enabled = True
+    cfg.target_guard_max_distance_c = 5.0
+    selected, diagnostics = select_by_ids(
+        candidates,
+        principles,
+        {"target_guard_test": 1.0},
+        {"target_guard_test": DistanceVarianceExpert()},
+        [],
+        fake_agent_cfg(),
+        cfg,
+        np.random.default_rng(42),
+    )
+    assert selected["formula_id"] == "near"
+    assert bool(diagnostics.loc[0, "pievo_selection_pool_member"]) is True
+    assert bool(diagnostics.loc[1, "pievo_selection_pool_member"]) is False
+    assert diagnostics.loc[0, "pievo_selection_method"] == "target_guard_warmup_max_variance"
 
 
 def test_surprisal_score_increases_with_residual() -> None:

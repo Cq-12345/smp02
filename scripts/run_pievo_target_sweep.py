@@ -74,6 +74,9 @@ def run_one_target(base_cfg: dict, target_tg_c: float, output_root: Path, reuse_
         "rounds": int(summary.get("rounds", 0)),
         "selected_rows": int(summary.get("selected_rows", 0)),
         "history_rows": int(summary.get("history_rows", summary.get("selected_rows", 0))),
+        "target_guard_enabled": bool(summary.get("target_guard_enabled", False)),
+        "target_guard_max_distance_c": float(summary.get("target_guard_max_distance_c", 0.0)),
+        "all_selected_within_target_guard": bool(summary.get("all_selected_within_target_guard", False)),
         "map_principle": summary.get("map_principle"),
         "posterior_entropy": float(summary.get("posterior_entropy", 0.0)),
         "all_selected_pass": bool(summary.get("validation", {}).get("all_selected_pass", False)),
@@ -92,8 +95,8 @@ def write_report(rows: list[dict[str, object]], report_path: Path, base_config: 
         "",
         "## Summary",
         "",
-        "| target Tg (C) | best selected Tg (C) | selected distance (C) | closest candidate Tg (C) | closest distance (C) | MAP principle | pass |",
-        "| ---: | ---: | ---: | ---: | ---: | --- | --- |",
+        "| target Tg (C) | best selected Tg (C) | selected distance (C) | closest candidate Tg (C) | closest distance (C) | all selected within guard | MAP principle | pass |",
+        "| ---: | ---: | ---: | ---: | ---: | --- | --- | --- |",
     ]
     for row in rows:
         best_tg = row["best_selected_predicted_tg_mean_c"]
@@ -106,6 +109,7 @@ def write_report(rows: list[dict[str, object]], report_path: Path, base_config: 
             f"{'-' if distance is None else f'{float(distance):.2f}'} | "
             f"{'-' if closest_tg is None else f'{float(closest_tg):.2f}'} | "
             f"{'-' if closest_distance is None else f'{float(closest_distance):.2f}'} | "
+            f"{bool(row['all_selected_within_target_guard'])} | "
             f"{row['map_principle']} | {bool(row['all_selected_pass'])} |"
         )
     lines.extend(
@@ -115,8 +119,8 @@ def write_report(rows: list[dict[str, object]], report_path: Path, base_config: 
             "",
             "- `target_tg_c` 已经是闭环任务参数，不再只是后处理筛选参数。",
             "- 每个目标都拥有独立 output directory、round history、posterior 和 selected formulations。",
-            "- `best selected` 表示 IDS/暖启动实际选择并写入 observation history 的最好样本；`closest candidate` 表示该目标运行过程中候选诊断表里最接近目标的样本。",
-            "- 如果 `best selected` 明显差于 `closest candidate`，说明短 smoke 的探索策略还没有充分利用近目标候选；正式运行应提高 rounds、降低 warmup 或加入目标命中约束。",
+            "- `best selected` 表示 target-feasible IDS/暖启动实际选择并写入 observation history 的最好样本；`closest candidate` 表示该目标运行过程中候选诊断表里最接近目标的样本。",
+            "- target guard 启用后，IDS 仍按信息增益选择，但搜索域被限制在近目标可行候选中；若没有足够近目标候选，系统才回退到全候选。",
             "- 该 smoke 使用小规模候选批次，适合验证链路；正式运行应提高 `candidate_batch_size` 和 `rounds`。",
         ]
     )
