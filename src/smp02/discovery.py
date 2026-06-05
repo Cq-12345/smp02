@@ -98,6 +98,7 @@ def discover_candidates(
 
     all_df = pd.DataFrame(rows)
     if all_df.empty:
+        all_df.to_csv(out / "all_ratio_candidates.csv", index=False)
         all_df.to_csv(out / "candidate_space_top_scored.csv", index=False)
         all_df.to_csv(out / "selected_candidates.csv", index=False)
         return all_df
@@ -107,6 +108,7 @@ def discover_candidates(
         (all_df["predicted_tg"] >= float(disc_cfg["target_tg_min"]))
         & (all_df["predicted_tg"] <= float(disc_cfg["target_tg_max"]))
     )
+    all_df.to_csv(out / "all_ratio_candidates.csv", index=False)
     top_space = all_df.sort_values("target_distance").head(max(int(disc_cfg["max_candidates"]) * 20, 1000))
     top_space.to_csv(out / "candidate_space_top_scored.csv", index=False)
     selected = all_df[all_df["in_target_range"]].sort_values("target_distance").head(int(disc_cfg["max_candidates"]))
@@ -122,4 +124,3 @@ def discover_candidates(
         out / "discovery_summary.json",
     )
     return selected
-

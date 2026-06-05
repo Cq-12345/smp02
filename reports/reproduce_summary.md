@@ -35,6 +35,7 @@ Run date: 2026-06-05 Asia/Shanghai
 - Monomers: 231.
 - Compatible monomer pairs: 6467.
 - Ratio candidates: 122873.
+- Full ratio candidate table: `artifacts/reproduce/discovery/all_ratio_candidates.csv`.
 - Selected candidates in 190-200 C: 500.
 - Harness pass rate on selected candidates: 500/500.
 - Full top-50 selected candidates: `reports/selected_candidates_top50.csv`.

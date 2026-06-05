@@ -100,6 +100,7 @@ def main() -> None:
     lines.append(f"- Monomers: {discovery['n_monomers']}.")
     lines.append(f"- Compatible monomer pairs: {discovery['n_compatible_pairs']}.")
     lines.append(f"- Ratio candidates: {discovery['n_ratio_candidates']}.")
+    lines.append("- Full ratio candidate table: `artifacts/reproduce/discovery/all_ratio_candidates.csv`.")
     lines.append(f"- Selected candidates in {discovery['target_range'][0]:.0f}-{discovery['target_range'][1]:.0f} C: {discovery['n_selected']}.")
     lines.append(f"- Harness pass rate on selected candidates: {int(harness['harness_pass'].sum())}/{len(harness)}.")
     lines.append("- Full top-50 selected candidates: `reports/selected_candidates_top50.csv`.")
