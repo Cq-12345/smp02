@@ -81,6 +81,9 @@ h = (m_1..m_n, r_1..r_n)
 - `artifacts/trail/generation/feedback_guided_replacement_eval/replacement_observation_ledger.csv`
 - `reports/feedback_guided_replacement_evaluation.md`
 - `reports/feedback_guided_replacement_comparison.md`
+- `configs/pievo_faithful_feedback_replacement_195_smoke.yaml`
+- `artifacts/pievo_faithful_feedback_replacement_195_smoke/*`
+- `reports/feedback_guided_replacement_pievo_comparison.md`
 
 结果：
 
@@ -92,6 +95,8 @@ h = (m_1..m_n, r_1..r_n)
 - 通过项已写入 observation ledger，并进入 `configs/pievo_faithful_replacement_195_smoke.yaml` 的 PiEvo-faithful external history。
 - 失败回流后的 strict replacement 仍生成 120 条 proposal，但每条都带非空 `counterpart_compatibility_reason`。
 - Strict replacement 的重建失败从 13 条降到 0 条，Harness 通过从 10 条增至 11 条；最佳距离仍为 0.37 C，说明互补反应对约束没有牺牲当前最佳近目标候选。
+- Strict replacement observation ledger 已进入 PiEvo-faithful：外部 observation 从 10 条变为 11 条，posterior entropy 从 2.4869 降为 1.4358，MAP principle 仍为 `long_aliphatic_penalty`，其 posterior 从 0.4749 升至 0.7454。
+- 在相同 seed、目标 Tg 和 target guard 下，4 轮 IDS 选择集合没有变化，最佳新选择仍为 194.99 C、距 195 C 目标 0.01 C；这说明本轮 feedback 主要改变 posterior 置信分布，而不是短 smoke 的选择路径。
 
 ### 3.3 VAE latent 生成
 
@@ -228,6 +233,6 @@ PYTHONPATH=src python trail/harness/constraints.py \
 
 1. 将真实 LLM/RAG agent 接到 `generation_record_schema.yaml`，要求先输出 generation record，再进入 predictor/Harness/PiEvo。
 2. 将 LLM 生成限制在“提出 principle/官能团组合/候选模板”，SMILES 草案必须由 RDKit、预测模型和 Harness 再验证。
-3. 将 strict replacement observation ledger 接入下一轮 PiEvo target sweep，并比较原始 replacement ledger 与 feedback-guided ledger 对 principle posterior 的影响。
-4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 侧已完成互补反应对约束接入。
+3. 对 feedback-guided replacement 做更多目标温度和更长 rounds 的 PiEvo sweep，确认 posterior 收缩是否会在更大候选池中改变 IDS 选择路径。
+4. 将 `generation_feedback/strategy_feedback.csv` 继续接入 prompt/RAG 生成器，用失败案例压低弱生成规则；replacement 侧已完成互补反应对约束和 PiEvo posterior 对比。
 5. 在真实或高保真 observation 足够前，不优先训练 SFT/扩散/流匹配。

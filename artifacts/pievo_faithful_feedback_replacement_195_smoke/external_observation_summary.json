@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "ledger_path": "artifacts/trail/generation/feedback_guided_replacement_eval/replacement_observation_ledger.csv",
+  "input_rows": 11,
+  "candidate_rows_after_filter": 11,
+  "accepted_rows": 11,
+  "rejected_rows": 0,
+  "rejected": [],
+  "source_counts": {
+    "surrogate": 11
+  },
+  "total_authority_weight": 11.0,
+  "mean_reward": 0.7185098623461168
+}

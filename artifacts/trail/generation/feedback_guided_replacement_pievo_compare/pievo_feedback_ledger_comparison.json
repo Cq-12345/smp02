@@ -1,0 +1,106 @@
+{
+  "original": {
+    "label": "original_replacement",
+    "output_dir": "artifacts/pievo_faithful_replacement_195_smoke",
+    "external_rows": 10,
+    "external_mean_reward": 0.7148151001324632,
+    "external_best_distance_c": 0.3732434861057641,
+    "history_rows": 14,
+    "total_authority_weight": 14.0,
+    "posterior_entropy": 2.4869334798070555,
+    "map_principle": "long_aliphatic_penalty",
+    "map_principle_posterior": 0.47485141543310927,
+    "best_selected_target_distance_c": 0.005546302352854582,
+    "selected_rows": 4,
+    "all_selected_within_target_guard": true,
+    "all_selected_pass": true,
+    "top_posterior": [
+      {
+        "principle": "long_aliphatic_penalty",
+        "posterior": 0.47485141543310927
+      },
+      {
+        "principle": "reaction_a5dd26ae10ad",
+        "posterior": 0.04463996233911901
+      },
+      {
+        "principle": "druglike_hetero_complexity_penalty",
+        "posterior": 0.02889181886125736
+      },
+      {
+        "principle": "stereochemical_complexity_penalty",
+        "posterior": 0.02872434218952689
+      },
+      {
+        "principle": "too_flexible_penalty",
+        "posterior": 0.025927712441513068
+      },
+      {
+        "principle": "reaction_536dfe22d324",
+        "posterior": 0.025340651466650065
+      },
+      {
+        "principle": "cyanate_ester_triazine",
+        "posterior": 0.025339639099364583
+      },
+      {
+        "principle": "nitrile_rich_rigidity",
+        "posterior": 0.025339639099364583
+      }
+    ]
+  },
+  "feedback_guided": {
+    "label": "feedback_guided_replacement",
+    "output_dir": "artifacts/pievo_faithful_feedback_replacement_195_smoke",
+    "external_rows": 11,
+    "external_mean_reward": 0.7185098623461168,
+    "external_best_distance_c": 0.3732434861057641,
+    "history_rows": 15,
+    "total_authority_weight": 15.0,
+    "posterior_entropy": 1.435810384632386,
+    "map_principle": "long_aliphatic_penalty",
+    "map_principle_posterior": 0.7454349182830999,
+    "best_selected_target_distance_c": 0.005546302352854582,
+    "selected_rows": 4,
+    "all_selected_within_target_guard": true,
+    "all_selected_pass": true,
+    "top_posterior": [
+      {
+        "principle": "long_aliphatic_penalty",
+        "posterior": 0.7454349182830999
+      },
+      {
+        "principle": "reaction_a5dd26ae10ad",
+        "posterior": 0.02169233507368212
+      },
+      {
+        "principle": "druglike_hetero_complexity_penalty",
+        "posterior": 0.014119936459408627
+      },
+      {
+        "principle": "stereochemical_complexity_penalty",
+        "posterior": 0.012725329976483504
+      },
+      {
+        "principle": "too_flexible_penalty",
+        "posterior": 0.01269076999980305
+      },
+      {
+        "principle": "reaction_536dfe22d324",
+        "posterior": 0.012447259177920203
+      },
+      {
+        "principle": "cyanate_ester_triazine",
+        "posterior": 0.012447039871200834
+      },
+      {
+        "principle": "nitrile_rich_rigidity",
+        "posterior": 0.012447039871200834
+      }
+    ]
+  },
+  "selected_overlap": 4,
+  "selected_union": 4,
+  "selected_jaccard": 1.0,
+  "same_selected_set": true
+}
