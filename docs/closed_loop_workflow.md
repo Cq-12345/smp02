@@ -220,6 +220,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_human_
   --out-dir artifacts/trail/human_review \
   --report reports/human_experiment_review_queue.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_pre_experiment_validation_plan.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/pre_experiment_validation_plan.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
@@ -236,6 +240,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --vae-latent-local-search-target-sweep-summary artifacts/trail/generation/vae_latent_local_search_target_sweep/vae_latent_local_search_target_sweep_aggregate.json \
   --generation-strategy-policy-summary artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json \
   --human-review-queue-summary artifacts/trail/human_review/human_experiment_review_queue_summary.json \
+  --human-review-validation-summary artifacts/trail/human_review/pre_experiment_validation_plan_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
   --sft-candidate-generation-summary artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json \
@@ -387,6 +392,7 @@ Human experiment review queue 已补充：
 - draft process records 30 条基础格式都通过，但 `ready_for_active_ledger=0`，因为仍缺固化温度、后固化、催化剂、NCO 指数、酰亚胺化条件等字段。
 - 队列中 20 条是 `process_design_for_dsc`，10 条建议先做 `high_fidelity_before_dsc`。
 - 最佳队列候选距 250 C 目标 0.034 C，但仍只是 surrogate evidence；必须由人工补齐工艺并显式批准，才能进入真实/高权重 observation ledger。
-- Workflow summary 已读取 `human_experiment_review_queue_summary.json`，并记录 `human_review_target_counts` 与 `human_review_candidate_origin_counts`，让人工闭环不再只是 schema 和说明文档。
+- `scripts/build_pre_experiment_validation_plan.py` 已把队列转成实验前验证计划：30 条都需要补工艺字段，25 条还需要高保真/扩展集成模型复核，0 条可不补工艺直接进入 DSC。
+- Workflow summary 已读取 `human_experiment_review_queue_summary.json` 和 `pre_experiment_validation_plan_summary.json`，并记录 `human_review_*` 与 `human_validation_*` 字段，让人工闭环不再只是 schema 和说明文档。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

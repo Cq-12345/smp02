@@ -1,0 +1,27 @@
+{
+  "input_review_rows": 30,
+  "plan_rows": 30,
+  "process_completion_required_rows": 30,
+  "high_fidelity_required_rows": 25,
+  "dsc_ready_without_process_completion_rows": 0,
+  "target_counts": {
+    "195.0": 17,
+    "250.0": 13
+  },
+  "validation_lane_counts": {
+    "process_plus_high_fidelity": 25,
+    "process_completion_before_dsc": 5
+  },
+  "candidate_origin_counts": {
+    "sparse_target_replacement_250": 13,
+    "vae_latent_local_search": 11,
+    "pievo_latent_local_search_selected": 3,
+    "pievo_ensemble_guard_selected": 2,
+    "expanded_inventory_replacement": 1
+  },
+  "best_target_distance_c": 0.0342827100285205,
+  "best_validation_score": 0.9553479867260357,
+  "plan_path": "artifacts/trail/human_review/pre_experiment_validation_plan.csv",
+  "summary_path": "artifacts/trail/human_review/pre_experiment_validation_plan_summary.json",
+  "report_path": "reports/pre_experiment_validation_plan.md"
+}

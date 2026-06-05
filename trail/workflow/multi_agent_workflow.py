@@ -53,6 +53,7 @@ def summarize(
     sparse_target_replacement_expansion_summary: Path = Path(
         "artifacts/trail/generation/sparse_target_replacement_expansion/sparse_target_replacement_expansion_summary.json"
     ),
+    human_review_validation_summary: Path = Path("artifacts/trail/human_review/pre_experiment_validation_plan_summary.json"),
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -71,6 +72,7 @@ def summarize(
     latent_local_search_target_sweep = read_json(vae_latent_local_search_target_sweep_summary, {})
     strategy_policy = read_json(generation_strategy_policy_summary, {})
     human_review = read_json(human_review_queue_summary, {})
+    human_validation = read_json(human_review_validation_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
     generative_training = read_json(generative_training_summary, {})
     sft_candidate_generation = read_json(sft_candidate_generation_summary, {})
@@ -182,6 +184,17 @@ def summarize(
         "human_review_high_fidelity_before_dsc_rows": human_review.get("review_priorities", {}).get("high_fidelity_before_dsc", 0),
         "human_review_target_counts": human_review.get("target_counts", {}),
         "human_review_candidate_origin_counts": human_review.get("candidate_origin_counts", {}),
+        "human_validation_plan_rows": human_validation.get("plan_rows", 0),
+        "human_validation_process_completion_required_rows": human_validation.get("process_completion_required_rows", 0),
+        "human_validation_high_fidelity_required_rows": human_validation.get("high_fidelity_required_rows", 0),
+        "human_validation_dsc_ready_without_process_completion_rows": human_validation.get(
+            "dsc_ready_without_process_completion_rows", 0
+        ),
+        "human_validation_target_counts": human_validation.get("target_counts", {}),
+        "human_validation_lane_counts": human_validation.get("validation_lane_counts", {}),
+        "human_validation_candidate_origin_counts": human_validation.get("candidate_origin_counts", {}),
+        "human_validation_best_target_distance_c": human_validation.get("best_target_distance_c"),
+        "human_validation_best_score": human_validation.get("best_validation_score"),
         "gnn_global_feature_architecture": gnn_global.get("architecture"),
         "gnn_global_feature_best_case": gnn_global.get("best_case"),
         "gnn_global_feature_baseline_mapek_test_pct": gnn_global.get("baseline_mapek_test_pct"),
@@ -245,6 +258,10 @@ def main() -> None:
     parser.add_argument("--vae-latent-local-search-target-sweep-summary", default="artifacts/trail/generation/vae_latent_local_search_target_sweep/vae_latent_local_search_target_sweep_aggregate.json")
     parser.add_argument("--generation-strategy-policy-summary", default="artifacts/trail/generation_strategy_policy/generation_strategy_bandit_summary.json")
     parser.add_argument("--human-review-queue-summary", default="artifacts/trail/human_review/human_experiment_review_queue_summary.json")
+    parser.add_argument(
+        "--human-review-validation-summary",
+        default="artifacts/trail/human_review/pre_experiment_validation_plan_summary.json",
+    )
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--sft-candidate-generation-summary", default="artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json")
@@ -287,6 +304,7 @@ def main() -> None:
         Path(args.sft_trained_candidate_generation_summary),
         Path(args.target_conditioned_strategy_policy_summary),
         Path(args.sparse_target_replacement_expansion_summary),
+        Path(args.human_review_validation_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

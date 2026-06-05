@@ -163,7 +163,8 @@ Agent 分工：
 - 队列目标分布为 195 C 17 条、250 C 13 条；250 C 的 13 条全部来自 `sparse_target_replacement_250`，最佳 target distance 为 0.034 C。
 - 20 条为 `process_design_for_dsc`，10 条为 `high_fidelity_before_dsc`。
 - 30 条 draft process records 基础格式通过，但 `ready_for_active_ledger=0`，说明仍需人工补固化/催化/后固化/酰亚胺化等工艺字段。
-- Workflow summary 已读取 `human_review_target_counts` 和 `human_review_candidate_origin_counts`；这一步把“真实实验结果迭代优化”前的人工质量门禁落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
+- `scripts/build_pre_experiment_validation_plan.py` 已把 30 条 review items 转成实验前验证计划：30 条都需要补工艺字段，25 条还需要高保真/扩展集成模型复核，0 条可在不补工艺的情况下直接进入 DSC。
+- Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts` 和 `human_validation_*`；这一步把“真实实验结果迭代优化”前的人工质量门禁落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
 
 ## 6. PiEvo-faithful 要求
 

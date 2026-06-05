@@ -166,3 +166,10 @@ Smoke 结果：
 - 20 条为 `process_design_for_dsc`，适合先补工艺字段再决定是否排真实实验。
 - 10 条为 `high_fidelity_before_dsc`，通常是预测 sigma 较高或 surrogate 风险较高，建议先做高保真/集成复核。
 - 30 条 draft process records 基础格式全部通过，但 `ready_for_active_ledger_rows=0`；这正是预期门禁，防止 surrogate 候选未经人工和工艺细节直接升级为高权重证据。
+
+当前 pre-experiment validation plan：
+
+- `scripts/build_pre_experiment_validation_plan.py` 会读取人工复核队列、知识库 process templates 和候选风险信号，输出 `pre_experiment_validation_plan.csv` 与 `reports/pre_experiment_validation_plan.md`。
+- 当前 30 条候选全部 `process_completion_required=true`，说明都必须补齐工艺字段后才能考虑真实 DSC。
+- 25 条 `high_fidelity_required=true`，主要来自高 Tg 稀疏目标、较高 predictor sigma、OOD 或新组分风险，应先做高保真/扩展模型集成复核。
+- 0 条 `dsc_ready_without_process_completion`，因此当前没有任何 surrogate 候选可以绕过人工工艺补全直接进入真实实验或 active ledger。

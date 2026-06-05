@@ -316,6 +316,27 @@
     "pievo_ensemble_guard_selected": 2,
     "expanded_inventory_replacement": 1
   },
+  "human_validation_plan_rows": 30,
+  "human_validation_process_completion_required_rows": 30,
+  "human_validation_high_fidelity_required_rows": 25,
+  "human_validation_dsc_ready_without_process_completion_rows": 0,
+  "human_validation_target_counts": {
+    "195.0": 17,
+    "250.0": 13
+  },
+  "human_validation_lane_counts": {
+    "process_plus_high_fidelity": 25,
+    "process_completion_before_dsc": 5
+  },
+  "human_validation_candidate_origin_counts": {
+    "sparse_target_replacement_250": 13,
+    "vae_latent_local_search": 11,
+    "pievo_latent_local_search_selected": 3,
+    "pievo_ensemble_guard_selected": 2,
+    "expanded_inventory_replacement": 1
+  },
+  "human_validation_best_target_distance_c": 0.0342827100285205,
+  "human_validation_best_score": 0.9553479867260357,
   "gnn_global_feature_architecture": "mpnn",
   "gnn_global_feature_best_case": "mpnn_baseline",
   "gnn_global_feature_baseline_mapek_test_pct": 11.051218783853365,
