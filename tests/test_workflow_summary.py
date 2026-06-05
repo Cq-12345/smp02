@@ -69,6 +69,20 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         json.dumps({"input_rows": 2, "harness_pass_rows": 2, "literature_template_context_rows": 1}),
         encoding="utf-8",
     )
+    gnn_global = tmp_path / "gnn_global.json"
+    gnn_global.write_text(
+        json.dumps(
+            {
+                "architecture": "mpnn",
+                "best_case": "mpnn_global",
+                "baseline_mapek_test_pct": 11.0,
+                "global_mapek_test_pct": 10.5,
+                "global_minus_baseline_mapek_test_pct": -0.5,
+                "global_minus_baseline_mae_test_c": -2.0,
+            }
+        ),
+        encoding="utf-8",
+    )
 
     result = summarize(
         candidates,
@@ -82,6 +96,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ensemble_guard_pievo,
         expanded_replacement,
         expanded_generation,
+        gnn_global,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -101,3 +116,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["expanded_inventory_llm_rag_rows"] == 2
     assert result["expanded_inventory_llm_rag_harness_pass"] == 2
     assert result["expanded_inventory_llm_rag_literature_template_context_rows"] == 1
+    assert result["gnn_global_feature_architecture"] == "mpnn"
+    assert result["gnn_global_feature_best_case"] == "mpnn_global"
+    assert result["gnn_global_feature_mapek_delta_pct"] == -0.5
+    assert result["gnn_global_feature_mae_delta_c"] == -2.0

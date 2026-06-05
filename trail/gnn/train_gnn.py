@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import torch
 from rdkit import Chem
+from rdkit.Chem import Descriptors
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
 from torch import nn
@@ -17,9 +18,29 @@ from torch_geometric.loader import DataLoader
 from torch_geometric.nn import GATConv, GCNConv, GINConv, NNConv, global_mean_pool
 
 from smp02.data import load_smp_records
+from smp02.functional_groups import SMARTS, classify_smiles, compatibility_reason
 
 
 KELVIN_OFFSET = 273.15
+GROUP_NAMES = tuple(SMARTS.keys())
+REACTIVE_GROUPS = frozenset(
+    {
+        "epoxy",
+        "primary_amine",
+        "secondary_amine",
+        "anhydride",
+        "isocyanate",
+        "hydroxyl",
+        "phenol",
+        "carboxylic_acid",
+        "acrylate_or_methacrylate",
+        "vinyl",
+        "thiol",
+        "cyanate_ester",
+        "maleimide",
+    }
+)
+FORMULATION_GLOBAL_FEATURE_DIM = 31
 
 
 def mae(y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -83,15 +104,93 @@ def bond_features(bond: Chem.Bond) -> list[float]:
     ]
 
 
-def record_to_graph(record) -> Data | None:
+def formulation_global_features(smiles: tuple[str, ...] | list[str], ratios: tuple[float, ...] | list[float], mols: list[Chem.Mol] | None = None) -> list[float]:
+    ratios_array = np.asarray(ratios, dtype=float)
+    total = float(ratios_array.sum())
+    if total <= 0:
+        ratios_array = np.full(len(smiles), 1.0 / max(len(smiles), 1), dtype=float)
+    else:
+        ratios_array = ratios_array / total
+    if mols is None:
+        mols = [Chem.MolFromSmiles(smi) for smi in smiles]
+    valid_mols = [mol for mol in mols if mol is not None]
+    if not smiles or not valid_mols:
+        return [0.0] * FORMULATION_GLOBAL_FEATURE_DIM
+
+    entropy = float(-(ratios_array * np.log(np.maximum(ratios_array, 1e-12))).sum())
+    entropy_norm = entropy / max(np.log(max(len(ratios_array), 2)), 1e-12)
+    ratio_features = [
+        min(len(smiles) / 4.0, 1.0),
+        float(ratios_array.max()),
+        float(ratios_array.min()),
+        float(ratios_array.std()),
+        float(entropy_norm),
+    ]
+
+    heavy_atoms = []
+    aromatic_fractions = []
+    hetero_fractions = []
+    ring_counts = []
+    rotatable_bonds = []
+    group_sets = []
+    for smi, mol in zip(smiles, mols, strict=False):
+        if mol is None:
+            group_sets.append(set())
+            heavy_atoms.append(0.0)
+            aromatic_fractions.append(0.0)
+            hetero_fractions.append(0.0)
+            ring_counts.append(0.0)
+            rotatable_bonds.append(0.0)
+            continue
+        heavy = max(float(mol.GetNumHeavyAtoms()), 1.0)
+        aromatic_atoms = sum(1 for atom in mol.GetAtoms() if atom.GetIsAromatic())
+        hetero_atoms = sum(1 for atom in mol.GetAtoms() if atom.GetAtomicNum() not in {1, 6})
+        heavy_atoms.append(heavy)
+        aromatic_fractions.append(float(aromatic_atoms) / heavy)
+        hetero_fractions.append(float(hetero_atoms) / heavy)
+        ring_counts.append(float(mol.GetRingInfo().NumRings()))
+        rotatable_bonds.append(float(Descriptors.NumRotatableBonds(mol)))
+        group_sets.append(set(classify_smiles(smi).groups))
+    descriptor_features = [
+        float(np.dot(ratios_array, np.asarray(heavy_atoms))) / 100.0,
+        float(np.dot(ratios_array, np.asarray(aromatic_fractions))),
+        float(np.dot(ratios_array, np.asarray(hetero_fractions))),
+        float(np.dot(ratios_array, np.asarray(ring_counts))) / 10.0,
+        float(np.dot(ratios_array, np.asarray(rotatable_bonds))) / 20.0,
+    ]
+
+    group_features = []
+    for group_name in GROUP_NAMES:
+        group_features.append(float(sum(ratio for ratio, groups in zip(ratios_array, group_sets, strict=False) if group_name in groups)))
+
+    compatible_pairs = 0
+    possible_pairs = 0
+    for idx, groups_a in enumerate(group_sets):
+        for groups_b in group_sets[idx + 1 :]:
+            possible_pairs += 1
+            if compatibility_reason(groups_a, groups_b):
+                compatible_pairs += 1
+    compatible_fraction = float(compatible_pairs / possible_pairs) if possible_pairs else 0.0
+    reactive_weight = float(sum(ratio for ratio, groups in zip(ratios_array, group_sets, strict=False) if groups & REACTIVE_GROUPS))
+    compatibility_features = [float(compatible_pairs > 0), compatible_fraction, reactive_weight]
+
+    features = ratio_features + descriptor_features + group_features + compatibility_features
+    if len(features) != FORMULATION_GLOBAL_FEATURE_DIM:
+        raise AssertionError(f"Expected {FORMULATION_GLOBAL_FEATURE_DIM} global features, got {len(features)}")
+    return features
+
+
+def record_to_graph(record, include_global_features: bool = False) -> Data | None:
     xs = []
     edges = []
     edge_attrs = []
+    mols = []
     offset = 0
     for smi, ratio in zip(record.smiles, record.ratios, strict=False):
         mol = Chem.MolFromSmiles(smi)
         if mol is None:
             return None
+        mols.append(mol)
         for atom in mol.GetAtoms():
             xs.append(atom_features(atom, float(ratio)))
         for bond in mol.GetBonds():
@@ -107,13 +206,17 @@ def record_to_graph(record) -> Data | None:
         return None
     edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous() if edges else torch.empty((2, 0), dtype=torch.long)
     edge_attr = torch.tensor(edge_attrs, dtype=torch.float32) if edge_attrs else torch.empty((0, 6), dtype=torch.float32)
-    return Data(x=torch.tensor(xs, dtype=torch.float32), edge_index=edge_index, edge_attr=edge_attr, y=torch.tensor([record.tg], dtype=torch.float32))
+    data = Data(x=torch.tensor(xs, dtype=torch.float32), edge_index=edge_index, edge_attr=edge_attr, y=torch.tensor([record.tg], dtype=torch.float32))
+    if include_global_features:
+        data.global_x = torch.tensor([formulation_global_features(record.smiles, record.ratios, mols)], dtype=torch.float32)
+    return data
 
 
 class GNNRegressor(nn.Module):
-    def __init__(self, in_channels: int = 5, hidden: int = 64, edge_channels: int = 6, architecture: str = "gcn") -> None:
+    def __init__(self, in_channels: int = 5, hidden: int = 64, edge_channels: int = 6, architecture: str = "gcn", global_channels: int = 0) -> None:
         super().__init__()
         self.architecture = architecture.lower()
+        self.global_channels = int(global_channels)
         if self.architecture == "gcn":
             self.conv1 = GCNConv(in_channels, hidden)
             self.conv2 = GCNConv(hidden, hidden)
@@ -131,7 +234,7 @@ class GNNRegressor(nn.Module):
             self.conv2 = NNConv(hidden, hidden, self.edge_mlp2, aggr="mean")
         else:
             raise ValueError(f"Unknown GNN architecture: {architecture}")
-        self.head = nn.Sequential(nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, 1))
+        self.head = nn.Sequential(nn.Linear(hidden + self.global_channels, hidden), nn.ReLU(), nn.Linear(hidden, 1))
 
     def forward(self, data: Data) -> torch.Tensor:
         if self.architecture == "mpnn":
@@ -141,6 +244,13 @@ class GNNRegressor(nn.Module):
             x = F.relu(self.conv1(data.x, data.edge_index))
             x = F.relu(self.conv2(x, data.edge_index))
         pooled = global_mean_pool(x, data.batch)
+        if self.global_channels:
+            global_x = getattr(data, "global_x", None)
+            if global_x is None:
+                global_x = pooled.new_zeros((pooled.shape[0], self.global_channels))
+            if global_x.dim() == 1:
+                global_x = global_x.view(pooled.shape[0], self.global_channels)
+            pooled = torch.cat([pooled, global_x.to(pooled.device)], dim=1)
         return self.head(pooled).view(-1)
 
 
@@ -159,17 +269,19 @@ def main() -> None:
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--test-size", type=float, default=0.15)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--global-features", action="store_true", help="Concatenate formulation-level descriptors, functional-group weights, and reaction compatibility features after graph pooling.")
     parser.add_argument("--out", default="artifacts/trail/gnn")
     args = parser.parse_args()
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     records = load_smp_records(args.data)
-    graphs = [g for g in (record_to_graph(r) for r in records) if g is not None]
+    graphs = [g for g in (record_to_graph(r, include_global_features=args.global_features) for r in records) if g is not None]
     train_graphs, test_graphs = train_test_split(graphs, test_size=args.test_size, random_state=args.seed)
     train_loader = DataLoader(train_graphs, batch_size=args.batch_size, shuffle=True)
     test_loader = DataLoader(test_graphs, batch_size=args.batch_size)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = GNNRegressor(hidden=args.hidden, architecture=args.architecture).to(device)
+    global_channels = FORMULATION_GLOBAL_FEATURE_DIM if args.global_features else 0
+    model = GNNRegressor(hidden=args.hidden, architecture=args.architecture, global_channels=global_channels).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     loss_history = []
     for _ in range(args.epochs):
@@ -206,6 +318,8 @@ def main() -> None:
             "ML method": f"SmallMoleculeGraph{args.architecture.upper()}",
             "model_family": "gnn",
             "architecture": args.architecture,
+            "global_features": bool(args.global_features),
+            "global_feature_dim": int(global_channels),
             "hidden": int(args.hidden),
             "epochs": int(args.epochs),
             "batch_size": int(args.batch_size),

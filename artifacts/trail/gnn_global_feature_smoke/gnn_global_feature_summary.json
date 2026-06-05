@@ -1,0 +1,12 @@
+{
+  "architecture": "mpnn",
+  "epochs": 5,
+  "batch_size": 32,
+  "baseline_mapek_test_pct": 11.051218783853365,
+  "global_mapek_test_pct": 11.612545035282947,
+  "global_minus_baseline_mapek_test_pct": 0.5613262514295823,
+  "baseline_mae_test_c": 47.19222120940685,
+  "global_mae_test_c": 47.90016462084125,
+  "global_minus_baseline_mae_test_c": 0.7079434114343996,
+  "best_case": "mpnn_baseline"
+}

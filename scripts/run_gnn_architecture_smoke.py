@@ -29,6 +29,8 @@ def run_architecture(architecture: str, args: argparse.Namespace) -> dict[str, o
         "--out",
         str(out),
     ]
+    if args.global_features:
+        cmd.append("--global-features")
     subprocess.run(cmd, check=True)
     metrics = json.loads((out / "metrics.json").read_text(encoding="utf-8"))
     metrics["output_dir"] = str(out)
@@ -45,7 +47,7 @@ def write_report(leaderboard: pd.DataFrame, report_path: Path, args: argparse.Na
         "## Run",
         "",
         "```bash",
-        f"PYTHONPATH=src {sys.executable} scripts/run_gnn_architecture_smoke.py --epochs {args.epochs} --batch-size {args.batch_size} --out-dir {args.out_dir}",
+        f"PYTHONPATH=src {sys.executable} scripts/run_gnn_architecture_smoke.py --epochs {args.epochs} --batch-size {args.batch_size} --out-dir {args.out_dir}{' --global-features' if args.global_features else ''}",
         "```",
         "",
         "## Leaderboard",
@@ -66,7 +68,8 @@ def write_report(leaderboard: pd.DataFrame, report_path: Path, args: argparse.Na
             "",
             f"- 本 smoke 最优 GNN 架构为 `{best['architecture']}`，MAPEK test 为 {float(best['MAPEK test dataset (%)']):.4f}%。",
             "- 这些 GNN 仍是短训 smoke，不应替代当前最佳 VAE-WVCM-GPR/NuSVR 模型。",
-            "- GNN 的价值更适合作为结构视角 ensemble 成员、disagreement/OOD 信号，以及未来加入 bond/process/global formulation features 后再正式比较。",
+            f"- 本次运行 global formulation features: `{bool(args.global_features)}`。",
+            "- GNN 的价值更适合作为结构视角 ensemble 成员、disagreement/OOD 信号，以及未来加入 process/global formulation features 后再正式比较。",
         ]
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -81,6 +84,7 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--hidden", type=int, default=64)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--global-features", action="store_true")
     parser.add_argument("--out-dir", default="artifacts/trail/gnn_architecture_smoke")
     parser.add_argument("--report", default="reports/gnn_architecture_smoke_leaderboard.md")
     args = parser.parse_args()
@@ -96,6 +100,7 @@ def main() -> None:
                 "architectures": architectures,
                 "epochs": int(args.epochs),
                 "batch_size": int(args.batch_size),
+                "global_features": bool(args.global_features),
                 "best_architecture": str(leaderboard.sort_values(["MAPEK test dataset (%)", "MAE test dataset (C)"]).iloc[0]["architecture"]),
             },
             indent=2,

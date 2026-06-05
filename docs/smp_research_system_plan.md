@@ -72,9 +72,10 @@
 
 - 论文复现模型：CNN、SVR、RF。
 - 扩展 model zoo：MLP、GBR、KRR、LightGBM、XGBoost、CatBoost、NGBoost、ExtraTrees、GPR、KNN、PLS、ElasticNet 等。
-- GNN 草案：`trail/gnn/train_gnn.py`。
+- GNN：`trail/gnn/train_gnn.py`，支持 GCN/GIN/GAT/MPNN、bond edge features，以及可选 global formulation features。
 - 集成分歧审计：`scripts/run_predictor_ensemble_disagreement.py` 会从同一 latent size 的强模型中计算候选级 ensemble mean/std/range，把 epistemic/OOD 风险写入 `artifacts/trail/predictors/ensemble_disagreement/`。
 - PiEvo live ensemble guard：`configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 会对 PiEvo 每轮实际候选批次运行 top-k model zoo，并用 `predictor_ensemble_std_tg_c` 收缩 IDS selection pool。
+- GNN global feature smoke：`scripts/run_gnn_global_feature_smoke.py` 对比 baseline MPNN 与 global-feature MPNN，确认组分数/比例熵、官能团权重和 reaction compatibility 特征可以进入 GNN head；当前 5 epoch 下未改善 MAPEK/MAE。
 
 关键指标：
 
@@ -165,3 +166,4 @@ Agent 分工：
 - 用 LLM/RAG 生成 anomaly-derived principles。
 - 对 dormant principle 做剪枝策略。
 - 对不同目标 Tg 批量运行，观察 posterior 是否随目标变化。
+- 对 GNN global features 做更长训练，并评估是否作为结构视角加入 predictor ensemble disagreement。

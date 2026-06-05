@@ -244,6 +244,12 @@
   "expanded_inventory_llm_rag_rows": 2,
   "expanded_inventory_llm_rag_harness_pass": 2,
   "expanded_inventory_llm_rag_literature_template_context_rows": 1,
+  "gnn_global_feature_architecture": "mpnn",
+  "gnn_global_feature_best_case": "mpnn_baseline",
+  "gnn_global_feature_baseline_mapek_test_pct": 11.051218783853365,
+  "gnn_global_feature_global_mapek_test_pct": 11.612545035282947,
+  "gnn_global_feature_mapek_delta_pct": 0.5613262514295823,
+  "gnn_global_feature_mae_delta_c": 0.7079434114343996,
   "generation_feedback": {
     "generation_records": 4,
     "generation_harness_pass": 3,

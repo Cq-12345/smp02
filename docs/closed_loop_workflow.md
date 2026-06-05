@@ -121,6 +121,13 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_predicto
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python -m smp02.pievo_faithful \
   --config configs/pievo_faithful_ensemble_guard_195_smoke.yaml
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_gnn_global_feature_smoke.py \
+  --architecture mpnn \
+  --epochs 5 \
+  --batch-size 32 \
+  --out-dir artifacts/trail/gnn_global_feature_smoke \
+  --report reports/gnn_global_feature_smoke.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
@@ -131,6 +138,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --ensemble-guard-pievo-summary artifacts/pievo_faithful_ensemble_guard_195_smoke/pievo_faithful_summary.json \
   --expanded-replacement-summary artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json \
   --expanded-generation-summary artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json \
+  --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --out artifacts/trail/workflow/multi_agent_summary.json
 ```
 
@@ -179,5 +187,12 @@ Predictor ensemble disagreement 已补充：
 - Workflow summary 已读取 `ensemble_disagreement_summary.json`，让 predictor agent 的 OOD 信号进入总览，而不是停留在单独报告。
 - PiEvo 现在不再只读取固定候选表的 disagreement 审计；`configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 会对每轮实际生成的候选批次做 live ensemble prediction，并把 `predictor_ensemble_std_tg_c <= 25 C` 作为 IDS selection pool guard。
 - 6 轮 smoke 中 target guard 和 ensemble guard 每轮都启用，6 个 selected 全部在 5 C target guard 内，也全部在 ensemble disagreement guard 内；最佳 selected distance 为 0.059 C，mean selected ensemble std 为 16.40 C。
+
+GNN global feature smoke 已补充：
+
+- `trail/gnn/train_gnn.py --global-features` 会在 graph pooling 后拼接 31 维配方级特征，包括比例熵、RDKit 加权结构描述符、官能团权重、互补反应对覆盖和 reactive group weight。
+- `scripts/run_gnn_global_feature_smoke.py` 对比 `mpnn_baseline` 与 `mpnn_global`，并输出 `artifacts/trail/gnn_global_feature_smoke/*` 和 `reports/gnn_global_feature_smoke.md`。
+- 5 epoch smoke 下 global-feature MPNN 的 MAPEK test 为 11.6125%，baseline 为 11.0512%；短训下没有改善 MAPEK/MAE，但 RMSE/R2 略好。
+- Workflow summary 已读取 `gnn_global_feature_summary.json`；该 GNN 当前是结构视角和 OOD/ensemble 候选信号，不替代 VAE-WVCM-GPR/NuSVR。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

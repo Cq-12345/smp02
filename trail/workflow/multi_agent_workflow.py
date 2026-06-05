@@ -35,6 +35,7 @@ def summarize(
     ensemble_guard_pievo_summary: Path,
     expanded_replacement_summary: Path,
     expanded_generation_summary: Path,
+    gnn_global_feature_summary: Path,
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -47,6 +48,7 @@ def summarize(
     ensemble_guard_pievo = read_json(ensemble_guard_pievo_summary, {})
     expanded_replacement = read_json(expanded_replacement_summary, {})
     expanded_generation = read_json(expanded_generation_summary, {})
+    gnn_global = read_json(gnn_global_feature_summary, {})
     return {
         "agents": AGENTS,
         "candidate_rows": int(len(candidates)),
@@ -85,6 +87,12 @@ def summarize(
         "expanded_inventory_llm_rag_rows": expanded_generation.get("input_rows", 0),
         "expanded_inventory_llm_rag_harness_pass": expanded_generation.get("harness_pass_rows", 0),
         "expanded_inventory_llm_rag_literature_template_context_rows": expanded_generation.get("literature_template_context_rows", 0),
+        "gnn_global_feature_architecture": gnn_global.get("architecture"),
+        "gnn_global_feature_best_case": gnn_global.get("best_case"),
+        "gnn_global_feature_baseline_mapek_test_pct": gnn_global.get("baseline_mapek_test_pct"),
+        "gnn_global_feature_global_mapek_test_pct": gnn_global.get("global_mapek_test_pct"),
+        "gnn_global_feature_mapek_delta_pct": gnn_global.get("global_minus_baseline_mapek_test_pct"),
+        "gnn_global_feature_mae_delta_c": gnn_global.get("global_minus_baseline_mae_test_c"),
         "generation_feedback": feedback,
     }
 
@@ -102,6 +110,7 @@ def main() -> None:
     parser.add_argument("--ensemble-guard-pievo-summary", default="artifacts/pievo_faithful_ensemble_guard_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--expanded-replacement-summary", default="artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json")
     parser.add_argument("--expanded-generation-summary", default="artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json")
+    parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
     parser.add_argument("--out", default="artifacts/trail/workflow/multi_agent_summary.json")
     args = parser.parse_args()
     result = summarize(
@@ -116,6 +125,7 @@ def main() -> None:
         Path(args.ensemble_guard_pievo_summary),
         Path(args.expanded_replacement_summary),
         Path(args.expanded_generation_summary),
+        Path(args.gnn_global_feature_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
