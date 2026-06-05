@@ -154,6 +154,7 @@ Agent 分工：
 - `sft_candidate_generator` 已因 23 条 trained projection records 进入 active arm，获得 23/100 proposal budget 建议；当前 policy 优先读取 trained SFT summary，而不是 dry-run replay。
 - `diffusion_or_flow_matching` 已因 23 条 trained projection records 进入 active arm，获得 19/100 proposal budget 建议；这只证明训练型投影链路可用，生成输出仍需重新通过 predictor/Harness/PiEvo。
 - `llm_smiles_generation` 在缺 predictor/chemistry evidence 时不进入下一轮预算。
+- 当前 policy 已读取 active evidence/PiEvo bridge 状态，`high_authority_evidence_status=awaiting_high_authority_evidence`、`high_authority_budget_mode=surrogate_backed_allocation`；因此不会把 0 行真实/高保真 evidence 当成策略奖励。
 
 当前 human review queue 状态：
 
@@ -168,7 +169,7 @@ Agent 分工：
 - `scripts/import_validation_request_results.py` 已生成 25 条 high-fidelity result intake template；当前没有完成结果，`accepted_result_rows=0`、`observation_ledger_pass_rows=0`。
 - `scripts/build_active_observation_ledger.py` 已把 result intake 后的 observation ledger 再收敛为 active high-authority evidence ledger；当前 `active_rows=0`、`authority_weight_sum=0.0`，因为尚无完成且获批的高保真/真实/文献观测。
 - `scripts/run_active_evidence_pievo_bridge.py` 已验证 active ledger 可进入 PiEvo 外部观测加载和 full-history posterior 更新路径；当前 `bridge_status=no_active_evidence_noop`、`external_accepted_rows=0`、`active_evidence_updates_posterior=false`。
-- Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts`、`human_validation_*`、`validation_request_*`、`validation_result_*`、`active_observation_*` 和 `active_evidence_pievo_bridge_*`；这一步把“真实实验结果迭代优化”前的人工质量门禁和 posterior 消费路径落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
+- Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts`、`human_validation_*`、`validation_request_*`、`validation_result_*`、`active_observation_*`、`active_evidence_pievo_bridge_*` 和 strategy policy 的 high-authority status；这一步把“真实实验结果迭代优化”前的人工质量门禁、posterior 消费路径和策略层 no-op 状态落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
 
 ## 6. PiEvo-faithful 要求
 

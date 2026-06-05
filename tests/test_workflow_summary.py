@@ -116,6 +116,10 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
                 "suppressed_strategies": 1,
                 "data_collection_only_strategies": 2,
                 "total_budget": 100,
+                "high_authority_evidence_status": "awaiting_high_authority_evidence",
+                "high_authority_budget_mode": "surrogate_backed_allocation",
+                "active_evidence_bridge_status": "no_active_evidence_noop",
+                "active_evidence_updates_pievo_posterior": False,
             }
         ),
         encoding="utf-8",
@@ -437,6 +441,10 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["generation_strategy_policy_suppressed_strategies"] == 1
     assert result["generation_strategy_policy_data_collection_only_strategies"] == 2
     assert result["generation_strategy_policy_total_budget"] == 100
+    assert result["generation_strategy_policy_high_authority_evidence_status"] == "awaiting_high_authority_evidence"
+    assert result["generation_strategy_policy_high_authority_budget_mode"] == "surrogate_backed_allocation"
+    assert result["generation_strategy_policy_active_evidence_bridge_status"] == "no_active_evidence_noop"
+    assert result["generation_strategy_policy_active_evidence_updates_pievo_posterior"] is False
     assert result["target_conditioned_strategy_policy_targets"] == 4
     assert result["target_conditioned_strategy_policy_all_targets_allocation_sum_100"] is True
     assert result["target_conditioned_strategy_policy_top_strategy_by_target"]["250.0"] == "functional_group_replacement"

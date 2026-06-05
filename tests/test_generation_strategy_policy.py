@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from scripts.update_generation_strategy_policy import collect_arms, run_policy, score_policy
+from scripts.update_generation_strategy_policy import collect_arms, high_authority_feedback_context, run_policy, score_policy
 
 
 def test_bandit_policy_gates_unready_generators() -> None:
@@ -51,6 +51,24 @@ def test_bandit_policy_gates_unready_generators() -> None:
     assert by_strategy["diffusion_or_flow_matching"]["status"] == "data_collection_only"
     assert by_strategy["diffusion_or_flow_matching"]["allocation_per_100"] == 0
     assert by_strategy["vae_latent_local_search"]["bandit_score"] > by_strategy["functional_group_replacement"]["bandit_score"]
+
+
+def test_high_authority_feedback_context_tracks_active_evidence_state() -> None:
+    waiting = high_authority_feedback_context(
+        {"active_rows": 0, "authority_weight_sum": 0.0},
+        {"bridge_status": "no_active_evidence_noop", "external_accepted_rows": 0, "active_evidence_updates_posterior": False},
+    )
+    assert waiting["high_authority_evidence_status"] == "awaiting_high_authority_evidence"
+    assert waiting["high_authority_budget_mode"] == "surrogate_backed_allocation"
+    assert waiting["active_evidence_updates_pievo_posterior"] is False
+
+    active = high_authority_feedback_context(
+        {"active_rows": 2, "authority_weight_sum": 8.0},
+        {"bridge_status": "active_evidence_updates_posterior", "external_accepted_rows": 2, "active_evidence_updates_posterior": True},
+    )
+    assert active["high_authority_evidence_status"] == "high_authority_posterior_active"
+    assert active["high_authority_budget_mode"] == "high_authority_informed_allocation_ready"
+    assert active["active_observation_authority_weight_sum"] == 8.0
 
 
 def test_bandit_policy_activates_ready_sft_without_unbounded_rate() -> None:
@@ -291,6 +309,20 @@ def test_run_policy_writes_outputs(tmp_path: Path) -> None:
     diffusion_flow_generation.write_text(json.dumps({"input_rows": 0}), encoding="utf-8")
     diffusion_flow_trained = tmp_path / "diffusion_flow_trained.json"
     diffusion_flow_trained.write_text(json.dumps({"input_rows": 0}), encoding="utf-8")
+    active_observation = tmp_path / "active_observation.json"
+    active_observation.write_text(json.dumps({"active_rows": 0, "authority_weight_sum": 0.0}), encoding="utf-8")
+    active_bridge = tmp_path / "active_bridge.json"
+    active_bridge.write_text(
+        json.dumps(
+            {
+                "bridge_status": "no_active_evidence_noop",
+                "external_accepted_rows": 0,
+                "external_rejected_rows": 0,
+                "active_evidence_updates_posterior": False,
+            }
+        ),
+        encoding="utf-8",
+    )
     out_dir = tmp_path / "out"
     report = tmp_path / "report.md"
 
@@ -304,6 +336,8 @@ def test_run_policy_writes_outputs(tmp_path: Path) -> None:
             sft_generation_summary=str(sft_generation),
             diffusion_flow_generation_summary=str(diffusion_flow_generation),
             diffusion_flow_trained_generation_summary=str(diffusion_flow_trained),
+            active_observation_summary=str(active_observation),
+            active_evidence_pievo_bridge_summary=str(active_bridge),
             exploration_c=0.25,
             softmax_temperature=0.25,
             total_budget=100,
@@ -314,6 +348,9 @@ def test_run_policy_writes_outputs(tmp_path: Path) -> None:
 
     assert not policy.empty
     assert summary["strategies"] == 6
+    assert summary["high_authority_evidence_status"] == "awaiting_high_authority_evidence"
+    assert summary["high_authority_budget_mode"] == "surrogate_backed_allocation"
+    assert summary["active_evidence_bridge_status"] == "no_active_evidence_noop"
     assert (out_dir / "generation_strategy_bandit_policy.csv").exists()
     assert (out_dir / "generation_strategy_bandit_summary.json").exists()
     assert report.exists()

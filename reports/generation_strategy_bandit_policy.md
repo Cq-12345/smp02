@@ -19,6 +19,26 @@
 | top_strategy | llm_rag_principle_generation |
 | suppressed_strategies | 1 |
 | data_collection_only_strategies | 0 |
+| high_authority_evidence_status | awaiting_high_authority_evidence |
+| high_authority_budget_mode | surrogate_backed_allocation |
+| high_authority_next_action | execute validation requests and keep generation budgets behind predictor/Harness/PiEvo/human gates. |
+| active_observation_rows | 0 |
+| active_observation_authority_weight_sum | 0.0 |
+| active_evidence_bridge_status | no_active_evidence_noop |
+| active_evidence_bridge_accepted_rows | 0 |
+| active_evidence_bridge_rejected_rows | 0 |
+| active_evidence_updates_pievo_posterior | False |
+
+## High-authority Evidence Gate
+
+- Status: `awaiting_high_authority_evidence`
+- Budget mode: `surrogate_backed_allocation`
+- Active observation rows: `0`
+- Active evidence bridge accepted rows: `0`
+- Active evidence updates PiEvo posterior: `False`
+- Next action: execute validation requests and keep generation budgets behind predictor/Harness/PiEvo/human gates.
+
+当前 policy 的 allocation 仍由 surrogate/generation evidence 计算；高权重 evidence 进入 PiEvo posterior 后，应先比较 posterior shift，再调整 budget 权重。
 
 ## Policy
 

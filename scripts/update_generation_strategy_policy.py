@@ -28,6 +28,24 @@ def read_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path) if path.exists() else pd.DataFrame()
 
 
+def int_value(value: Any, default: int = 0) -> int:
+    try:
+        if value is None or pd.isna(value):
+            return default
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def float_value(value: Any, default: float = 0.0) -> float:
+    try:
+        if value is None or pd.isna(value):
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def exp_reward_from_distance(best_distance_c: float | None, reward_temperature_c: float = 5.0) -> float | None:
     if best_distance_c is None or pd.isna(best_distance_c):
         return None
@@ -36,6 +54,41 @@ def exp_reward_from_distance(best_distance_c: float | None, reward_temperature_c
 
 def bounded(value: float, lo: float = 0.0, hi: float = 1.0) -> float:
     return max(lo, min(hi, value))
+
+
+def high_authority_feedback_context(
+    active_observation_summary: dict[str, Any],
+    active_evidence_pievo_bridge_summary: dict[str, Any],
+) -> dict[str, Any]:
+    active_rows = int_value(active_observation_summary.get("active_rows"))
+    active_authority_weight = float_value(active_observation_summary.get("authority_weight_sum"))
+    bridge_accepted = int_value(active_evidence_pievo_bridge_summary.get("external_accepted_rows"))
+    bridge_rejected = int_value(active_evidence_pievo_bridge_summary.get("external_rejected_rows"))
+    bridge_updates_posterior = bool(active_evidence_pievo_bridge_summary.get("active_evidence_updates_posterior", False))
+    bridge_status = str(active_evidence_pievo_bridge_summary.get("bridge_status", "missing_active_evidence_bridge_summary"))
+    if bridge_updates_posterior and bridge_accepted > 0:
+        evidence_status = "high_authority_posterior_active"
+        budget_mode = "high_authority_informed_allocation_ready"
+        next_action = "compare active-evidence posterior shifts against surrogate-only strategy rewards before changing budget weights."
+    elif active_rows > 0 and bridge_accepted == 0:
+        evidence_status = "active_evidence_not_accepted_by_pievo"
+        budget_mode = "surrogate_backed_allocation_with_active_evidence_audit"
+        next_action = "audit active ledger filters because active evidence exists but did not enter PiEvo posterior."
+    else:
+        evidence_status = "awaiting_high_authority_evidence"
+        budget_mode = "surrogate_backed_allocation"
+        next_action = "execute validation requests and keep generation budgets behind predictor/Harness/PiEvo/human gates."
+    return {
+        "high_authority_evidence_status": evidence_status,
+        "high_authority_budget_mode": budget_mode,
+        "high_authority_next_action": next_action,
+        "active_observation_rows": active_rows,
+        "active_observation_authority_weight_sum": active_authority_weight,
+        "active_evidence_bridge_status": bridge_status,
+        "active_evidence_bridge_accepted_rows": bridge_accepted,
+        "active_evidence_bridge_rejected_rows": bridge_rejected,
+        "active_evidence_updates_pievo_posterior": bridge_updates_posterior,
+    }
 
 
 def feedback_lookup(strategy_feedback: pd.DataFrame) -> dict[str, dict[str, Any]]:
@@ -354,6 +407,21 @@ def write_report(policy: pd.DataFrame, summary: dict[str, Any], out_dir: Path, r
     lines.extend(
         [
             "",
+            "## High-authority Evidence Gate",
+            "",
+            f"- Status: `{summary.get('high_authority_evidence_status', '')}`",
+            f"- Budget mode: `{summary.get('high_authority_budget_mode', '')}`",
+            f"- Active observation rows: `{summary.get('active_observation_rows', 0)}`",
+            f"- Active evidence bridge accepted rows: `{summary.get('active_evidence_bridge_accepted_rows', 0)}`",
+            f"- Active evidence updates PiEvo posterior: `{summary.get('active_evidence_updates_pievo_posterior', False)}`",
+            f"- Next action: {summary.get('high_authority_next_action', '')}",
+            "",
+            "当前 policy 的 allocation 仍由 surrogate/generation evidence 计算；高权重 evidence 进入 PiEvo posterior 后，应先比较 posterior shift，再调整 budget 权重。",
+        ]
+    )
+    lines.extend(
+        [
+            "",
             "## Policy",
             "",
             "| strategy | status | attempts | successes | beta pass mean | utility | UCB bonus | score | allocation/100 | review | action |",
@@ -402,6 +470,20 @@ def run_policy(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[str, Any]]:
         softmax_temperature=float(args.softmax_temperature),
         total_budget=int(args.total_budget),
     )
+    summary.update(
+        high_authority_feedback_context(
+            read_json(Path(getattr(args, "active_observation_summary", "artifacts/trail/human_review/active_high_authority_observation_summary.json"))),
+            read_json(
+                Path(
+                    getattr(
+                        args,
+                        "active_evidence_pievo_bridge_summary",
+                        "artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json",
+                    )
+                )
+            ),
+        )
+    )
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     policy.to_csv(out_dir / "generation_strategy_bandit_policy.csv", index=False)
@@ -421,6 +503,11 @@ def main() -> None:
     parser.add_argument("--sft-trained-generation-summary", default="artifacts/trail/generation/sft_trained_projection_generator/generation_record_summary.json")
     parser.add_argument("--diffusion-flow-generation-summary", default="artifacts/trail/generation/diffusion_flow_candidate_dry_run/generation_record_summary.json")
     parser.add_argument("--diffusion-flow-trained-generation-summary", default="artifacts/trail/generation/diffusion_flow_trained_generator/generation_record_summary.json")
+    parser.add_argument("--active-observation-summary", default="artifacts/trail/human_review/active_high_authority_observation_summary.json")
+    parser.add_argument(
+        "--active-evidence-pievo-bridge-summary",
+        default="artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json",
+    )
     parser.add_argument("--exploration-c", type=float, default=0.25)
     parser.add_argument("--softmax-temperature", type=float, default=0.25)
     parser.add_argument("--total-budget", type=int, default=100)

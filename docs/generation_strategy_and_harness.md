@@ -430,6 +430,8 @@ allocation = softmax(score / temperature)
 - `sft_candidate_generator` 已因 23 条 trained projection generation records 成为 active arm，获得 23/100 下一轮 proposal budget 建议；当前 policy 优先读取 trained projection summary，而不是只看 dry-run replay。
 - `diffusion_or_flow_matching` 已因 23 条 trained projection generation records 成为 active arm，获得 19/100 下一轮 proposal budget 建议；这只表示训练型投影链路已可用，不表示已有可信直接 SMILES diffusion/flow 模型输出。
 - 当前 top strategy 为 `llm_rag_principle_generation`，原因是 2/2 generation records 通过 Harness 且 UCB 鼓励继续探索低样本高回报策略。
+- policy summary 现在读取 `active_high_authority_observation_summary.json` 和 `active_evidence_pievo_bridge_summary.json`；当前 `high_authority_evidence_status=awaiting_high_authority_evidence`、`high_authority_budget_mode=surrogate_backed_allocation`。
+- 因为 active evidence 仍为 0 行，当前 allocation 不会把缺失的真实/高保真证据当成奖励；真实或高保真 evidence 进入 PiEvo posterior 后，应先比较 posterior shift，再调整 budget 权重。
 
 ### 5.2 Target-conditioned Strategy Policy
 
@@ -467,4 +469,4 @@ transfer_budget(T) = base_transfer_budget * exp(-abs(T - 195) / transfer_decay)
 6. 对进入 PiEvo 的新候选批次，使用 `configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 的 live ensemble guard 重新计算本批次 `predictor_ensemble_std_tg_c`，不要假设固定候选表的 disagreement 结果覆盖所有生成候选。
 7. SFT dry-run、SFT trained projection、diffusion/flow dry-run 和轻量条件 flow-matching 训练 smoke 都已跑通；下一步应做真实 LLM/SFT fine-tune 输出对比、改进 flow 训练/投影质量，或加入有效 SMILES decoder。任何训练输出仍必须写入 ledger 并经过 predictor/Harness/PiEvo。
 8. 250 C sparse target source-pool expansion 已跑通，并已进入 `pre_experiment_validation_plan`、`validation_request_queue`、`validation_result_intake_template`、active evidence gate 和 PiEvo bridge：13 条 250 C 候选产生 26 个 request，其中 13 个补工艺、13 个高保真验证。下一步是真实执行这些 request；只有填写结果、工艺 ready、人工批准、observation ledger pass，且来源为高保真/真实/文献，才会进入 active high-authority evidence ledger 并通过 bridge 更新 PiEvo posterior。
-9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。
+9. 下一轮生成预算可以读取 `generation_strategy_bandit_policy.csv`，但当前是 `surrogate_backed_allocation`；每个被分配预算的策略仍必须写入 ledger，并走 predictor/Harness/PiEvo/人工审核链路。

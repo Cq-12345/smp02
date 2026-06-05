@@ -393,7 +393,8 @@ Generation strategy bandit policy 已补充：
 - `sft_candidate_generator` 已因 23 条 trained projection records 全部通过 Harness 成为 active arm；当前 policy 优先读取 trained SFT summary，SFT 获得 23/100 proposal budget 建议。
 - `diffusion_or_flow_matching` 已因 23 条 trained projection records 全部通过 Harness 成为 active arm，获得 19/100 proposal budget 建议；当前仍只是训练型 projection 链路已开放，不代表已有直接 SMILES 扩散/流模型推荐。
 - `llm_smiles_generation` 因缺 predictor/chemistry evidence 继续 suppressed。
-- Workflow summary 已读取 `generation_strategy_bandit_summary.json`，让“RL/策略优化”进入总览链路。
+- policy summary 已读取 active evidence/PiEvo bridge 状态；当前 `high_authority_evidence_status=awaiting_high_authority_evidence`，`high_authority_budget_mode=surrogate_backed_allocation`，因此 allocation 仍按 surrogate/generation evidence 计算。
+- Workflow summary 已读取 `generation_strategy_bandit_summary.json` 的 high-authority 字段，让“RL/策略优化”能区分 surrogate-backed budget 和未来 high-authority-informed budget。
 
 Target-conditioned generation strategy policy 已补充：
 

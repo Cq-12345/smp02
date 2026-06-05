@@ -5,5 +5,14 @@
   "total_budget": 100,
   "top_strategy": "llm_rag_principle_generation",
   "suppressed_strategies": 1,
-  "data_collection_only_strategies": 0
+  "data_collection_only_strategies": 0,
+  "high_authority_evidence_status": "awaiting_high_authority_evidence",
+  "high_authority_budget_mode": "surrogate_backed_allocation",
+  "high_authority_next_action": "execute validation requests and keep generation budgets behind predictor/Harness/PiEvo/human gates.",
+  "active_observation_rows": 0,
+  "active_observation_authority_weight_sum": 0.0,
+  "active_evidence_bridge_status": "no_active_evidence_noop",
+  "active_evidence_bridge_accepted_rows": 0,
+  "active_evidence_bridge_rejected_rows": 0,
+  "active_evidence_updates_pievo_posterior": false
 }

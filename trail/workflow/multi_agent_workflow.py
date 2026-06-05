@@ -159,6 +159,13 @@ def summarize(
         "generation_strategy_policy_suppressed_strategies": strategy_policy.get("suppressed_strategies", 0),
         "generation_strategy_policy_data_collection_only_strategies": strategy_policy.get("data_collection_only_strategies", 0),
         "generation_strategy_policy_total_budget": strategy_policy.get("total_budget", 0),
+        "generation_strategy_policy_high_authority_evidence_status": strategy_policy.get("high_authority_evidence_status", ""),
+        "generation_strategy_policy_high_authority_budget_mode": strategy_policy.get("high_authority_budget_mode", ""),
+        "generation_strategy_policy_active_evidence_bridge_status": strategy_policy.get("active_evidence_bridge_status", ""),
+        "generation_strategy_policy_active_evidence_updates_pievo_posterior": strategy_policy.get(
+            "active_evidence_updates_pievo_posterior",
+            False,
+        ),
         "target_conditioned_strategy_policy_targets": target_conditioned_strategy_policy.get("targets", 0),
         "target_conditioned_strategy_policy_all_targets_allocation_sum_100": target_conditioned_strategy_policy.get(
             "all_targets_allocation_sum_100"

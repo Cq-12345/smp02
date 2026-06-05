@@ -265,6 +265,10 @@
   "generation_strategy_policy_suppressed_strategies": 1,
   "generation_strategy_policy_data_collection_only_strategies": 0,
   "generation_strategy_policy_total_budget": 100,
+  "generation_strategy_policy_high_authority_evidence_status": "awaiting_high_authority_evidence",
+  "generation_strategy_policy_high_authority_budget_mode": "surrogate_backed_allocation",
+  "generation_strategy_policy_active_evidence_bridge_status": "no_active_evidence_noop",
+  "generation_strategy_policy_active_evidence_updates_pievo_posterior": false,
   "target_conditioned_strategy_policy_targets": 4,
   "target_conditioned_strategy_policy_all_targets_allocation_sum_100": true,
   "target_conditioned_strategy_policy_top_strategy_by_target": {
