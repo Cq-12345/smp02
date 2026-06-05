@@ -25,8 +25,8 @@ vae:
 predictors:
   test_size: 0.15
   pcp_tolerance: 0.15
-  selection_metric: R2 test
-  selection_higher_is_better: true
+  selection_metric: MAPEK test dataset (%)
+  selection_higher_is_better: false
   cnn_epochs: 3
   cnn_batch_size: 16
   cnn_learning_rate: 0.00001

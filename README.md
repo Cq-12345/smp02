@@ -8,7 +8,7 @@
 2. 用 ChEMBL SMILES 预训练 VAE，并用 SMP 单体随机 SMILES 增强数据 fine-tune decoder。
 3. 对 7 个 latent size `[16, 32, 64, 128, 256, 512, 1024]` 训练 VAE。
 4. 用 WVCM 将单体 latent vector 按摩尔比加权求和，复现 CNN、SVR、RF，并扩展训练 MLP、GBR、KRR、LightGBM、XGBoost、CatBoost、NGBoost 等 model zoo。
-5. 按 `selection_metric` 自动选择当前效果最好的 Tg predictor，后续 discovery 默认使用全局最佳模型。
+5. 按 `MAPEK test dataset (%)` 自动选择当前效果最好的 Tg predictor，后续 discovery 默认使用全局最佳模型。
 6. 对单体做官能团 SMARTS 分类，按热固性反应兼容规则生成合理候选配方。
 7. 枚举 5%-95% 摩尔比，用最佳模型预测 Tg，筛选 190-200°C 候选。
 8. 运行“界定搜索空间 -> 生成假设 -> 预测评估 -> 优化原则/假设”的 in-silico 闭环迭代。
@@ -35,7 +35,7 @@ Smoke 配置只训练极小样本和少量 epoch，用于检查整条链路：
 
 ## 完整复现
 
-完整配置对齐论文参数：ChEMBL 550,000 条、VAE 20 epoch pretrain + 20 epoch fine-tune、7 个 latent size、论文 CNN/SVR/RF 对比，并额外训练几十个回归模型进行统一排行。
+完整配置对齐论文参数：ChEMBL 550,000 条、VAE 20 epoch pretrain + 20 epoch fine-tune、7 个 latent size、论文 CNN/SVR/RF 对比，并额外训练几十个回归模型进行统一排行。当前主选择指标为 `MAPEK test dataset (%)`，即用 Kelvin 温标分母计算百分比误差，数值越低越好。
 
 ```bash
 ./scripts/run_reproduce.sh
@@ -55,6 +55,7 @@ PYTHONPATH=src conda run --no-capture-output -n mhc_pyg314 python -m smp02.cli t
 PYTHONPATH=src conda run --no-capture-output -n mhc_pyg314 python -m smp02.cli train-predictors --config configs/reproduce.yaml
 PYTHONPATH=src conda run --no-capture-output -n mhc_pyg314 python -m smp02.cli discover --config configs/reproduce.yaml
 PYTHONPATH=src conda run --no-capture-output -n mhc_pyg314 python -m smp02.cli closed-loop --config configs/reproduce.yaml
+PYTHONPATH=src conda run --no-capture-output -n mhc_pyg314 python scripts/summarize_reproduce_results.py
 ```
 
 ## 关键文档

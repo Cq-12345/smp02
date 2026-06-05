@@ -100,8 +100,8 @@ RF：
 
 默认选择指标来自 `configs/reproduce.yaml`：
 
-- `selection_metric: R2 test`
-- `selection_higher_is_better: true`
+- `selection_metric: MAPEK test dataset (%)`
+- `selection_higher_is_better: false`
 
 后续候选配方 discovery 使用 `discovery.predictor: best`，会自动读取全局最佳模型和对应 latent size。
 
