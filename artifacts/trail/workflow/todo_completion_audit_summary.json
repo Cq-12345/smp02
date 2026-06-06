@@ -1,0 +1,22 @@
+{
+  "audit_rows": 10,
+  "implemented_rows": 9,
+  "deferred_rows": 1,
+  "needs_real_or_high_fidelity_evidence_rows": 2,
+  "all_evidence_present_rows": 10,
+  "missing_evidence_rows": 0,
+  "non_deferred_all_evidence_present": true,
+  "primary_open_blocker": "human_process_approval_and_real_or_high_fidelity_observation",
+  "deferred_task_ids": [
+    "commodity_polymer_hypergraph_representation"
+  ],
+  "needs_evidence_task_ids": [
+    "generation_models",
+    "human_real_experiment_loop"
+  ],
+  "missing_evidence_task_ids": [],
+  "evidence_level": "todo_completion_audit_not_observation",
+  "audit_path": "artifacts/trail/workflow/todo_completion_audit.csv",
+  "summary_path": "artifacts/trail/workflow/todo_completion_audit_summary.json",
+  "report_path": "reports/todo_completion_audit.md"
+}

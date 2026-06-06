@@ -67,6 +67,7 @@ def summarize(
     active_evidence_pievo_bridge_summary: Path = Path(
         "artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json"
     ),
+    todo_completion_audit_summary: Path = Path("artifacts/trail/workflow/todo_completion_audit_summary.json"),
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -97,6 +98,7 @@ def summarize(
     validation_result_intake = read_json(validation_result_intake_summary, {})
     active_observations = read_json(active_observation_summary, {})
     active_evidence_pievo_bridge = read_json(active_evidence_pievo_bridge_summary, {})
+    todo_completion_audit = read_json(todo_completion_audit_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
     generative_training = read_json(generative_training_summary, {})
     sft_candidate_generation = read_json(sft_candidate_generation_summary, {})
@@ -361,6 +363,20 @@ def summarize(
         "active_evidence_pievo_bridge_posterior_entropy": active_evidence_pievo_bridge.get("posterior_entropy"),
         "active_evidence_pievo_bridge_map_principle": active_evidence_pievo_bridge.get("map_principle", ""),
         "active_evidence_updates_pievo_posterior": active_evidence_pievo_bridge.get("active_evidence_updates_posterior", False),
+        "todo_completion_audit_rows": todo_completion_audit.get("audit_rows", 0),
+        "todo_completion_implemented_rows": todo_completion_audit.get("implemented_rows", 0),
+        "todo_completion_deferred_rows": todo_completion_audit.get("deferred_rows", 0),
+        "todo_completion_needs_real_or_high_fidelity_evidence_rows": todo_completion_audit.get(
+            "needs_real_or_high_fidelity_evidence_rows",
+            0,
+        ),
+        "todo_completion_missing_evidence_rows": todo_completion_audit.get("missing_evidence_rows", 0),
+        "todo_completion_non_deferred_all_evidence_present": todo_completion_audit.get(
+            "non_deferred_all_evidence_present",
+            False,
+        ),
+        "todo_completion_primary_open_blocker": todo_completion_audit.get("primary_open_blocker", ""),
+        "todo_completion_evidence_level": todo_completion_audit.get("evidence_level", ""),
         "gnn_global_feature_architecture": gnn_global.get("architecture"),
         "gnn_global_feature_best_case": gnn_global.get("best_case"),
         "gnn_global_feature_baseline_mapek_test_pct": gnn_global.get("baseline_mapek_test_pct"),
@@ -472,6 +488,10 @@ def main() -> None:
         "--active-evidence-pievo-bridge-summary",
         default="artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json",
     )
+    parser.add_argument(
+        "--todo-completion-audit-summary",
+        default="artifacts/trail/workflow/todo_completion_audit_summary.json",
+    )
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--sft-candidate-generation-summary", default="artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json")
@@ -526,6 +546,7 @@ def main() -> None:
         Path(args.validation_result_intake_summary),
         Path(args.active_observation_summary),
         Path(args.active_evidence_pievo_bridge_summary),
+        Path(args.todo_completion_audit_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

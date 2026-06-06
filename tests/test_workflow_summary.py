@@ -410,6 +410,22 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    todo_audit = tmp_path / "todo_audit.json"
+    todo_audit.write_text(
+        json.dumps(
+            {
+                "audit_rows": 10,
+                "implemented_rows": 9,
+                "deferred_rows": 1,
+                "needs_real_or_high_fidelity_evidence_rows": 2,
+                "missing_evidence_rows": 0,
+                "non_deferred_all_evidence_present": True,
+                "primary_open_blocker": "human_process_approval_and_real_or_high_fidelity_observation",
+                "evidence_level": "todo_completion_audit_not_observation",
+            }
+        ),
+        encoding="utf-8",
+    )
     gnn_global = tmp_path / "gnn_global.json"
     gnn_global.write_text(
         json.dumps(
@@ -537,6 +553,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         validation_result_intake,
         active_observations,
         active_evidence_pievo_bridge,
+        todo_audit,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -705,6 +722,14 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["active_evidence_pievo_bridge_posterior_history_rows"] == 1
     assert result["active_evidence_pievo_bridge_total_authority_weight"] == 3.0
     assert result["active_evidence_pievo_bridge_posterior_entropy"] == 2.5
+    assert result["todo_completion_audit_rows"] == 10
+    assert result["todo_completion_implemented_rows"] == 9
+    assert result["todo_completion_deferred_rows"] == 1
+    assert result["todo_completion_needs_real_or_high_fidelity_evidence_rows"] == 2
+    assert result["todo_completion_missing_evidence_rows"] == 0
+    assert result["todo_completion_non_deferred_all_evidence_present"] is True
+    assert result["todo_completion_primary_open_blocker"] == "human_process_approval_and_real_or_high_fidelity_observation"
+    assert result["todo_completion_evidence_level"] == "todo_completion_audit_not_observation"
     assert result["active_evidence_pievo_bridge_map_principle"] == "cyanate_ester_triazine"
     assert result["active_evidence_updates_pievo_posterior"] is True
     assert result["gnn_global_feature_architecture"] == "mpnn"
