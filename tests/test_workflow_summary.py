@@ -444,6 +444,24 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    external_generator_checklist = tmp_path / "external_generator_checklist.json"
+    external_generator_checklist.write_text(
+        json.dumps(
+            {
+                "checklist_rows": 4,
+                "ready_external_provider_rows": 3,
+                "suppressed_or_blocked_rows": 1,
+                "sft_ready": True,
+                "diffusion_flow_ready": True,
+                "sft_examples": 268,
+                "diffusion_flow_seed_rows": 268,
+                "ready_strategy_counts": {"sft_candidate_generator": 1},
+                "blocked_strategy_counts": {"llm_smiles_generation": 1},
+                "evidence_level": "external_generator_output_checklist_not_observation",
+            }
+        ),
+        encoding="utf-8",
+    )
     gnn_global = tmp_path / "gnn_global.json"
     gnn_global.write_text(
         json.dumps(
@@ -573,6 +591,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         active_observations,
         active_evidence_pievo_bridge,
         todo_audit,
+        external_generator_checklist,
     )
 
     assert result["predictor_ensemble_models"] == 6
@@ -759,6 +778,16 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["todo_completion_non_deferred_all_evidence_present"] is True
     assert result["todo_completion_primary_open_blocker"] == "human_process_approval_and_real_or_high_fidelity_observation"
     assert result["todo_completion_evidence_level"] == "todo_completion_audit_not_observation"
+    assert result["external_generator_checklist_rows"] == 4
+    assert result["external_generator_ready_provider_rows"] == 3
+    assert result["external_generator_suppressed_or_blocked_rows"] == 1
+    assert result["external_generator_sft_ready"] is True
+    assert result["external_generator_diffusion_flow_ready"] is True
+    assert result["external_generator_sft_examples"] == 268
+    assert result["external_generator_diffusion_flow_seed_rows"] == 268
+    assert result["external_generator_ready_strategy_counts"]["sft_candidate_generator"] == 1
+    assert result["external_generator_blocked_strategy_counts"]["llm_smiles_generation"] == 1
+    assert result["external_generator_evidence_level"] == "external_generator_output_checklist_not_observation"
     assert result["active_evidence_pievo_bridge_map_principle"] == "cyanate_ester_triazine"
     assert result["active_evidence_updates_pievo_posterior"] is True
     assert result["gnn_global_feature_architecture"] == "mpnn"

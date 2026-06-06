@@ -216,6 +216,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/train_condit
   --out-dir artifacts/trail/generation/diffusion_flow_trained_generator \
   --report reports/diffusion_flow_trained_generator.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_external_generator_output_checklist.py \
+  --out-dir artifacts/trail/generation/external_generator_output_checklist \
+  --report reports/external_generator_output_checklist.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/update_generation_strategy_policy.py \
   --out-dir artifacts/trail/generation_strategy_policy \
   --report reports/generation_strategy_bandit_policy.md
@@ -308,6 +312,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --active-observation-summary artifacts/trail/human_review/active_high_authority_observation_summary.json \
   --active-evidence-pievo-bridge-summary artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json \
   --todo-completion-audit-summary artifacts/trail/workflow/todo_completion_audit_summary.json \
+  --external-generator-output-checklist-summary artifacts/trail/generation/external_generator_output_checklist/external_generator_output_checklist_summary.json \
   --gnn-global-feature-summary artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json \
   --generative-training-summary artifacts/trail/generation/generative_training_sets/generative_training_summary.json \
   --sft-candidate-generation-summary artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json \
@@ -397,6 +402,7 @@ SFT / diffusion / flow readiness 已补充：
 - 当前 16 个 generation ledgers 共 1965 条输入，其中 303 条通过 Harness，去重后得到 227 条训练候选。
 - SFT JSONL 为 192 条 train、35 条 eval，`sft_ready=true`；当前门槛 20 条已通过，SFT dry-run 和轻量监督 trained projection smoke 均已完成。
 - diffusion/flow seed table 为 192 条 train、35 条 eval，`diffusion_flow_ready=true`；当前门槛 100 条已通过，且 diffusion/flow dry-run 与轻量 flow-matching 训练 smoke 已完成。
+- `scripts/build_external_generator_output_checklist.py` 已把真实外部 LLM/SFT/decoder/flow 输出接入前的门禁结构化：4 类 provider task 中 3 类 ready，`llm_smiles_generation` 仍 suppressed；所有外部输出只能先提交 generation records。
 - 这一步仍不直接推荐 SFT/flow 输出；训练后生成的候选必须重新写入 ledger，并经过 predictor、Harness、PiEvo 和人工审核。
 
 SFT candidate generator dry-run 已补充：

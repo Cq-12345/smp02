@@ -541,6 +541,22 @@
   "todo_completion_non_deferred_all_evidence_present": true,
   "todo_completion_primary_open_blocker": "human_process_approval_and_real_or_high_fidelity_observation",
   "todo_completion_evidence_level": "todo_completion_audit_not_observation",
+  "external_generator_checklist_rows": 4,
+  "external_generator_ready_provider_rows": 3,
+  "external_generator_suppressed_or_blocked_rows": 1,
+  "external_generator_sft_ready": true,
+  "external_generator_diffusion_flow_ready": true,
+  "external_generator_sft_examples": 268,
+  "external_generator_diffusion_flow_seed_rows": 268,
+  "external_generator_ready_strategy_counts": {
+    "llm_rag_principle_generation": 1,
+    "sft_candidate_generator": 1,
+    "diffusion_or_flow_matching": 1
+  },
+  "external_generator_blocked_strategy_counts": {
+    "llm_smiles_generation": 1
+  },
+  "external_generator_evidence_level": "external_generator_output_checklist_not_observation",
   "gnn_global_feature_architecture": "mpnn",
   "gnn_global_feature_best_case": "mpnn_baseline",
   "gnn_global_feature_baseline_mapek_test_pct": 11.051218783853365,

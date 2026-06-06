@@ -74,6 +74,7 @@ DEFAULT_ENTRIES = [
             "reports/sft_candidate_generator_dry_run.md",
             "reports/diffusion_flow_candidate_generator_dry_run.md",
             "reports/diffusion_flow_trained_generator.md",
+            "reports/external_generator_output_checklist.md",
             "docs/generation_strategy_and_harness.md",
         ],
         "next_action": "接入真实外部 LLM/SFT 或有效 SMILES decoder；输出仍走 ledger/Harness/PiEvo",

@@ -1,0 +1,24 @@
+{
+  "checklist_rows": 4,
+  "ready_external_provider_rows": 3,
+  "suppressed_or_blocked_rows": 1,
+  "sft_ready": true,
+  "diffusion_flow_ready": true,
+  "sft_examples": 268,
+  "diffusion_flow_seed_rows": 268,
+  "strategy_policy_top_strategy": "llm_rag_principle_generation",
+  "strategy_policy_high_authority_evidence_status": "awaiting_high_authority_evidence",
+  "ready_strategy_counts": {
+    "llm_rag_principle_generation": 1,
+    "sft_candidate_generator": 1,
+    "diffusion_or_flow_matching": 1
+  },
+  "blocked_strategy_counts": {
+    "llm_smiles_generation": 1
+  },
+  "creates_observation": false,
+  "evidence_level": "external_generator_output_checklist_not_observation",
+  "checklist_path": "artifacts/trail/generation/external_generator_output_checklist/external_generator_output_checklist.csv",
+  "summary_path": "artifacts/trail/generation/external_generator_output_checklist/external_generator_output_checklist_summary.json",
+  "report_path": "reports/external_generator_output_checklist.md"
+}

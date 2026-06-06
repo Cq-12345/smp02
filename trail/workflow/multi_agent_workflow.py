@@ -71,6 +71,9 @@ def summarize(
         "artifacts/pievo_faithful_active_evidence_bridge_smoke/active_evidence_pievo_bridge_summary.json"
     ),
     todo_completion_audit_summary: Path = Path("artifacts/trail/workflow/todo_completion_audit_summary.json"),
+    external_generator_output_checklist_summary: Path = Path(
+        "artifacts/trail/generation/external_generator_output_checklist/external_generator_output_checklist_summary.json"
+    ),
 ) -> dict:
     candidates = pd.read_csv(candidate_space) if candidate_space.exists() else pd.DataFrame()
     history = read_json(closed_loop_history, [])
@@ -103,6 +106,7 @@ def summarize(
     active_observations = read_json(active_observation_summary, {})
     active_evidence_pievo_bridge = read_json(active_evidence_pievo_bridge_summary, {})
     todo_completion_audit = read_json(todo_completion_audit_summary, {})
+    external_generator_output_checklist = read_json(external_generator_output_checklist_summary, {})
     gnn_global = read_json(gnn_global_feature_summary, {})
     generative_training = read_json(generative_training_summary, {})
     sft_candidate_generation = read_json(sft_candidate_generation_summary, {})
@@ -397,6 +401,16 @@ def summarize(
         ),
         "todo_completion_primary_open_blocker": todo_completion_audit.get("primary_open_blocker", ""),
         "todo_completion_evidence_level": todo_completion_audit.get("evidence_level", ""),
+        "external_generator_checklist_rows": external_generator_output_checklist.get("checklist_rows", 0),
+        "external_generator_ready_provider_rows": external_generator_output_checklist.get("ready_external_provider_rows", 0),
+        "external_generator_suppressed_or_blocked_rows": external_generator_output_checklist.get("suppressed_or_blocked_rows", 0),
+        "external_generator_sft_ready": external_generator_output_checklist.get("sft_ready", False),
+        "external_generator_diffusion_flow_ready": external_generator_output_checklist.get("diffusion_flow_ready", False),
+        "external_generator_sft_examples": external_generator_output_checklist.get("sft_examples", 0),
+        "external_generator_diffusion_flow_seed_rows": external_generator_output_checklist.get("diffusion_flow_seed_rows", 0),
+        "external_generator_ready_strategy_counts": external_generator_output_checklist.get("ready_strategy_counts", {}),
+        "external_generator_blocked_strategy_counts": external_generator_output_checklist.get("blocked_strategy_counts", {}),
+        "external_generator_evidence_level": external_generator_output_checklist.get("evidence_level", ""),
         "gnn_global_feature_architecture": gnn_global.get("architecture"),
         "gnn_global_feature_best_case": gnn_global.get("best_case"),
         "gnn_global_feature_baseline_mapek_test_pct": gnn_global.get("baseline_mapek_test_pct"),
@@ -516,6 +530,10 @@ def main() -> None:
         "--todo-completion-audit-summary",
         default="artifacts/trail/workflow/todo_completion_audit_summary.json",
     )
+    parser.add_argument(
+        "--external-generator-output-checklist-summary",
+        default="artifacts/trail/generation/external_generator_output_checklist/external_generator_output_checklist_summary.json",
+    )
     parser.add_argument("--gnn-global-feature-summary", default="artifacts/trail/gnn_global_feature_smoke/gnn_global_feature_summary.json")
     parser.add_argument("--generative-training-summary", default="artifacts/trail/generation/generative_training_sets/generative_training_summary.json")
     parser.add_argument("--sft-candidate-generation-summary", default="artifacts/trail/generation/sft_candidate_dry_run/generation_record_summary.json")
@@ -572,6 +590,7 @@ def main() -> None:
         Path(args.active_observation_summary),
         Path(args.active_evidence_pievo_bridge_summary),
         Path(args.todo_completion_audit_summary),
+        Path(args.external_generator_output_checklist_summary),
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

@@ -218,4 +218,4 @@ Agent 分工：
 - 对 dormant principle 做剪枝策略。
 - 对不同目标 Tg 批量运行，观察 posterior 是否随目标变化。
 - 对 GNN global features 做更长训练，并评估是否作为结构视角加入 predictor ensemble disagreement。
-- SFT dry-run、SFT trained projection、diffusion/flow dry-run 和轻量 flow-matching 训练 smoke 已跑通；下一步可做真实 LLM/SFT fine-tune 输出对比，改进 flow 训练/投影质量，或加入有效 SMILES decoder。训练输出必须写回 generation ledger，再经过 predictor、Harness、PiEvo 和人工审核。
+- SFT dry-run、SFT trained projection、diffusion/flow dry-run 和轻量 flow-matching 训练 smoke 已跑通；`scripts/build_external_generator_output_checklist.py` 已把真实 LLM/SFT fine-tune、有效 SMILES decoder 或外部 diffusion/flow 输出的提交门禁结构化。外部生成输出必须写回 generation ledger，再经过 predictor、Harness、PiEvo 和人工审核。

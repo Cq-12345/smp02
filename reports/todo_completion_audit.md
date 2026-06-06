@@ -28,7 +28,7 @@
 | 知识库/先验库/本体 | implemented_needs_more_literature_extraction | 4/4 | 从更多 SMP 文献抽取固化程序和 process fields |
 | 候选组分数据集/来源/官能团分类 | implemented | 4/4 | 用真实/高保真 evidence 调整 source authority |
 | 预测模型/CNN-SVR-RF/GNN/model zoo | implemented | 5/5 | 更长 GNN 训练，并评估是否纳入 ensemble/OOD 审计 |
-| 生成模型/VAE/LLM/RAG/SFT/diffusion/flow/Harness | implemented_smoke_needs_real_generator_outputs | 6/6 | 接入真实外部 LLM/SFT 或有效 SMILES decoder；输出仍走 ledger/Harness/PiEvo |
+| 生成模型/VAE/LLM/RAG/SFT/diffusion/flow/Harness | implemented_smoke_needs_real_generator_outputs | 7/7 | 接入真实外部 LLM/SFT 或有效 SMILES decoder；输出仍走 ledger/Harness/PiEvo |
 | PiEvo-faithful/原则 posterior/IDS/full-history | implemented | 4/4 | 用高权重真实/高保真 evidence 检验 posterior shift |
 | 人工闭环/真实实验结果迭代优化 | implemented_blocked_by_human_or_high_fidelity_evidence | 6/6 | 先审核 12 行 process approval，再执行高保真/真实结果 intake |
 | 多智能体 workflow/服务化总览 | implemented | 3/3 | 后续把真实 provider/真实实验结果接入同一 summary |
