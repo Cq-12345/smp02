@@ -97,6 +97,7 @@ DEFAULT_ENTRIES = [
         "evidence_paths": [
             "reports/human_experiment_review_queue.md",
             "reports/process_approval_intake.md",
+            "reports/process_approval_reviewer_checklist.md",
             "reports/high_fidelity_protocol_packet.md",
             "reports/validation_dependency_graph.md",
             "reports/active_high_authority_observation_ledger.md",

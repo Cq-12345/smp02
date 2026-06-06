@@ -328,6 +328,24 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    process_approval_reviewer = tmp_path / "process_approval_reviewer.json"
+    process_approval_reviewer.write_text(
+        json.dumps(
+            {
+                "checklist_rows": 12,
+                "ready_for_human_review_rows": 12,
+                "already_submitted_rows": 0,
+                "accepted_process_approval_rows": 0,
+                "can_unlock_high_fidelity_protocol_rows": 12,
+                "downstream_protocol_rows": 13,
+                "target_counts": {"195.0": 4, "250.0": 8},
+                "suggested_field_frequency": {"cure_temperature_c": 10},
+                "approval_gate_status": "awaiting_human_process_approval",
+                "evidence_level": "process_approval_reviewer_checklist_not_observation",
+            }
+        ),
+        encoding="utf-8",
+    )
     high_fidelity_protocol = tmp_path / "high_fidelity_protocol.json"
     high_fidelity_protocol.write_text(
         json.dumps(
@@ -548,6 +566,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         process_completion_packet,
         process_design_suggestion,
         process_approval,
+        process_approval_reviewer,
         high_fidelity_protocol,
         validation_dependency,
         validation_result_intake,
@@ -684,6 +703,16 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["process_approval_ready_process_record_rows"] == 0
     assert result["process_approval_unblocked_observation_request_rows"] == 0
     assert result["process_approval_gate_status"] == "awaiting_human_process_approval"
+    assert result["process_approval_reviewer_checklist_rows"] == 12
+    assert result["process_approval_reviewer_ready_rows"] == 12
+    assert result["process_approval_reviewer_already_submitted_rows"] == 0
+    assert result["process_approval_reviewer_accepted_rows"] == 0
+    assert result["process_approval_reviewer_can_unlock_high_fidelity_rows"] == 12
+    assert result["process_approval_reviewer_downstream_protocol_rows"] == 13
+    assert result["process_approval_reviewer_target_counts"]["250.0"] == 8
+    assert result["process_approval_reviewer_suggested_field_frequency"]["cure_temperature_c"] == 10
+    assert result["process_approval_reviewer_gate_status"] == "awaiting_human_process_approval"
+    assert result["process_approval_reviewer_evidence_level"] == "process_approval_reviewer_checklist_not_observation"
     assert result["high_fidelity_protocol_rows"] == 25
     assert result["high_fidelity_protocol_ready_rows"] == 0
     assert result["high_fidelity_protocol_blocked_rows"] == 25

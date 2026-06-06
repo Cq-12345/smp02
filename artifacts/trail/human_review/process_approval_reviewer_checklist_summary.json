@@ -1,0 +1,43 @@
+{
+  "input_approval_rows": 12,
+  "checklist_rows": 12,
+  "ready_for_human_review_rows": 12,
+  "already_submitted_rows": 0,
+  "accepted_process_approval_rows": 0,
+  "can_unlock_high_fidelity_protocol_rows": 12,
+  "downstream_protocol_rows": 13,
+  "target_counts": {
+    "195.0": 4,
+    "250.0": 8
+  },
+  "candidate_origin_counts": {
+    "sparse_target_replacement_250": 8,
+    "pievo_latent_local_search_selected": 3,
+    "vae_latent_local_search": 1
+  },
+  "process_template_counts": {
+    "epoxy_amine_thermal_cure": 5,
+    "epoxy_anhydride_catalyzed_cure": 4,
+    "anhydride_amine_imidization": 2,
+    "maleimide_addition_or_copolymerization": 1
+  },
+  "suggested_field_frequency": {
+    "mix_temperature_c": 6,
+    "cure_temperature_c": 10,
+    "cure_time_h": 6,
+    "post_cure_temperature_c": 10,
+    "post_cure_time_h": 6,
+    "catalyst_loading": 4,
+    "solvent": 2,
+    "imidization_temperature_c": 2,
+    "imidization_time_h": 2,
+    "co_reactant_stoichiometry": 1
+  },
+  "approval_gate_status": "awaiting_human_process_approval",
+  "max_downstream_authority_weight_if_completed": 3.0,
+  "creates_observation": false,
+  "evidence_level": "process_approval_reviewer_checklist_not_observation",
+  "checklist_path": "artifacts/trail/human_review/process_approval_reviewer_checklist.csv",
+  "summary_path": "artifacts/trail/human_review/process_approval_reviewer_checklist_summary.json",
+  "report_path": "reports/process_approval_reviewer_checklist.md"
+}

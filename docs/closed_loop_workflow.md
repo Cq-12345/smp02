@@ -249,6 +249,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_proce
   --out-dir artifacts/trail/human_review \
   --report reports/process_approval_intake.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_process_approval_reviewer_checklist.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/process_approval_reviewer_checklist.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_high_fidelity_protocol_packet.py \
   --out-dir artifacts/trail/human_review \
   --report reports/high_fidelity_protocol_packet.md
@@ -297,6 +301,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --process-completion-packet-summary artifacts/trail/human_review/process_completion_packet_summary.json \
   --process-design-suggestion-summary artifacts/trail/human_review/process_design_suggestion_summary.json \
   --process-approval-summary artifacts/trail/human_review/process_completion_approval_summary.json \
+  --process-approval-reviewer-checklist-summary artifacts/trail/human_review/process_approval_reviewer_checklist_summary.json \
   --high-fidelity-protocol-summary artifacts/trail/human_review/high_fidelity_protocol_summary.json \
   --validation-dependency-summary artifacts/trail/human_review/validation_dependency_summary.json \
   --validation-result-intake-summary artifacts/trail/human_review/validation_result_intake_summary.json \
@@ -466,6 +471,7 @@ Human experiment review queue 已补充：
 - `scripts/build_process_completion_packet.py` 已把 immediate batch 展开成 12 行可填写工艺补全模板；12 行都能通过基础 process record 格式，但因字段未填和未批准，`ready_for_active_ledger=0`。
 - `scripts/build_process_design_suggestion_packet.py` 已把 12 行工艺补全模板转成知识模板驱动的工艺建议：12 行基础 process record 通过，12 行字段可由模板建议补全，8 行是 250 C 高 Tg 工艺窗口，5 行有高 predictor sigma；但所有行仍保持 `review_status=needs_human_review`，`ready_for_active_ledger=0`。
 - `scripts/import_process_approval_intake.py` 已生成 12 行人工审批模板；当前没有人工提交的审批记录，因此 `accepted_process_approval_rows=0`、`unblocked_observation_request_rows=0`。即使未来审批通过，也只是解锁对应 high-fidelity/real request，仍不会直接写入 observation ledger。
+- `scripts/build_process_approval_reviewer_checklist.py` 已把 12 行审批模板转成 reviewer checklist：12 行都 ready for human review，当前 0 行 submitted/accepted；这 12 行若通过，可解锁 13 条 downstream high-fidelity protocol。字段频次最高的是 `cure_temperature_c` 和 `post_cure_temperature_c`，各 10 次。
 - `scripts/build_high_fidelity_protocol_packet.py` 已把 25 条 high-fidelity request 展开成方法协议包：195 C 12 条、250 C 13 条；当前 0 条 ready、25 条仍被 process approval 阻塞。协议包只列出 `process_feasibility_review`、`model_ensemble_recheck`、`high_fidelity_simulation_or_expanded_model_ensemble` 等必需方法，不产生 observation。
 - `scripts/build_validation_dependency_graph.py` 已把 request、process approval、high-fidelity protocol、result intake 和 active evidence gate 形式化成 DAG：118 个节点、125 条边，当前 125 条边全部 blocked/pending。critical path 的下一步是审核 12 行 `process_completion_approval_template`。
 - `scripts/import_validation_request_results.py` 已生成 25 条 high-fidelity result intake template；当前没有完成结果，因此 0 条 accepted observation、0 条 observation ledger pass。
@@ -473,6 +479,6 @@ Human experiment review queue 已补充：
 - PiEvo 外部观测加载器现在支持 `external_observation_allowed_source_types` 和 `external_observation_require_active_evidence`；active-evidence bridge 用这些二级过滤保护 posterior。
 - `scripts/run_active_evidence_pievo_bridge.py` 已验证 active ledger 可进入 PiEvo full-history posterior 路径；当前 `bridge_status=no_active_evidence_noop`，`external_accepted_rows=0`，`active_evidence_updates_posterior=false`。
 - `scripts/build_todo_completion_audit.py` 已把 TODO 覆盖情况转成 10 行审计表：9 行 implemented、1 行按用户要求 deferred、0 行 evidence missing；主阻塞是人工 process approval 和真实/高保真 observation。
-- Workflow summary 已读取 `human_experiment_review_queue_summary.json`、`pre_experiment_validation_plan_summary.json`、`validation_request_summary.json`、`process_completion_packet_summary.json`、`process_design_suggestion_summary.json`、`process_completion_approval_summary.json`、`high_fidelity_protocol_summary.json`、`validation_dependency_summary.json`、`validation_result_intake_summary.json`、`active_high_authority_observation_summary.json`、`active_evidence_pievo_bridge_summary.json` 和 `todo_completion_audit_summary.json`，并记录 `human_review_*`、`human_validation_*`、`validation_request_*`、`process_completion_packet_*`、`process_design_suggestion_*`、`process_approval_*`、`high_fidelity_protocol_*`、`validation_dependency_*`、`validation_result_*`、`active_observation_*`、`active_evidence_pievo_bridge_*` 与 `todo_completion_*` 字段，让人工闭环不再只是 schema 和说明文档。
+- Workflow summary 已读取 `human_experiment_review_queue_summary.json`、`pre_experiment_validation_plan_summary.json`、`validation_request_summary.json`、`process_completion_packet_summary.json`、`process_design_suggestion_summary.json`、`process_completion_approval_summary.json`、`process_approval_reviewer_checklist_summary.json`、`high_fidelity_protocol_summary.json`、`validation_dependency_summary.json`、`validation_result_intake_summary.json`、`active_high_authority_observation_summary.json`、`active_evidence_pievo_bridge_summary.json` 和 `todo_completion_audit_summary.json`，并记录 `human_review_*`、`human_validation_*`、`validation_request_*`、`process_completion_packet_*`、`process_design_suggestion_*`、`process_approval_*`、`process_approval_reviewer_*`、`high_fidelity_protocol_*`、`validation_dependency_*`、`validation_result_*`、`active_observation_*`、`active_evidence_pievo_bridge_*` 与 `todo_completion_*` 字段，让人工闭环不再只是 schema 和说明文档。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

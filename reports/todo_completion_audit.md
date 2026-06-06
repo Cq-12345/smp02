@@ -30,7 +30,7 @@
 | 预测模型/CNN-SVR-RF/GNN/model zoo | implemented | 5/5 | 更长 GNN 训练，并评估是否纳入 ensemble/OOD 审计 |
 | 生成模型/VAE/LLM/RAG/SFT/diffusion/flow/Harness | implemented_smoke_needs_real_generator_outputs | 6/6 | 接入真实外部 LLM/SFT 或有效 SMILES decoder；输出仍走 ledger/Harness/PiEvo |
 | PiEvo-faithful/原则 posterior/IDS/full-history | implemented | 4/4 | 用高权重真实/高保真 evidence 检验 posterior shift |
-| 人工闭环/真实实验结果迭代优化 | implemented_blocked_by_human_or_high_fidelity_evidence | 5/5 | 先审核 12 行 process approval，再执行高保真/真实结果 intake |
+| 人工闭环/真实实验结果迭代优化 | implemented_blocked_by_human_or_high_fidelity_evidence | 6/6 | 先审核 12 行 process approval，再执行高保真/真实结果 intake |
 | 多智能体 workflow/服务化总览 | implemented | 3/3 | 后续把真实 provider/真实实验结果接入同一 summary |
 | RL/策略层预算分配 | implemented_surrogate_backed | 3/3 | 高权重 evidence 进入后，比较 posterior shift 再调预算 |
 

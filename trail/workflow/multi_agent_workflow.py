@@ -60,6 +60,9 @@ def summarize(
     process_completion_packet_summary: Path = Path("artifacts/trail/human_review/process_completion_packet_summary.json"),
     process_design_suggestion_summary: Path = Path("artifacts/trail/human_review/process_design_suggestion_summary.json"),
     process_approval_summary: Path = Path("artifacts/trail/human_review/process_completion_approval_summary.json"),
+    process_approval_reviewer_checklist_summary: Path = Path(
+        "artifacts/trail/human_review/process_approval_reviewer_checklist_summary.json"
+    ),
     high_fidelity_protocol_summary: Path = Path("artifacts/trail/human_review/high_fidelity_protocol_summary.json"),
     validation_dependency_summary: Path = Path("artifacts/trail/human_review/validation_dependency_summary.json"),
     validation_result_intake_summary: Path = Path("artifacts/trail/human_review/validation_result_intake_summary.json"),
@@ -93,6 +96,7 @@ def summarize(
     process_completion_packet = read_json(process_completion_packet_summary, {})
     process_design_suggestion = read_json(process_design_suggestion_summary, {})
     process_approval = read_json(process_approval_summary, {})
+    process_approval_reviewer_checklist = read_json(process_approval_reviewer_checklist_summary, {})
     high_fidelity_protocol = read_json(high_fidelity_protocol_summary, {})
     validation_dependency = read_json(validation_dependency_summary, {})
     validation_result_intake = read_json(validation_result_intake_summary, {})
@@ -312,6 +316,22 @@ def summarize(
         "process_approval_unblocked_target_counts": process_approval.get("unblocked_target_counts", {}),
         "process_approval_unblocked_source_counts": process_approval.get("unblocked_source_counts", {}),
         "process_approval_gate_status": process_approval.get("approval_gate_status", ""),
+        "process_approval_reviewer_checklist_rows": process_approval_reviewer_checklist.get("checklist_rows", 0),
+        "process_approval_reviewer_ready_rows": process_approval_reviewer_checklist.get("ready_for_human_review_rows", 0),
+        "process_approval_reviewer_already_submitted_rows": process_approval_reviewer_checklist.get("already_submitted_rows", 0),
+        "process_approval_reviewer_accepted_rows": process_approval_reviewer_checklist.get("accepted_process_approval_rows", 0),
+        "process_approval_reviewer_can_unlock_high_fidelity_rows": process_approval_reviewer_checklist.get(
+            "can_unlock_high_fidelity_protocol_rows",
+            0,
+        ),
+        "process_approval_reviewer_downstream_protocol_rows": process_approval_reviewer_checklist.get("downstream_protocol_rows", 0),
+        "process_approval_reviewer_target_counts": process_approval_reviewer_checklist.get("target_counts", {}),
+        "process_approval_reviewer_suggested_field_frequency": process_approval_reviewer_checklist.get(
+            "suggested_field_frequency",
+            {},
+        ),
+        "process_approval_reviewer_gate_status": process_approval_reviewer_checklist.get("approval_gate_status", ""),
+        "process_approval_reviewer_evidence_level": process_approval_reviewer_checklist.get("evidence_level", ""),
         "high_fidelity_protocol_rows": high_fidelity_protocol.get("high_fidelity_protocol_rows", 0),
         "high_fidelity_protocol_ready_rows": high_fidelity_protocol.get("ready_protocol_rows", 0),
         "high_fidelity_protocol_blocked_rows": high_fidelity_protocol.get("blocked_protocol_rows", 0),
@@ -469,6 +489,10 @@ def main() -> None:
         default="artifacts/trail/human_review/process_completion_approval_summary.json",
     )
     parser.add_argument(
+        "--process-approval-reviewer-checklist-summary",
+        default="artifacts/trail/human_review/process_approval_reviewer_checklist_summary.json",
+    )
+    parser.add_argument(
         "--high-fidelity-protocol-summary",
         default="artifacts/trail/human_review/high_fidelity_protocol_summary.json",
     )
@@ -541,6 +565,7 @@ def main() -> None:
         Path(args.process_completion_packet_summary),
         Path(args.process_design_suggestion_summary),
         Path(args.process_approval_summary),
+        Path(args.process_approval_reviewer_checklist_summary),
         Path(args.high_fidelity_protocol_summary),
         Path(args.validation_dependency_summary),
         Path(args.validation_result_intake_summary),

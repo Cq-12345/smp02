@@ -189,6 +189,20 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_proce
 - `process_completion_approval_summary.json`
 - `reports/process_approval_intake.md`
 
+Process approval reviewer checklist：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_process_approval_reviewer_checklist.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/process_approval_reviewer_checklist.md
+```
+
+输出：
+
+- `process_approval_reviewer_checklist.csv`
+- `process_approval_reviewer_checklist_summary.json`
+- `reports/process_approval_reviewer_checklist.md`
+
 High-fidelity protocol packet：
 
 ```bash
@@ -333,6 +347,14 @@ Smoke 结果：
 - 审批后的 process record 还会重新进入 `import_process_records`，必须 `ready_for_active_ledger=true`，才允许解锁同一 `linked_observation_id` 的 high-fidelity 或 real request。
 - 当前没有人工提交的 `process_completion_approval_completed.csv`，因此 `submitted_approval_rows=0`、`accepted_process_approval_rows=0`、`unblocked_observation_request_rows=0`。
 - 这一步只解锁后续 validation result intake，不产生 Tg observation；高保真/真实/文献结果仍必须单独填写 `observed_tg_c`、method、operator，并通过 result intake 和 active evidence gate。
+
+当前 process approval reviewer checklist：
+
+- `scripts/build_process_approval_reviewer_checklist.py` 会把 12 行审批模板转成 reviewer checklist，并连接到下游 high-fidelity protocol。
+- 当前 12 行都 `ready_for_human_review=true`，0 行 submitted，0 行 accepted；这意味着还没有人工审批被写入系统。
+- 12 行 checklist 可解锁 13 条 downstream high-fidelity protocol；目标分布为 195 C 4 行、250 C 8 行。
+- 建议字段频次最高的是 `cure_temperature_c=10`、`post_cure_temperature_c=10`、`mix_temperature_c=6`、`cure_time_h=6`、`post_cure_time_h=6`。
+- checklist 的 `evidence_level=process_approval_reviewer_checklist_not_observation`；它只是审查行动包，不产生 Tg observation。
 
 当前 high-fidelity protocol packet：
 
