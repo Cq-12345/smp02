@@ -203,6 +203,21 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_high_f
 - `high_fidelity_protocol_summary.json`
 - `reports/high_fidelity_protocol_packet.md`
 
+Validation dependency graph：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_validation_dependency_graph.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/validation_dependency_graph.md
+```
+
+输出：
+
+- `validation_dependency_nodes.csv`
+- `validation_dependency_edges.csv`
+- `validation_dependency_summary.json`
+- `reports/validation_dependency_graph.md`
+
 ## 5. 与 PiEvo 的连接
 
 当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
@@ -326,6 +341,14 @@ Smoke 结果：
 - 当前 `ready_protocol_rows=0`、`blocked_protocol_rows=25`、`process_approval_unblocked_rows=0`，因为尚无人工 process approval 解锁这些 request。
 - 方法频次为 `process_feasibility_review=25`、`model_ensemble_recheck=25`、`high_fidelity_simulation_or_expanded_model_ensemble=25`、`thermal_stability_pre_screen=13`、`target_specific_literature_check=13`。
 - 协议包的 `evidence_level=high_fidelity_protocol_template_not_observation`；它只定义高保真/扩展集成模型应如何执行和记录，不能作为 Tg observation。
+
+当前 validation dependency graph：
+
+- `scripts/build_validation_dependency_graph.py` 会把 request、process approval、high-fidelity protocol、validation result intake 和 active evidence gate 连接成 DAG 风格的节点/边表。
+- 当前有 118 个节点、125 条边；由于没有人工 process approval 和完成结果，125 条边全部是 blocked/pending。
+- 阻塞边主要来自 `process_approval_not_unblocked=50`、`human_process_approval_missing=25`、`protocol_not_ready=25`、`validation_result_missing_or_unapproved=25`。
+- 当前 critical path 的下一步是 `review_process_completion_approval_template`，共 12 行；只有这些 process approval 通过后，对应 high-fidelity protocol 才能进入执行和 result intake。
+- 依赖图的 `evidence_level=validation_dependency_graph_not_observation`；它形式化约束和下一步动作，不产生 Tg observation，也不更新 PiEvo posterior。
 
 当前 validation result intake：
 

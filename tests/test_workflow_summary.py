@@ -324,6 +324,25 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    validation_dependency = tmp_path / "validation_dependency.json"
+    validation_dependency.write_text(
+        json.dumps(
+            {
+                "node_rows": 118,
+                "edge_rows": 125,
+                "blocked_or_pending_edge_rows": 125,
+                "pending_process_approval_rows": 12,
+                "ready_high_fidelity_protocol_rows": 0,
+                "blocked_high_fidelity_protocol_rows": 25,
+                "active_evidence_rows": 0,
+                "ready_next_action": "review_process_completion_approval_template",
+                "ready_next_action_rows": 12,
+                "blocker_reason_counts": {"process_approval_not_unblocked": 50},
+                "evidence_level": "validation_dependency_graph_not_observation",
+            }
+        ),
+        encoding="utf-8",
+    )
     validation_result_intake = tmp_path / "validation_result_intake.json"
     validation_result_intake.write_text(
         json.dumps(
@@ -493,6 +512,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         process_design_suggestion,
         process_approval,
         high_fidelity_protocol,
+        validation_dependency,
         validation_result_intake,
         active_observations,
         active_evidence_pievo_bridge,
@@ -624,6 +644,17 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["high_fidelity_protocol_method_frequency"]["process_feasibility_review"] == 25
     assert result["high_fidelity_protocol_approval_gate_status"] == "awaiting_human_process_approval"
     assert result["high_fidelity_protocol_evidence_level"] == "high_fidelity_protocol_template_not_observation"
+    assert result["validation_dependency_node_rows"] == 118
+    assert result["validation_dependency_edge_rows"] == 125
+    assert result["validation_dependency_blocked_or_pending_edge_rows"] == 125
+    assert result["validation_dependency_pending_process_approval_rows"] == 12
+    assert result["validation_dependency_ready_high_fidelity_protocol_rows"] == 0
+    assert result["validation_dependency_blocked_high_fidelity_protocol_rows"] == 25
+    assert result["validation_dependency_active_evidence_rows"] == 0
+    assert result["validation_dependency_ready_next_action"] == "review_process_completion_approval_template"
+    assert result["validation_dependency_ready_next_action_rows"] == 12
+    assert result["validation_dependency_blocker_reason_counts"]["process_approval_not_unblocked"] == 50
+    assert result["validation_dependency_evidence_level"] == "validation_dependency_graph_not_observation"
     assert result["validation_result_template_rows"] == 25
     assert result["validation_result_rows"] == 0
     assert result["validation_result_accepted_rows"] == 0

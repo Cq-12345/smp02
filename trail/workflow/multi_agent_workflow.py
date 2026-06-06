@@ -60,6 +60,7 @@ def summarize(
     process_design_suggestion_summary: Path = Path("artifacts/trail/human_review/process_design_suggestion_summary.json"),
     process_approval_summary: Path = Path("artifacts/trail/human_review/process_completion_approval_summary.json"),
     high_fidelity_protocol_summary: Path = Path("artifacts/trail/human_review/high_fidelity_protocol_summary.json"),
+    validation_dependency_summary: Path = Path("artifacts/trail/human_review/validation_dependency_summary.json"),
     validation_result_intake_summary: Path = Path("artifacts/trail/human_review/validation_result_intake_summary.json"),
     active_observation_summary: Path = Path("artifacts/trail/human_review/active_high_authority_observation_summary.json"),
     active_evidence_pievo_bridge_summary: Path = Path(
@@ -90,6 +91,7 @@ def summarize(
     process_design_suggestion = read_json(process_design_suggestion_summary, {})
     process_approval = read_json(process_approval_summary, {})
     high_fidelity_protocol = read_json(high_fidelity_protocol_summary, {})
+    validation_dependency = read_json(validation_dependency_summary, {})
     validation_result_intake = read_json(validation_result_intake_summary, {})
     active_observations = read_json(active_observation_summary, {})
     active_evidence_pievo_bridge = read_json(active_evidence_pievo_bridge_summary, {})
@@ -305,6 +307,23 @@ def summarize(
         "high_fidelity_protocol_method_frequency": high_fidelity_protocol.get("method_frequency", {}),
         "high_fidelity_protocol_approval_gate_status": high_fidelity_protocol.get("approval_gate_status", ""),
         "high_fidelity_protocol_evidence_level": high_fidelity_protocol.get("evidence_level", ""),
+        "validation_dependency_node_rows": validation_dependency.get("node_rows", 0),
+        "validation_dependency_edge_rows": validation_dependency.get("edge_rows", 0),
+        "validation_dependency_blocked_or_pending_edge_rows": validation_dependency.get("blocked_or_pending_edge_rows", 0),
+        "validation_dependency_pending_process_approval_rows": validation_dependency.get("pending_process_approval_rows", 0),
+        "validation_dependency_ready_high_fidelity_protocol_rows": validation_dependency.get(
+            "ready_high_fidelity_protocol_rows",
+            0,
+        ),
+        "validation_dependency_blocked_high_fidelity_protocol_rows": validation_dependency.get(
+            "blocked_high_fidelity_protocol_rows",
+            0,
+        ),
+        "validation_dependency_active_evidence_rows": validation_dependency.get("active_evidence_rows", 0),
+        "validation_dependency_ready_next_action": validation_dependency.get("ready_next_action", ""),
+        "validation_dependency_ready_next_action_rows": validation_dependency.get("ready_next_action_rows", 0),
+        "validation_dependency_blocker_reason_counts": validation_dependency.get("blocker_reason_counts", {}),
+        "validation_dependency_evidence_level": validation_dependency.get("evidence_level", ""),
         "validation_result_template_rows": validation_result_intake.get("template_rows", 0),
         "validation_result_rows": validation_result_intake.get("result_rows", 0),
         "validation_result_accepted_rows": validation_result_intake.get("accepted_result_rows", 0),
@@ -420,6 +439,10 @@ def main() -> None:
         default="artifacts/trail/human_review/high_fidelity_protocol_summary.json",
     )
     parser.add_argument(
+        "--validation-dependency-summary",
+        default="artifacts/trail/human_review/validation_dependency_summary.json",
+    )
+    parser.add_argument(
         "--validation-result-intake-summary",
         default="artifacts/trail/human_review/validation_result_intake_summary.json",
     )
@@ -480,6 +503,7 @@ def main() -> None:
         Path(args.process_design_suggestion_summary),
         Path(args.process_approval_summary),
         Path(args.high_fidelity_protocol_summary),
+        Path(args.validation_dependency_summary),
         Path(args.validation_result_intake_summary),
         Path(args.active_observation_summary),
         Path(args.active_evidence_pievo_bridge_summary),
