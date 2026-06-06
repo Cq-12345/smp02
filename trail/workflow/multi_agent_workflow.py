@@ -59,6 +59,7 @@ def summarize(
     process_completion_packet_summary: Path = Path("artifacts/trail/human_review/process_completion_packet_summary.json"),
     process_design_suggestion_summary: Path = Path("artifacts/trail/human_review/process_design_suggestion_summary.json"),
     process_approval_summary: Path = Path("artifacts/trail/human_review/process_completion_approval_summary.json"),
+    high_fidelity_protocol_summary: Path = Path("artifacts/trail/human_review/high_fidelity_protocol_summary.json"),
     validation_result_intake_summary: Path = Path("artifacts/trail/human_review/validation_result_intake_summary.json"),
     active_observation_summary: Path = Path("artifacts/trail/human_review/active_high_authority_observation_summary.json"),
     active_evidence_pievo_bridge_summary: Path = Path(
@@ -88,6 +89,7 @@ def summarize(
     process_completion_packet = read_json(process_completion_packet_summary, {})
     process_design_suggestion = read_json(process_design_suggestion_summary, {})
     process_approval = read_json(process_approval_summary, {})
+    high_fidelity_protocol = read_json(high_fidelity_protocol_summary, {})
     validation_result_intake = read_json(validation_result_intake_summary, {})
     active_observations = read_json(active_observation_summary, {})
     active_evidence_pievo_bridge = read_json(active_evidence_pievo_bridge_summary, {})
@@ -292,6 +294,17 @@ def summarize(
         "process_approval_unblocked_target_counts": process_approval.get("unblocked_target_counts", {}),
         "process_approval_unblocked_source_counts": process_approval.get("unblocked_source_counts", {}),
         "process_approval_gate_status": process_approval.get("approval_gate_status", ""),
+        "high_fidelity_protocol_rows": high_fidelity_protocol.get("high_fidelity_protocol_rows", 0),
+        "high_fidelity_protocol_ready_rows": high_fidelity_protocol.get("ready_protocol_rows", 0),
+        "high_fidelity_protocol_blocked_rows": high_fidelity_protocol.get("blocked_protocol_rows", 0),
+        "high_fidelity_protocol_process_approval_unblocked_rows": high_fidelity_protocol.get(
+            "process_approval_unblocked_rows",
+            0,
+        ),
+        "high_fidelity_protocol_target_counts": high_fidelity_protocol.get("target_counts", {}),
+        "high_fidelity_protocol_method_frequency": high_fidelity_protocol.get("method_frequency", {}),
+        "high_fidelity_protocol_approval_gate_status": high_fidelity_protocol.get("approval_gate_status", ""),
+        "high_fidelity_protocol_evidence_level": high_fidelity_protocol.get("evidence_level", ""),
         "validation_result_template_rows": validation_result_intake.get("template_rows", 0),
         "validation_result_rows": validation_result_intake.get("result_rows", 0),
         "validation_result_accepted_rows": validation_result_intake.get("accepted_result_rows", 0),
@@ -403,6 +416,10 @@ def main() -> None:
         default="artifacts/trail/human_review/process_completion_approval_summary.json",
     )
     parser.add_argument(
+        "--high-fidelity-protocol-summary",
+        default="artifacts/trail/human_review/high_fidelity_protocol_summary.json",
+    )
+    parser.add_argument(
         "--validation-result-intake-summary",
         default="artifacts/trail/human_review/validation_result_intake_summary.json",
     )
@@ -462,6 +479,7 @@ def main() -> None:
         Path(args.process_completion_packet_summary),
         Path(args.process_design_suggestion_summary),
         Path(args.process_approval_summary),
+        Path(args.high_fidelity_protocol_summary),
         Path(args.validation_result_intake_summary),
         Path(args.active_observation_summary),
         Path(args.active_evidence_pievo_bridge_summary),

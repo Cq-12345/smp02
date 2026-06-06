@@ -308,6 +308,22 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    high_fidelity_protocol = tmp_path / "high_fidelity_protocol.json"
+    high_fidelity_protocol.write_text(
+        json.dumps(
+            {
+                "high_fidelity_protocol_rows": 25,
+                "ready_protocol_rows": 0,
+                "blocked_protocol_rows": 25,
+                "process_approval_unblocked_rows": 0,
+                "target_counts": {"195.0": 12, "250.0": 13},
+                "method_frequency": {"process_feasibility_review": 25},
+                "approval_gate_status": "awaiting_human_process_approval",
+                "evidence_level": "high_fidelity_protocol_template_not_observation",
+            }
+        ),
+        encoding="utf-8",
+    )
     validation_result_intake = tmp_path / "validation_result_intake.json"
     validation_result_intake.write_text(
         json.dumps(
@@ -476,6 +492,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         process_completion_packet,
         process_design_suggestion,
         process_approval,
+        high_fidelity_protocol,
         validation_result_intake,
         active_observations,
         active_evidence_pievo_bridge,
@@ -599,6 +616,14 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["process_approval_ready_process_record_rows"] == 0
     assert result["process_approval_unblocked_observation_request_rows"] == 0
     assert result["process_approval_gate_status"] == "awaiting_human_process_approval"
+    assert result["high_fidelity_protocol_rows"] == 25
+    assert result["high_fidelity_protocol_ready_rows"] == 0
+    assert result["high_fidelity_protocol_blocked_rows"] == 25
+    assert result["high_fidelity_protocol_process_approval_unblocked_rows"] == 0
+    assert result["high_fidelity_protocol_target_counts"]["250.0"] == 13
+    assert result["high_fidelity_protocol_method_frequency"]["process_feasibility_review"] == 25
+    assert result["high_fidelity_protocol_approval_gate_status"] == "awaiting_human_process_approval"
+    assert result["high_fidelity_protocol_evidence_level"] == "high_fidelity_protocol_template_not_observation"
     assert result["validation_result_template_rows"] == 25
     assert result["validation_result_rows"] == 0
     assert result["validation_result_accepted_rows"] == 0

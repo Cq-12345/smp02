@@ -189,6 +189,20 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/import_proce
 - `process_completion_approval_summary.json`
 - `reports/process_approval_intake.md`
 
+High-fidelity protocol packet：
+
+```bash
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_high_fidelity_protocol_packet.py \
+  --out-dir artifacts/trail/human_review \
+  --report reports/high_fidelity_protocol_packet.md
+```
+
+输出：
+
+- `high_fidelity_protocol_packet.csv`
+- `high_fidelity_protocol_summary.json`
+- `reports/high_fidelity_protocol_packet.md`
+
 ## 5. 与 PiEvo 的连接
 
 当前 `pievo_faithful` 已经可以把 ledger 中通过审核的 observation 加入 history：
@@ -304,6 +318,14 @@ Smoke 结果：
 - 审批后的 process record 还会重新进入 `import_process_records`，必须 `ready_for_active_ledger=true`，才允许解锁同一 `linked_observation_id` 的 high-fidelity 或 real request。
 - 当前没有人工提交的 `process_completion_approval_completed.csv`，因此 `submitted_approval_rows=0`、`accepted_process_approval_rows=0`、`unblocked_observation_request_rows=0`。
 - 这一步只解锁后续 validation result intake，不产生 Tg observation；高保真/真实/文献结果仍必须单独填写 `observed_tg_c`、method、operator，并通过 result intake 和 active evidence gate。
+
+当前 high-fidelity protocol packet：
+
+- `scripts/build_high_fidelity_protocol_packet.py` 会把 `validation_request_queue.csv` 中的 `high_fidelity_validation` request 转成方法协议模板。
+- 当前协议包有 25 条：195 C 12 条、250 C 13 条；候选来源以 `sparse_target_replacement_250` 13 条和 `vae_latent_local_search` 7 条为主。
+- 当前 `ready_protocol_rows=0`、`blocked_protocol_rows=25`、`process_approval_unblocked_rows=0`，因为尚无人工 process approval 解锁这些 request。
+- 方法频次为 `process_feasibility_review=25`、`model_ensemble_recheck=25`、`high_fidelity_simulation_or_expanded_model_ensemble=25`、`thermal_stability_pre_screen=13`、`target_specific_literature_check=13`。
+- 协议包的 `evidence_level=high_fidelity_protocol_template_not_observation`；它只定义高保真/扩展集成模型应如何执行和记录，不能作为 Tg observation。
 
 当前 validation result intake：
 

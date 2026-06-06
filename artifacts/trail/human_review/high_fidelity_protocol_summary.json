@@ -1,0 +1,44 @@
+{
+  "input_request_rows": 55,
+  "high_fidelity_protocol_rows": 25,
+  "ready_protocol_rows": 0,
+  "blocked_protocol_rows": 25,
+  "process_approval_unblocked_rows": 0,
+  "target_counts": {
+    "195.0": 12,
+    "250.0": 13
+  },
+  "candidate_origin_counts": {
+    "sparse_target_replacement_250": 13,
+    "vae_latent_local_search": 7,
+    "pievo_latent_local_search_selected": 3,
+    "pievo_ensemble_guard_selected": 1,
+    "expanded_inventory_replacement": 1
+  },
+  "source_counts": {
+    "high_fidelity_simulation": 25
+  },
+  "method_frequency": {
+    "process_feasibility_review": 25,
+    "model_ensemble_recheck": 25,
+    "high_fidelity_simulation_or_expanded_model_ensemble": 25,
+    "thermal_stability_pre_screen": 13,
+    "target_specific_literature_check": 13,
+    "imidization_protocol_review": 4,
+    "trimerization_catalyst_review": 2
+  },
+  "risk_flag_frequency": {
+    "process_incomplete": 25,
+    "high_predictor_sigma": 23,
+    "high_ood_penalty": 22,
+    "high_tg_target": 13,
+    "sparse_target_origin": 13,
+    "new_component": 14
+  },
+  "max_authority_weight_if_completed": 3.0,
+  "approval_gate_status": "awaiting_human_process_approval",
+  "evidence_level": "high_fidelity_protocol_template_not_observation",
+  "packet_path": "artifacts/trail/human_review/high_fidelity_protocol_packet.csv",
+  "summary_path": "artifacts/trail/human_review/high_fidelity_protocol_summary.json",
+  "report_path": "reports/high_fidelity_protocol_packet.md"
+}

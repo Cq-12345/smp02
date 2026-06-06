@@ -439,6 +439,25 @@
   "process_approval_unblocked_target_counts": {},
   "process_approval_unblocked_source_counts": {},
   "process_approval_gate_status": "awaiting_human_process_approval",
+  "high_fidelity_protocol_rows": 25,
+  "high_fidelity_protocol_ready_rows": 0,
+  "high_fidelity_protocol_blocked_rows": 25,
+  "high_fidelity_protocol_process_approval_unblocked_rows": 0,
+  "high_fidelity_protocol_target_counts": {
+    "195.0": 12,
+    "250.0": 13
+  },
+  "high_fidelity_protocol_method_frequency": {
+    "process_feasibility_review": 25,
+    "model_ensemble_recheck": 25,
+    "high_fidelity_simulation_or_expanded_model_ensemble": 25,
+    "thermal_stability_pre_screen": 13,
+    "target_specific_literature_check": 13,
+    "imidization_protocol_review": 4,
+    "trimerization_catalyst_review": 2
+  },
+  "high_fidelity_protocol_approval_gate_status": "awaiting_human_process_approval",
+  "high_fidelity_protocol_evidence_level": "high_fidelity_protocol_template_not_observation",
   "validation_result_template_rows": 25,
   "validation_result_rows": 0,
   "validation_result_accepted_rows": 0,
