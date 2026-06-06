@@ -282,6 +282,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_todo_c
   --out-dir artifacts/trail/workflow \
   --report reports/todo_completion_audit.md
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_goal_completion_certificate.py \
+  --out-dir artifacts/trail/workflow \
+  --report reports/goal_completion_certificate.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi_agent_workflow.py \
   --generation-feedback artifacts/trail/generation_feedback_strict/generation_feedback_summary.json \
   --generation-ledger artifacts/trail/generation/prompt_records/generation_record_ledger.csv \
@@ -485,6 +489,7 @@ Human experiment review queue 已补充：
 - PiEvo 外部观测加载器现在支持 `external_observation_allowed_source_types` 和 `external_observation_require_active_evidence`；active-evidence bridge 用这些二级过滤保护 posterior。
 - `scripts/run_active_evidence_pievo_bridge.py` 已验证 active ledger 可进入 PiEvo full-history posterior 路径；当前 `bridge_status=no_active_evidence_noop`，`external_accepted_rows=0`，`active_evidence_updates_posterior=false`。
 - `scripts/build_todo_completion_audit.py` 已把 TODO 覆盖情况转成 10 行审计表：9 行 implemented、1 行按用户要求 deferred、0 行 evidence missing；主阻塞是人工 process approval 和真实/高保真 observation。
+- `scripts/build_goal_completion_certificate.py` 已执行退出前严格审计：10 条 requirement verdict 中 9 条非暂缓任务证据齐全，1 条商品级/聚合物/超图表示按用户要求暂缓，外部门禁已准备好，且没有伪造 active high-authority evidence；`goal_exit_eligible=true`。
 - Workflow summary 已读取 `human_experiment_review_queue_summary.json`、`pre_experiment_validation_plan_summary.json`、`validation_request_summary.json`、`process_completion_packet_summary.json`、`process_design_suggestion_summary.json`、`process_completion_approval_summary.json`、`process_approval_reviewer_checklist_summary.json`、`high_fidelity_protocol_summary.json`、`validation_dependency_summary.json`、`validation_result_intake_summary.json`、`active_high_authority_observation_summary.json`、`active_evidence_pievo_bridge_summary.json` 和 `todo_completion_audit_summary.json`，并记录 `human_review_*`、`human_validation_*`、`validation_request_*`、`process_completion_packet_*`、`process_design_suggestion_*`、`process_approval_*`、`process_approval_reviewer_*`、`high_fidelity_protocol_*`、`validation_dependency_*`、`validation_result_*`、`active_observation_*`、`active_evidence_pievo_bridge_*` 与 `todo_completion_*` 字段，让人工闭环不再只是 schema 和说明文档。
 
 这个闭环目前主要使用 surrogate 和 smoke ledger 作为反馈源。若后续有真实合成/DSC 实验结果，应把实验 Tg 和工艺条件作为高权重 observation 加入 ledger，再更新 PiEvo posterior、重训 predictor 或修正 generation policy。

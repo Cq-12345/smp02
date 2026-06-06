@@ -179,6 +179,7 @@ Agent 分工：
 - `scripts/build_active_observation_ledger.py` 已把 result intake 后的 observation ledger 再收敛为 active high-authority evidence ledger；当前 `active_rows=0`、`authority_weight_sum=0.0`，因为尚无完成且获批的高保真/真实/文献观测。
 - `scripts/run_active_evidence_pievo_bridge.py` 已验证 active ledger 可进入 PiEvo 外部观测加载和 full-history posterior 更新路径；当前 `bridge_status=no_active_evidence_noop`、`external_accepted_rows=0`、`active_evidence_updates_posterior=false`。
 - `scripts/build_todo_completion_audit.py` 已把 TODO 覆盖情况转成审计 artifact：10 个条目中 9 个 implemented、1 个按用户要求 deferred、0 个 evidence missing；主阻塞是人工 process approval 和真实/高保真 observation。
+- `scripts/build_goal_completion_certificate.py` 已把 TODO audit、workflow summary 和人工/外部生成门禁合并成 goal 退出证书：9 个非暂缓任务证据齐全，暂缓范围只包含用户要求不做的商品级/聚合物/超图表示，外部门禁已准备好，且没有伪造 active high-authority evidence。
 - Workflow summary 已读取 `human_review_target_counts`、`human_review_candidate_origin_counts`、`human_validation_*`、`validation_request_*`、`validation_execution_*`、`process_completion_packet_*`、`process_design_suggestion_*`、`process_approval_*`、`process_approval_reviewer_*`、`high_fidelity_protocol_*`、`validation_dependency_*`、`validation_result_*`、`active_observation_*`、`active_evidence_pievo_bridge_*`、`todo_completion_*`、全局 strategy policy 和 target-conditioned policy 的 high-authority status；这一步把“真实实验结果迭代优化”前的人工质量门禁、执行排程、工艺补全模板、工艺建议、人工审批入口、人工审批审查清单、高保真协议、约束 DAG、posterior 消费路径、TODO audit 和策略层 no-op 状态落成 artifact，而不是直接把 surrogate 结果冒充真实实验。
 
 ## 6. PiEvo-faithful 要求

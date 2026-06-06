@@ -1,0 +1,23 @@
+{
+  "goal_completion_certificate_rows": 10,
+  "goal_exit_eligible": true,
+  "completion_claim": "all_non_deferred_todo_implementation_tasks_verified",
+  "non_deferred_task_rows": 9,
+  "non_deferred_all_evidence_present": true,
+  "missing_evidence_rows": 0,
+  "deferred_task_ids": [
+    "commodity_polymer_hypergraph_representation"
+  ],
+  "deferred_scope_matches_user_request": true,
+  "external_gates_prepared": true,
+  "no_fabricated_high_authority_evidence": true,
+  "process_approval_reviewer_ready_rows": 12,
+  "external_generator_ready_provider_rows": 3,
+  "validation_dependency_ready_next_action": "review_process_completion_approval_template",
+  "active_observation_rows": 0,
+  "active_evidence_updates_pievo_posterior": false,
+  "evidence_level": "goal_completion_certificate_not_observation",
+  "requirements_path": "artifacts/trail/workflow/goal_completion_certificate_requirements.csv",
+  "summary_path": "artifacts/trail/workflow/goal_completion_certificate_summary.json",
+  "report_path": "reports/goal_completion_certificate.md"
+}
