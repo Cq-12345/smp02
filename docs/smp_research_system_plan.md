@@ -73,6 +73,7 @@
 - 论文复现模型：CNN、SVR、RF。
 - 扩展 model zoo：MLP、GBR、KRR、LightGBM、XGBoost、CatBoost、NGBoost、ExtraTrees、GPR、KNN、PLS、ElasticNet 等。
 - GNN：`trail/gnn/train_gnn.py`，支持 GCN/GIN/GAT/MPNN、bond edge features，以及可选 global formulation features。
+- 模型选择 registry：`scripts/build_predictor_model_registry.py` 已把默认闭环代理固化为 `VAE(512)+GaussianProcess_RBF`，MAPEK test 3.9778%；点误差备选为 `VAE(512)+NuSVR_RBF`，MAE/RMSE/R2 更好。
 - 集成分歧审计：`scripts/run_predictor_ensemble_disagreement.py` 会从同一 latent size 的强模型中计算候选级 ensemble mean/std/range，把 epistemic/OOD 风险写入 `artifacts/trail/predictors/ensemble_disagreement/`。
 - PiEvo live ensemble guard：`configs/pievo_faithful_ensemble_guard_195_smoke.yaml` 会对 PiEvo 每轮实际候选批次运行 top-k model zoo，并用 `predictor_ensemble_std_tg_c` 收缩 IDS selection pool。
 - GNN global feature smoke：`scripts/run_gnn_global_feature_smoke.py` 对比 baseline MPNN 与 global-feature MPNN，确认组分数/比例熵、官能团权重和 reaction compatibility 特征可以进入 GNN head；当前 5 epoch 下未改善 MAPEK/MAE。
@@ -91,7 +92,7 @@
 - 默认遵循论文 85/15 train/test split。
 - 模型选择应优先看 `MAPEK test`、`MAE test`、`RMSE test` 和 R2 的综合表现。
 - 任何用于 agent 的 predictor 都必须保存模型路径、latent size、训练特征路径和指标。
-- 单一最佳模型不能单独决定推荐顺序；当前 workflow 同时记录 target distance、Harness、PiEvo posterior 和 predictor ensemble disagreement，并已能在 PiEvo selection pool 中过滤高分歧候选。
+- 单一最佳模型不能单独决定推荐顺序；当前 workflow 同时记录 predictor model registry、target distance、Harness、PiEvo posterior 和 predictor ensemble disagreement，并已能在 PiEvo selection pool 中过滤高分歧候选。
 
 ## 4. 生成模型策略
 

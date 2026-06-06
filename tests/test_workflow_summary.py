@@ -40,6 +40,26 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    predictor_registry = tmp_path / "predictor_registry.json"
+    predictor_registry.write_text(
+        json.dumps(
+            {
+                "primary_method": "VAE (512) + GaussianProcess_RBF",
+                "primary_latent_size": 512,
+                "primary_mapek_test_pct": 3.9778,
+                "primary_mae_test_c": 18.7641,
+                "primary_rmse_test_c": 40.4371,
+                "primary_r2_test": 0.8233,
+                "mae_backup_method": "VAE (512) + NuSVR_RBF",
+                "rmse_backup_method": "VAE (512) + NuSVR_RBF",
+                "r2_backup_method": "VAE (512) + NuSVR_RBF",
+                "uncertainty_provider_method": "VAE (512) + GaussianProcess_RBF",
+                "ensemble_member_rows": 6,
+                "evidence_level": "predictor_selection_registry_not_new_training",
+            }
+        ),
+        encoding="utf-8",
+    )
     ensemble_guard_pievo = tmp_path / "ensemble_guard_pievo.json"
     ensemble_guard_pievo.write_text(
         json.dumps(
@@ -488,6 +508,7 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
         observations,
         pievo_summary,
         ensemble_summary,
+        predictor_registry,
         ensemble_guard_pievo,
         expanded_replacement,
         expanded_generation,
@@ -524,6 +545,16 @@ def test_workflow_summary_includes_predictor_ensemble_disagreement(tmp_path: Pat
     assert result["predictor_ensemble_high_disagreement_rows"] == 526
     assert result["predictor_ensemble_mean_std_c"] == 32.16
     assert result["predictor_ensemble_mean_abs_best_model_delta_c"] == 30.37
+    assert result["predictor_model_registry_primary_method"] == "VAE (512) + GaussianProcess_RBF"
+    assert result["predictor_model_registry_primary_latent_size"] == 512
+    assert result["predictor_model_registry_primary_mapek_test_pct"] == 3.9778
+    assert result["predictor_model_registry_primary_mae_test_c"] == 18.7641
+    assert result["predictor_model_registry_primary_rmse_test_c"] == 40.4371
+    assert result["predictor_model_registry_primary_r2_test"] == 0.8233
+    assert result["predictor_model_registry_mae_backup_method"] == "VAE (512) + NuSVR_RBF"
+    assert result["predictor_model_registry_uncertainty_provider_method"] == "VAE (512) + GaussianProcess_RBF"
+    assert result["predictor_model_registry_ensemble_member_rows"] == 6
+    assert result["predictor_model_registry_evidence_level"] == "predictor_selection_registry_not_new_training"
     assert result["pievo_ensemble_guard_selected_rows"] == 6
     assert result["pievo_ensemble_guard_best_distance_c"] == 0.059
     assert result["pievo_ensemble_guard_all_selected_within_guard"] is True

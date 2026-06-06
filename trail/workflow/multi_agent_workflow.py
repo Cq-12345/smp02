@@ -32,6 +32,7 @@ def summarize(
     feedback_aware_observation_ledger: Path,
     feedback_aware_pievo_summary: Path,
     ensemble_disagreement_summary: Path,
+    predictor_model_registry_summary: Path,
     ensemble_guard_pievo_summary: Path,
     expanded_replacement_summary: Path,
     expanded_generation_summary: Path,
@@ -75,6 +76,7 @@ def summarize(
     feedback_aware_observations = pd.read_csv(feedback_aware_observation_ledger) if feedback_aware_observation_ledger.exists() else pd.DataFrame()
     feedback_aware_pievo = read_json(feedback_aware_pievo_summary, {})
     ensemble_disagreement = read_json(ensemble_disagreement_summary, {})
+    predictor_model_registry = read_json(predictor_model_registry_summary, {})
     ensemble_guard_pievo = read_json(ensemble_guard_pievo_summary, {})
     expanded_replacement = read_json(expanded_replacement_summary, {})
     expanded_generation = read_json(expanded_generation_summary, {})
@@ -139,6 +141,18 @@ def summarize(
         "predictor_ensemble_high_disagreement_rows": ensemble_disagreement.get("near_target_high_disagreement_rows", 0),
         "predictor_ensemble_mean_std_c": ensemble_disagreement.get("mean_ensemble_std_c"),
         "predictor_ensemble_mean_abs_best_model_delta_c": ensemble_disagreement.get("mean_abs_best_model_delta_c"),
+        "predictor_model_registry_primary_method": predictor_model_registry.get("primary_method", ""),
+        "predictor_model_registry_primary_latent_size": predictor_model_registry.get("primary_latent_size"),
+        "predictor_model_registry_primary_mapek_test_pct": predictor_model_registry.get("primary_mapek_test_pct"),
+        "predictor_model_registry_primary_mae_test_c": predictor_model_registry.get("primary_mae_test_c"),
+        "predictor_model_registry_primary_rmse_test_c": predictor_model_registry.get("primary_rmse_test_c"),
+        "predictor_model_registry_primary_r2_test": predictor_model_registry.get("primary_r2_test"),
+        "predictor_model_registry_mae_backup_method": predictor_model_registry.get("mae_backup_method", ""),
+        "predictor_model_registry_rmse_backup_method": predictor_model_registry.get("rmse_backup_method", ""),
+        "predictor_model_registry_r2_backup_method": predictor_model_registry.get("r2_backup_method", ""),
+        "predictor_model_registry_uncertainty_provider_method": predictor_model_registry.get("uncertainty_provider_method", ""),
+        "predictor_model_registry_ensemble_member_rows": predictor_model_registry.get("ensemble_member_rows", 0),
+        "predictor_model_registry_evidence_level": predictor_model_registry.get("evidence_level", ""),
         "pievo_ensemble_guard_selected_rows": ensemble_guard_pievo.get("selected_rows", 0),
         "pievo_ensemble_guard_best_distance_c": ensemble_guard_pievo.get("best_selected_target_distance_c"),
         "pievo_ensemble_guard_all_selected_within_guard": ensemble_guard_pievo.get("all_selected_within_ensemble_disagreement_guard"),
@@ -401,6 +415,10 @@ def main() -> None:
     parser.add_argument("--feedback-aware-observation-ledger", default="artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv")
     parser.add_argument("--feedback-aware-pievo-summary", default="artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--ensemble-disagreement-summary", default="artifacts/trail/predictors/ensemble_disagreement/ensemble_disagreement_summary.json")
+    parser.add_argument(
+        "--predictor-model-registry-summary",
+        default="artifacts/trail/predictors/model_selection_registry/predictor_model_selection_summary.json",
+    )
     parser.add_argument("--ensemble-guard-pievo-summary", default="artifacts/pievo_faithful_ensemble_guard_195_smoke/pievo_faithful_summary.json")
     parser.add_argument("--expanded-replacement-summary", default="artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json")
     parser.add_argument("--expanded-generation-summary", default="artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json")
@@ -479,6 +497,7 @@ def main() -> None:
         Path(args.feedback_aware_observation_ledger),
         Path(args.feedback_aware_pievo_summary),
         Path(args.ensemble_disagreement_summary),
+        Path(args.predictor_model_registry_summary),
         Path(args.ensemble_guard_pievo_summary),
         Path(args.expanded_replacement_summary),
         Path(args.expanded_generation_summary),

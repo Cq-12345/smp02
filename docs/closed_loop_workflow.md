@@ -163,6 +163,10 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/run_predicto
   --target-window-c 5 \
   --device cpu
 
+PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python scripts/build_predictor_model_registry.py \
+  --out-dir artifacts/trail/predictors/model_selection_registry \
+  --report reports/predictor_model_selection_registry.md
+
 PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python -m smp02.pievo_faithful \
   --config configs/pievo_faithful_ensemble_guard_195_smoke.yaml
 
@@ -273,6 +277,7 @@ PYTHONPATH=src /home/user4/conda_envs/mhc_pyg314/bin/python trail/workflow/multi
   --feedback-aware-observation-ledger artifacts/trail/generation/feedback_aware_llm_rag_observations/generation_observation_ledger.csv \
   --feedback-aware-pievo-summary artifacts/pievo_faithful_feedback_aware_llm_rag_195_smoke/pievo_faithful_summary.json \
   --ensemble-disagreement-summary artifacts/trail/predictors/ensemble_disagreement/ensemble_disagreement_summary.json \
+  --predictor-model-registry-summary artifacts/trail/predictors/model_selection_registry/predictor_model_selection_summary.json \
   --ensemble-guard-pievo-summary artifacts/pievo_faithful_ensemble_guard_195_smoke/pievo_faithful_summary.json \
   --expanded-replacement-summary artifacts/trail/generation/expanded_inventory_replacement_eval/replacement_eval_summary.json \
   --expanded-generation-summary artifacts/trail/generation/expanded_inventory_feedback_aware_llm_rag/generation_record_summary.json \
@@ -357,6 +362,9 @@ VAE latent local search 已补充：
 
 Predictor ensemble disagreement 已补充：
 
+- `scripts/build_predictor_model_registry.py` 已把 model zoo 选择结果固化为 registry：默认闭环代理为 `VAE(512)+GaussianProcess_RBF`，MAPEK test 为 3.9778%，MAE/RMSE/R2 备选为 `VAE(512)+NuSVR_RBF`。
+- registry 的 `uncertainty_provider` 仍是 GaussianProcess_RBF；它解释了为什么 PiEvo 默认使用 GPR sigma，而不是只按 MAE/RMSE 选 NuSVR。
+- Workflow summary 已读取 `predictor_model_registry_*` 字段，让“后续就用哪个模型”成为 artifact 契约，而不是只写在报告里。
 - 当前使用 6 个 VAE(512)-WVCM 强模型作为 ensemble 成员，覆盖 GPR、NuSVR、XGBoost、ExtraTrees 和 sklearn GradientBoosting。
 - 10000 条候选中，按 ensemble mean 计算 195±5 C 近目标候选共有 1045 条；其中低分歧 84 条，高分歧 526 条。
 - `ensemble_std_tg_c` 不是物理不确定性，而是模型间分歧；低分歧近目标候选适合优先进入人工审核，高分歧近目标候选应作为 OOD/epistemic 风险标记。
